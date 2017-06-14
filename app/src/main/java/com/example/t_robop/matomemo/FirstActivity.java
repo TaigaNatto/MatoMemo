@@ -25,8 +25,19 @@ public class FirstActivity extends AppCompatActivity {
 
     Button button;
 
-    //クラスはここに追加して！
-    Class[] MatomemoClass={MainActivity5.class};
+    /**********************************************/
+    Class[] MatomemoClass={MainActivity5.class,MatoMemoListActivity.class};
+    /***　　　　　　　　　　　 ∩＿
+     　　　　　　　　 　　　〈〈〈 ヽ
+     　　 　　　　　　　　　 〈⊃ 　}
+        　　　 /ﾆＹﾆヽ　　    |　　 |
+     　　　 /（ ﾟ )( ﾟ ）ヽ　 !　　 !
+     　　／::::⌒｀´⌒::::＼ |　　/    <ここにActivityを追加してね！
+     　 |　,-）＿＿＿（-，|　／　　
+     　　､　　|-┬-|　　／
+      　/　＿　`ー'´　/
+      　(＿＿＿）　　/
+     * */
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
