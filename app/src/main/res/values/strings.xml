@@ -2,4 +2,6 @@
     <string name="app_name">MatoMemo</string>
     <string name="tab_title1">メモ</string>
     <string name="tab_title2">まとめ</string>
+
+    <string name="texts">aaa</string>
 </resources>
