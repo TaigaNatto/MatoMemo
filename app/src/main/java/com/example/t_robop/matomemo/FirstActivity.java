@@ -1,11 +1,21 @@
 package com.example.t_robop.matomemo;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.List;
 
 public class FirstActivity extends AppCompatActivity {
 
@@ -13,15 +23,37 @@ public class FirstActivity extends AppCompatActivity {
     ArrayAdapter arrayAdapter;
     ArrayList<Class> arrayList;
 
+    Button button;
+
+    //クラスはここに追加して！
+    Class[] MatomemoClass={MainActivity5.class};
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_first);
 
-        listView=(ListView)findViewById(R.id.list);
-        arrayAdapter=new ArrayAdapter(this,android.R.layout.simple_list_item_1);
-        arrayList=new ArrayList<Class>();
+        button = (Button) findViewById(R.id.button_first);
+        button.setText("押すと落ちるよ！");
 
-        arrayList.add(FirstActivity.class);
+        listView = (ListView) findViewById(R.id.list);
+        arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1);
+        arrayList=new ArrayList<>();
+
+        for (int i=0;i<MatomemoClass.length;i++){
+            arrayList.add(MatomemoClass[i]);
+            arrayAdapter.add(MatomemoClass[i].getName().toString());
+        }
+        listView.setAdapter(arrayAdapter);
+
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Intent intent=new Intent(view.getContext(),arrayList.get(position));
+                startActivity(intent);
+            }
+        });
+
     }
+
 }
