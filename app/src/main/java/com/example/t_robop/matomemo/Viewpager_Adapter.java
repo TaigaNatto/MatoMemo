@@ -1,6 +1,5 @@
 package com.example.t_robop.matomemo;
 
-import android.app.FragmentManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentPagerAdapter;
 
@@ -21,11 +20,24 @@ public class Viewpager_Adapter extends FragmentPagerAdapter {
 
     @Override
     public Fragment getItem(int position) {
+        switch (position){
+            case 0:
+                return new memoFragment();
+
+            case 1:
+                return new matomeFragment();
+        }
+
         return null;
     }
 
     @Override
     public int getCount() {
-        return 0;
+        return numberOfTabs;
+    }
+
+    @Override
+    public CharSequence getPageTitle(int position){
+        return tabTitles[position];
     }
 }
