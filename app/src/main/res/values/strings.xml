@@ -3,5 +3,8 @@
     <string name="tab_title1">メモ</string>
     <string name="tab_title2">まとめ</string>
 
-    <string name="texts">aaa</string>
+    <string-array name="tabs">
+        <item>memo_tab</item>
+        <item>matome_tab</item>
+    </string-array>
 </resources>

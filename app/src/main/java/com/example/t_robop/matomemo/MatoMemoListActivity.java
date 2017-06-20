@@ -25,6 +25,7 @@ public class MatoMemoListActivity extends AppCompatActivity implements ViewPager
 
     TabLayout tabLayout;
     ViewPager viewPager;
+    Viewpager_Adapter viewpagerAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,10 +37,12 @@ public class MatoMemoListActivity extends AppCompatActivity implements ViewPager
 
     }
 
-    //xmlとの関連付け
+    //xmlとの関連付けや初期化
     void association(){
+        String[] tabs_names = getResources().getStringArray(R.array.tabs);
         tabLayout = (TabLayout)findViewById(R.id.tabs);
         viewPager = (ViewPager)findViewById(R.id.pager);
+        viewpagerAdapter = new Viewpager_Adapter(getSupportFragmentManager(),tabs_names);
     }
 
     void tabViewSetting(){
@@ -113,40 +116,6 @@ public class MatoMemoListActivity extends AppCompatActivity implements ViewPager
             fragment.setArguments(args);
 
             return fragment;
-        }
-
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstance){
-            int page = getArguments().getInt("page",1);
-
-            switch (page){
-                case 1:
-
-                    listView = (ListView)inflater.inflate(R.layout.activity_memo_tab,container,false);
-
-                    ArrayList<String> memoList = new ArrayList<>();
-                    memoList.add("メモ");
-
-                    ArrayAdapter<String> adapterMemo = new ArrayAdapter<String>(
-                            getContext(), android.R.layout.simple_list_item_1, memoList);
-                    listView.setAdapter(adapterMemo);
-
-                    break;
-
-                case 2:
-                    listView = (ListView)inflater.inflate(R.layout.activity_matome_tab,container,false);
-
-                    ArrayList<String> matomeList = new ArrayList<>();
-                    matomeList.add("まとめ");
-
-                    ArrayAdapter<String> adapterMatome = new ArrayAdapter<String>(
-                            getContext(), android.R.layout.simple_list_item_1, matomeList);
-                    listView.setAdapter(adapterMatome);
-
-                    break;
-            }
-            return listView;
-
         }
     }
 
