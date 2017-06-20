@@ -10,13 +10,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.List;
 
 public class FirstActivity extends AppCompatActivity {
 
@@ -27,7 +21,7 @@ public class FirstActivity extends AppCompatActivity {
     Button button;
 
     /**********************************************/
-    Class[] MatomemoClass={MainActivity5.class,MatoMemoListActivity.class};
+    Class[] MatomemoClass={MainActivity5.class,MatoMemoListActivity.class,StartListActivity.class,GroupEditActivity.class};
     /***　　　　　　　　　　　 ∩＿
      　　　　　　　　 　　　〈〈〈 ヽ
      　　 　　　　　　　　　 〈⊃ 　}
