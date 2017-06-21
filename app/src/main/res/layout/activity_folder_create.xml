@@ -4,10 +4,19 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="com.example.t_robop.matomemo.MainActivity5">
+    tools:context="com.example.t_robop.matomemo.FolderCreateActivity">
+
+    <Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="?android:actionBarSize"
+        android:background="?android:colorPrimary"
+        >
+    </Toolbar>
 
     <EditText
-        android:id="@+id/edit"
+        android:id="@+id/txtDate"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="まとめ名前入力"/>
@@ -21,7 +30,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/button1"
-            android:text="日付"/>
+            android:text="日付"
+            android:onClick="showDatePickerDialog"/>  
 
         <TextView
             android:layout_width="wrap_content"
@@ -32,7 +42,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/button2"
-            android:text="日付"/>
+            android:text="日付"
+            android:onClick="showDatePickerDialog"/>
     </LinearLayout>
 
     <CheckBox
