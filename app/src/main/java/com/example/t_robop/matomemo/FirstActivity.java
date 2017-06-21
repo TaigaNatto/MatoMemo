@@ -21,7 +21,7 @@ public class FirstActivity extends AppCompatActivity {
     Button button;
 
     /**********************************************/
-    Class[] MatomemoClass={MainActivity5.class,MatoMemoListActivity.class,StartListActivity.class,GroupEditActivity.class};
+    Class[] MatomemoClass={FolderCreateActivity.class,MatoMemoListActivity.class,StartListActivity.class,GroupEditActivity.class};
     /***　　　　　　　　　　　 ∩＿
      　　　　　　　　 　　　〈〈〈 ヽ
      　　 　　　　　　　　　 〈⊃ 　}

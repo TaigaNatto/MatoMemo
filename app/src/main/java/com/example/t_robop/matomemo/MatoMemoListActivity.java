@@ -113,11 +113,11 @@ public class MatoMemoListActivity extends AppCompatActivity implements ViewPager
 
             switch (page){
                 case 1:
-                    view = inflater.inflate(R.layout.memo_tab,container,false);
+                    view = inflater.inflate(R.layout.activity_memo_tab,container,false);
                     break;
 
                 case 2:
-                    view = inflater.inflate(R.layout.matome_tab,container,false);
+                    view = inflater.inflate(R.layout.activity_matome_tab,container,false);
             }
 
             return view;
