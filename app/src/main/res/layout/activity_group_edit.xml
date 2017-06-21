@@ -4,14 +4,21 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.t_robop.matomemo.groupCreate"
-    android:orientation="vertical">
-
+    tools:context="com.example.t_robop.matomemo.GroupEditActivity"
+    android:orientation="vertical"
+    android:baselineAligned="false">
 
     <ListView
+        android:id="@+id/list"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="6"
+        android:layout_weight="1" />
+
+    <ListView
+        android:id="@+id/list_item"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="7.5"
         android:choiceMode="multipleChoice"/>
 
 
@@ -22,6 +29,7 @@
         android:layout_height="0dp"
         android:layout_weight="1"
         android:src="@mipmap/ic_launcher"
-        android:layout_marginLeft="300dp" />
+        android:layout_marginLeft="300dp"
+        android:onClick="plus"/>
 
 </LinearLayout>
