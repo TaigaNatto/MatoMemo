@@ -1,10 +1,8 @@
 <resources>
     <string name="app_name">MatoMemo</string>
-    <string name="tab_title1">メモ</string>
-    <string name="tab_title2">まとめ</string>
 
     <string-array name="tabs">
-        <item>memo_tab</item>
-        <item>matome_tab</item>
+        <item>メモ</item>
+        <item>まとめ</item>
     </string-array>
 </resources>
