@@ -20,8 +20,6 @@
         <activity android:name=".StartListActivity"></activity>
         <activity android:name=".FolderCreateActivity"></activity>
         <activity android:name=".MatoMemoListActivity"></activity>
-        <activity android:name=".memo_tab"></activity>
-        <activity android:name=".matome_tab"></activity>
     </application>
 
 </manifest>
