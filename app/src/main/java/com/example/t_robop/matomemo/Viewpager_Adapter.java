@@ -2,6 +2,7 @@ package com.example.t_robop.matomemo;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.util.Log;
 
 /**
  * Created by user on 2017/06/20.
@@ -15,7 +16,7 @@ public class Viewpager_Adapter extends FragmentPagerAdapter {
     public Viewpager_Adapter(android.support.v4.app.FragmentManager supportFragmentManager, String[] tabTitles) {
         super(supportFragmentManager);
         this.tabTitles = tabTitles;
-        numberOfTabs = tabTitles.length;
+        numberOfTabs = tabTitles.length;    //「メモ」と「まとめ」の2つ
     }
 
     @Override

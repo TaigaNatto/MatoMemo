@@ -1,17 +1,19 @@
 package com.example.t_robop.matomemo;
 
 import android.support.design.widget.TabLayout;
-import android.support.design.widget.TabLayout.TabLayoutOnPageChangeListener;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
+import android.widget.Button;
 
 
-public class MatoMemoListActivity extends AppCompatActivity implements ViewPager.OnPageChangeListener {
+public class MatoMemoListActivity extends AppCompatActivity {
 
     TabLayout tabLayout;
     ViewPager viewPager;
-    Viewpager_Adapter viewpagerAdapter;
+    Viewpager_Adapter viewPagerAdapter;
+    Button button;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -21,25 +23,43 @@ public class MatoMemoListActivity extends AppCompatActivity implements ViewPager
         String[] tabs_names = getResources().getStringArray(R.array.tabs);  //string.xmlに書いてあるxmlファイルから配列取得
         tabLayout = (TabLayout)findViewById(R.id.tabs); //tabLayoutのid取得
         viewPager = (ViewPager)findViewById(R.id.pager);    //viewPagerのid取得
-        viewpagerAdapter = new Viewpager_Adapter(getSupportFragmentManager(),tabs_names);   //作成したfragmentとviewPagerのadapterを作成
-        viewPager.setAdapter(viewpagerAdapter); //viewPagerにfragmentをセット
+        button = (Button)findViewById(R.id.button);
+
+        viewPagerAdapter = new Viewpager_Adapter(getSupportFragmentManager(),tabs_names);   //作成したfragmentとviewPagerのadapterを作成
+        viewPager.setAdapter(viewPagerAdapter); //viewPagerにfragmentをセット
         //viewPager.addOnAdapterChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));   //tabLayoutでも移動できるようにする  //よくわかんないCastしてるけどコメントアウトしたらできた
+
+        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener(){
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {  //ページ切り替え時に呼び出されるメソッド
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {  //ページがpositionの番号になったとき呼ばれるメソッド
+                switch (position){
+                    case 0:
+                        Log.d("position","onPageSelected"+ String.valueOf(position));
+                        button.setText("メモを書く");
+                        break;
+
+                    case 1:
+                        Log.d("position","onPageSelected"+ String.valueOf(position));
+                        button.setText("まとめを作る");
+                        break;
+                }
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {   //ページスクロール時に呼ばれるメソッド
+
+            }
+
+        });
+
         tabLayout.setupWithViewPager(viewPager);    //tabLayoutとviewPagerの連携
 
     }
 
-    @Override
-    public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
 
-    }
-
-    @Override
-    public void onPageSelected(int position) {
-
-    }
-
-    @Override
-    public void onPageScrollStateChanged(int state) {
-
-    }
 }
