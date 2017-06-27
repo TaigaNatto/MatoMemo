@@ -16,10 +16,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".groupCreate"></activity>
-        <activity android:name=".startList"></activity>
-        <activity android:name=".MainActivity5"></activity>
-        <activity android:name=".MatoMemoListActivity"></activity>
+        <activity android:name=".groupCreate" />
+        <activity android:name=".startList" />
+        <activity android:name=".MainActivity5" />
+        <activity android:name=".MatoMemoListActivity" />
+        <activity android:name=".RealmTestActivity"></activity>
     </application>
 
 </manifest>
