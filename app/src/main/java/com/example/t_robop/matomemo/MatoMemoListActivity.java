@@ -13,7 +13,9 @@ public class MatoMemoListActivity extends AppCompatActivity {
     TabLayout tabLayout;
     ViewPager viewPager;
     Viewpager_Adapter viewPagerAdapter;
-    Button button;
+    Button matoMemoButton;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,7 +25,9 @@ public class MatoMemoListActivity extends AppCompatActivity {
         String[] tabs_names = getResources().getStringArray(R.array.tabs);  //string.xmlに書いてあるxmlファイルから配列取得
         tabLayout = (TabLayout)findViewById(R.id.tabs); //tabLayoutのid取得
         viewPager = (ViewPager)findViewById(R.id.pager);    //viewPagerのid取得
-        button = (Button)findViewById(R.id.button);
+        matoMemoButton = (Button)findViewById(R.id.MatoMemoButton);
+
+
 
         viewPagerAdapter = new Viewpager_Adapter(getSupportFragmentManager(),tabs_names);   //作成したfragmentとviewPagerのadapterを作成
         viewPager.setAdapter(viewPagerAdapter); //viewPagerにfragmentをセット
@@ -40,12 +44,12 @@ public class MatoMemoListActivity extends AppCompatActivity {
                 switch (position){
                     case 0:
                         Log.d("position","onPageSelected"+ String.valueOf(position));
-                        button.setText("メモを書く");
+                        matoMemoButton.setText("メモを書く");
                         break;
 
                     case 1:
                         Log.d("position","onPageSelected"+ String.valueOf(position));
-                        button.setText("まとめを作る");
+                        matoMemoButton.setText("まとめを作る");
                         break;
                 }
             }
