@@ -28,6 +28,7 @@ public class FirstActivity extends AppCompatActivity {
 
     /**********************************************/
     Class[] MatomemoClass={MainActivity5.class,MatoMemoListActivity.class,groupCreate.class,startList.class,RealmTestActivity.class};
+    Class[] MatomemoClass={FolderCreateActivity.class,MatoMemoListActivity.class,StartListActivity.class,GroupEditActivity.class};
     /***　　　　　　　　　　　 ∩＿
      　　　　　　　　 　　　〈〈〈 ヽ
      　　 　　　　　　　　　 〈⊃ 　}
