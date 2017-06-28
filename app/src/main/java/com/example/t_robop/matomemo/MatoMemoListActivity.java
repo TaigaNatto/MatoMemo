@@ -15,6 +15,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 
+import io.realm.Realm;
+
 
 public class MatoMemoListActivity extends AppCompatActivity {
 
@@ -22,11 +24,16 @@ public class MatoMemoListActivity extends AppCompatActivity {
     ViewPager viewPager;
     Viewpager_Adapter viewPagerAdapter;
     Button matoMemoButton;
+    Realm realm;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_matomemo_list);
+
+        //Database
+        Realm.init(this);
+        realm = Realm.getDefaultInstance();
 
         //Toolbar
         Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar);
