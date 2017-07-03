@@ -28,11 +28,22 @@
         android:id="@+id/fab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@mipmap/ic_launcher"
+        android:src="@drawable/plusmark"
         android:layout_margin="35dp"
         android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"
         android:onClick="plus"
         />
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="20dp"
+        android:text="フォルダを作成してください"
+        android:layout_marginLeft="60dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="120dp"
+        android:layout_marginBottom="120dp" />
 
 </RelativeLayout>

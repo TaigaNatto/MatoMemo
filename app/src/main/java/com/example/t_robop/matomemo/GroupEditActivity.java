@@ -12,10 +12,14 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+
 import java.util.ArrayList;
 import java.util.Objects;
 import java.util.concurrent.ScheduledExecutorService;
 import static android.R.attr.checked;
+import static android.R.attr.id;
 
 public class GroupEditActivity extends AppCompatActivity {
     //ArrayListのString型でarrayListを作成
@@ -32,14 +36,17 @@ public class GroupEditActivity extends AppCompatActivity {
     boolean checking = false;
     //ArrayAdapterのString型でarrayAdapterを作成
     ArrayAdapter<String> arrayAdapter;
+    //TextViewで「textView」を作成
+    TextView textView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_group_edit);
         //レイアウトで作ったListViewをjavaで使えるようにする
         listView = (ListView) findViewById(R.id.list_item);
+        //TextViewの関連付け
+        textView = (TextView) findViewById(R.id.textView);
         //"arrayList"をArrayListでインスタンス化
         arrayList = new ArrayList<>();
         //arrayListに"memo"を追加
@@ -54,22 +61,22 @@ public class GroupEditActivity extends AppCompatActivity {
                     //listViewがタップされたときに実行
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                         //selを0で初期化して作成
-                        int sel = 0;
+                        checking = false;
                         //listViewの要素数分繰り返す
                         for(int x = itemNum - 1;x >= 0;x--){
                             //checkがついているなら実行
                             if (listView.isItemChecked(x)){
-                                //selを1で初期化
-                                sel = 1;
+                                //checkingをtrueに
+                                checking = true;
                             }
                         }
-
-                        if (sel == 1){
+                        //checkingがtrueなら削除のアイコン、違うならプラスのアイコン
+                        if (checking){
                             //削除のアイコンに変更
-                            checking = true;
+                            ((android.support.design.widget.FloatingActionButton) findViewById(R.id.fab)).setImageResource(R.drawable.gomi);
                         }else{
                             //プラスのアイコンに変更
-                            checking = false;
+                            ((android.support.design.widget.FloatingActionButton) findViewById(R.id.fab)).setImageResource(R.drawable.plusmark);
                         }
                     }
                 }
@@ -89,10 +96,16 @@ public class GroupEditActivity extends AppCompatActivity {
                     itemNum--;
                     //checkの状態を元にもどす
                     checking = false;
+                    //画像をplusに変更
+                    ((android.support.design.widget.FloatingActionButton) findViewById(R.id.fab)).setImageResource(R.drawable.plusmark);
                 }
             }
             //checkBoxの中身を初期化
             listView.setAdapter(arrayAdapter);
+            //TextViewに「フォルダを作成してください」を代入
+            if (itemNum == 0){
+                textView.setText("フォルダを作成してください");
+            }
         }else {
             //"editView"を使用可能に
             editView = new EditText(this);
@@ -117,6 +130,10 @@ public class GroupEditActivity extends AppCompatActivity {
                     listView.setAdapter(arrayAdapter);
                     //listViewの要素数を追加
                     itemNum++;
+                    //TextViewに「」を代入
+                    if (itemNum != 0){
+                        textView.setText(" ");
+                    }
                 }
             });
             //ダイアログを表示
