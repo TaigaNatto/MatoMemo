@@ -3,9 +3,16 @@
     xmlns:app="http://schemas.android.com/tools">
 
     <item
-        android:id="@+id/action_settings"
+        android:id="@+id/tag_settings"
         android:orderInCategory="100"
-        android:title="Settings"
+        android:title="タグ設定"
         app:showAsAction="never"/>
+
+    <item
+        android:id="@+id/important_setting"
+        android:orderInCategory="100"
+        android:title="重要度設定"
+        app:showAsAction="never"
+        />
 
 </menu>

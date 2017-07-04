@@ -1,5 +1,6 @@
 package com.example.t_robop.matomemo;
 
+import android.content.Intent;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
@@ -131,11 +132,11 @@ public class MatoMemoListActivity extends AppCompatActivity {
 
     //Drawer内のButtonクリック処理
     public void editFolder(View v){
-        arrayAdapter.add("huetayo");
-        drawerList.setAdapter(arrayAdapter);
+        Intent intent = new Intent(this,FolderCreateActivity.class);
+        startActivity(intent);
     }
 
-    //Menuの生成
+    //メニューバーの作成
     @Override
     public boolean onCreateOptionsMenu(Menu menu){
         MenuInflater inflater = getMenuInflater();
@@ -143,12 +144,21 @@ public class MatoMemoListActivity extends AppCompatActivity {
         return true;
     }
 
-    //Menu項目の選択時処理
+    //メニューが選択されたときの処理
     @Override
-    public boolean onOptionsItemSelected(MenuItem item){
-        switch (item.getItemId()){
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        //addしたときのIDで識別
+        switch(item.getItemId())
+        {
+            case R.id.tag_settings:
+                Log.d("menu","タグ設定へ");
+                break;
+
+            case R.id.important_setting:
+                Log.d("menu","重要度設定へ");
 
         }
-        return super.onOptionsItemSelected(item);
+        return true;
     }
 }
