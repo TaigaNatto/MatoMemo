@@ -16,6 +16,7 @@ import java.util.ArrayList;
 
 public class memoFragment extends Fragment {
 
+    ArrayAdapter<String> adapterMemo;
     ListView memoListView;
 
     @Override
@@ -38,8 +39,7 @@ public class memoFragment extends Fragment {
         memoList.add("メモ");
 
 
-        ArrayAdapter<String> adapterMemo = new ArrayAdapter<String>(
-                getContext(), android.R.layout.simple_list_item_1, memoList);
+        adapterMemo = new ArrayAdapter<String>(getContext(), android.R.layout.simple_list_item_1, memoList);
         memoListView.setAdapter(adapterMemo);
 
         return memoListView;

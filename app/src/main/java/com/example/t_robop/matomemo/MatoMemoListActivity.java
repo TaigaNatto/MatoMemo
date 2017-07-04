@@ -11,19 +11,35 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ListView;
+import android.widget.Toast;
 
 import io.realm.Realm;
+
+import static android.widget.Toast.makeText;
 
 
 public class MatoMemoListActivity extends AppCompatActivity {
 
+    //Tab
     TabLayout tabLayout;
     ViewPager viewPager;
     Viewpager_Adapter viewPagerAdapter;
+
+    //NavigationDrawer内
+    DrawerLayout drawerLayout;
+    ListView drawerList;
+    ArrayAdapter<String> arrayAdapter;
+
     Button matoMemoButton;
+
     Realm realm;
 
     @Override
@@ -31,7 +47,7 @@ public class MatoMemoListActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_matomemo_list);
 
-        //Database
+        //Database初期化
         Realm.init(this);
         realm = Realm.getDefaultInstance();
 
@@ -39,28 +55,39 @@ public class MatoMemoListActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        //DrawerToggle
-        DrawerLayout drawerLayout = (DrawerLayout)findViewById(R.id.drawerLayout);
+        //ToDo DrawerのLayout改良
+        //Drawerのid
+        drawerLayout = (DrawerLayout)findViewById(R.id.drawerLayout);
+
+        //DrawerToggleの表示
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this,drawerLayout,toolbar,R.string.drawer_open,R.string.drawer_close);
         drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
 
-        //NavigationView Listener
-        NavigationView navigationView = (NavigationView)findViewById(R.id.navigationView);
-        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
-            //NavigationDrawer内のメニュー選択時
+        //Drawer内のListViewのid
+        drawerList = (ListView)findViewById(R.id.left_drawer);
+
+        //Drawer内のArrayAdapterのインスタンス生成
+        arrayAdapter=new ArrayAdapter<String>(this,R.layout.drawer_list_item);
+
+        //Debug用Drawer内のList表示
+        arrayAdapter.add("aka");
+        arrayAdapter.add("kiiro");
+        arrayAdapter.add("midori");
+
+        //AdapterをListViewにセット
+        drawerList.setAdapter(arrayAdapter);
+
+        //Drawer内のItemのクリック処理
+        drawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-
-                switch (item.getGroupId()){
-                    case R.id.menu_item1:
-                        Log.d("Navigation_test","Item 1 Selected");
-                        break;
-                }
-
-                DrawerLayout drawer = (DrawerLayout)findViewById(R.id.drawerLayout);
-                drawer.closeDrawer(GravityCompat.START);
-                return false;
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                //Debug用Drawer内のItem名をToast表示
+                //ToDO Toast表示できてない
+                ListView list = (ListView)parent;
+                String msg = "ItemClick : " + (String)list.getItemAtPosition(position);
+                Toast toast = Toast.makeText(MatoMemoListActivity.this,"",Toast.LENGTH_SHORT);
+                toast.show();
             }
         });
 
@@ -106,5 +133,28 @@ public class MatoMemoListActivity extends AppCompatActivity {
 
         tabLayout.setupWithViewPager(viewPager);    //tabLayoutとviewPagerの連携
 
+    }
+
+    //Drawer内のButtonクリック処理
+    public void add(View v){
+        arrayAdapter.add("huetayo");
+        drawerList.setAdapter(arrayAdapter);
+    }
+
+    //Menuの生成
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu){
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.options,menu);
+        return true;
+    }
+
+    //Menu項目の選択時処理
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item){
+        switch (item.getItemId()){
+
+        }
+        return super.onOptionsItemSelected(item);
     }
 }
