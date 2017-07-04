@@ -1,9 +1,6 @@
 package com.example.t_robop.matomemo;
 
-import android.support.annotation.NonNull;
-import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
-import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -22,8 +19,6 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import io.realm.Realm;
-
-import static android.widget.Toast.makeText;
 
 
 public class MatoMemoListActivity extends AppCompatActivity {
@@ -55,7 +50,6 @@ public class MatoMemoListActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        //ToDo DrawerのLayout改良
         //Drawerのid
         drawerLayout = (DrawerLayout)findViewById(R.id.drawerLayout);
 
@@ -71,6 +65,7 @@ public class MatoMemoListActivity extends AppCompatActivity {
         arrayAdapter=new ArrayAdapter<String>(this,R.layout.drawer_list_item);
 
         //Debug用Drawer内のList表示
+        arrayAdapter.add("未分類");
         arrayAdapter.add("aka");
         arrayAdapter.add("kiiro");
         arrayAdapter.add("midori");
@@ -78,15 +73,14 @@ public class MatoMemoListActivity extends AppCompatActivity {
         //AdapterをListViewにセット
         drawerList.setAdapter(arrayAdapter);
 
-        //Drawer内のItemのクリック処理
         drawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            //Drawer内のItemのクリック処理
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 //Debug用Drawer内のItem名をToast表示
-                //ToDO Toast表示できてない
                 ListView list = (ListView)parent;
                 String msg = "ItemClick : " + (String)list.getItemAtPosition(position);
-                Toast toast = Toast.makeText(MatoMemoListActivity.this,"",Toast.LENGTH_SHORT);
+                Toast toast = Toast.makeText(MatoMemoListActivity.this,msg,Toast.LENGTH_SHORT);
                 toast.show();
             }
         });
@@ -136,7 +130,7 @@ public class MatoMemoListActivity extends AppCompatActivity {
     }
 
     //Drawer内のButtonクリック処理
-    public void add(View v){
+    public void editFolder(View v){
         arrayAdapter.add("huetayo");
         drawerList.setAdapter(arrayAdapter);
     }

@@ -23,23 +23,23 @@ public class memoFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle saveInstanceState){
         memoListView = (ListView)inflater.inflate(R.layout.activity_memo_tab,container,false);
 
-        ArrayList<String> memoList = new ArrayList<>();
-        memoList.add("メモ");
-        memoList.add("メモ");
-        memoList.add("メモ");
-        memoList.add("メモ");
-        memoList.add("メモ");
-        memoList.add("メモ");
-        memoList.add("メモ");
-        memoList.add("メモ");
-        memoList.add("メモ");
-        memoList.add("メモ");
-        memoList.add("メモ");
-        memoList.add("メモ");
-        memoList.add("メモ");
+        adapterMemo = new ArrayAdapter<String>(getContext(), android.R.layout.simple_list_item_1);
+
+        adapterMemo.add("メモ");
+        adapterMemo.add("メモ");
+        adapterMemo.add("メモ");
+        adapterMemo.add("メモ");
+        adapterMemo.add("メモ");
+        adapterMemo.add("メモ");
+        adapterMemo.add("メモ");
+        adapterMemo.add("メモ");
+        adapterMemo.add("メモ");
+        adapterMemo.add("メモ");
+        adapterMemo.add("メモ");
+        adapterMemo.add("メモ");
+        adapterMemo.add("メモ");
 
 
-        adapterMemo = new ArrayAdapter<String>(getContext(), android.R.layout.simple_list_item_1, memoList);
         memoListView.setAdapter(adapterMemo);
 
         return memoListView;
