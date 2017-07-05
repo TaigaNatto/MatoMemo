@@ -2,6 +2,7 @@ package com.example.t_robop.matomemo;
 
 import android.content.Intent;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -86,7 +87,7 @@ public class MatoMemoListActivity extends AppCompatActivity {
             }
         });
 
-        //画面下のButton
+        //画面下のButtonのid
         matoMemoButton = (Button)findViewById(R.id.MatoMemoButton);
 
         //tabLayoutとViewPager
@@ -109,12 +110,12 @@ public class MatoMemoListActivity extends AppCompatActivity {
                 switch (position){
                     case 0:
                         Log.d("position","onPageSelected"+ String.valueOf(position));
-                        matoMemoButton.setText("メモを書く");
+                        matoMemoButton.setText(R.string.WriteMemo); //"メモを書く"をButtonのTextにセット
                         break;
 
                     case 1:
                         Log.d("position","onPageSelected"+ String.valueOf(position));
-                        matoMemoButton.setText("まとめを作る");
+                        matoMemoButton.setText(R.string.MakeMatome);    //"まとめを作る"をButtonのTextにセット
                         break;
                 }
             }
@@ -130,9 +131,28 @@ public class MatoMemoListActivity extends AppCompatActivity {
 
     }
 
+    //画面下のButton処理
+    public void MatoMemoClick(View v){
+        String buttonText = (String) matoMemoButton.getText();  //ButtonのTextを取得
+        Intent intent = null;
+
+        switch (buttonText){
+            case "メモを書く":
+                intent = new Intent(this,WritingActivity.class);    //WritingActivityにIntent
+                break;
+
+            case "まとめを作る":
+                intent = new Intent(this,FolderCreateActivity.class);    //FolderCreateActivityにIntent
+                break;
+        }
+
+        startActivity(intent);  //Intent!!!
+
+    }
+
     //Drawer内のButtonクリック処理
     public void editFolder(View v){
-        Intent intent = new Intent(this,FolderCreateActivity.class);
+        Intent intent = new Intent(this,GroupEditActivity.class);   //GroupEditActivityにIntent
         startActivity(intent);
     }
 
@@ -140,25 +160,33 @@ public class MatoMemoListActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu){
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.options,menu);
+        inflater.inflate(R.menu.options,menu);  //res\menu\optionsのlayoutを読み込む
         return true;
     }
 
     //メニューが選択されたときの処理
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        Intent intent = null;
 
         //addしたときのIDで識別
         switch(item.getItemId())
         {
             case R.id.tag_settings:
-                Log.d("menu","タグ設定へ");
+                Log.d("menu","タグ設定へ");  //TagEditActivityへIntent
                 break;
 
             case R.id.important_setting:
-                Log.d("menu","重要度設定へ");
+                Log.d("menu","重要度設定へ");     //ImportantEditActivityへIntent
+                break;
+
+            case R.id.editFolder:
+                intent = new Intent(this,GroupEditActivity.class);  //GroupEditActivityへIntent
+                break;
 
         }
+        startActivity(intent);
+
         return true;
     }
 }

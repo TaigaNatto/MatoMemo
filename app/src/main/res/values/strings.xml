@@ -2,15 +2,12 @@
     <string name="app_name">MatoMemo</string>
     <string name="drawer_open">DrawerOpen</string>
     <string name="drawer_close">DrawerClose</string>
+    <string name="WriteMemo">メモを書く</string>
+    <string name="MakeMatome">まとめを作る</string>
 
     <string-array name="tabs">
         <item>メモ</item>
         <item>まとめ</item>
     </string-array>
 
-    <string-array name="planets_array">
-        <item>aaa</item>
-        <item>bbb</item>
-        <item>ccc</item>
-    </string-array>
 </resources>

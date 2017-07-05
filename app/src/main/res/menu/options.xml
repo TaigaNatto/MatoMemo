@@ -15,4 +15,11 @@
         app:showAsAction="never"
         />
 
+    <item
+        android:id="@+id/editFolder"
+        android:orderInCategory="100"
+        android:title="フォルダの編集"
+        app:showAsAction="never"
+        />
+
 </menu>
