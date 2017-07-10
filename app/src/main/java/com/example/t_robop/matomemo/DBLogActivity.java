@@ -96,4 +96,24 @@ public class DBLogActivity extends AppCompatActivity {
 
         loadRealm("memo");
     }
+
+    //削除
+    public void del_v(View v){
+        // クエリを発行
+        RealmQuery<RealmMemoEntity> query  = realm.where(RealmMemoEntity.class);
+        //消したいデータを指定 (以下の場合はmemoデータの「memo」が「test」のものを指定)
+        query.equalTo("memo","test");
+        //指定されたデータを持つデータのみに絞り込む
+        final RealmResults<RealmMemoEntity> results = query.findAll();
+        // 変更操作はトランザクションの中で実行する必要あり
+        realm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                // すべてのオブジェクトを削除
+                results.deleteAllFromRealm();
+            }
+        });
+
+        loadRealm("memo");
+    }
 }
