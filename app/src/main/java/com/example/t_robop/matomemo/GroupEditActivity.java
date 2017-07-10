@@ -1,10 +1,12 @@
 package com.example.t_robop.matomemo;
 
 import android.content.DialogInterface;
+import android.graphics.Color;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.SparseBooleanArray;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.Adapter;
 import android.widget.AdapterView;
@@ -14,7 +16,7 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-
+import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.Objects;
 import java.util.concurrent.ScheduledExecutorService;
@@ -34,6 +36,8 @@ public class GroupEditActivity extends AppCompatActivity {
     int itemNum = 0;
     //checkがついていないときtrue※
     boolean checking = false;
+    //重複していないときtrue※
+    boolean original = true;
     //ArrayAdapterのString型でarrayAdapterを作成
     ArrayAdapter<String> arrayAdapter;
     //TextViewで「textView」を作成
@@ -74,9 +78,12 @@ public class GroupEditActivity extends AppCompatActivity {
                         if (checking){
                             //削除のアイコンに変更
                             ((android.support.design.widget.FloatingActionButton) findViewById(R.id.fab)).setImageResource(R.drawable.gomi);
+
+                            //listView.setBackgroundColor(Color.rgb(255, 255, 255));
                         }else{
                             //プラスのアイコンに変更
                             ((android.support.design.widget.FloatingActionButton) findViewById(R.id.fab)).setImageResource(R.drawable.plusmark);
+                            //listView.setBackgroundColor(Color.rgb(127, 127, 255));
                         }
                     }
                 }
@@ -87,9 +94,9 @@ public class GroupEditActivity extends AppCompatActivity {
             //checkが1つもついていないとき実行
         if(checking) {
             //listViewの要素数分だけ繰り返す
-            for(int x = itemNum - 1;x >= 0;x--){
+            for (int x = itemNum - 1; x >= 0; x--) {
                 //もしチェックボックスにチェックがついているなら実行
-                if (listView.isItemChecked(x)){
+                if (listView.isItemChecked(x)) {
                     //チェックがついてる行を削除
                     arrayAdapter.remove(arrayAdapter.getItem(x));
                     //listViewの要素数を1減らす
@@ -103,7 +110,7 @@ public class GroupEditActivity extends AppCompatActivity {
             //checkBoxの中身を初期化
             listView.setAdapter(arrayAdapter);
             //TextViewに「フォルダを作成してください」を代入
-            if (itemNum == 0){
+            if (itemNum == 0) {
                 textView.setText("フォルダを作成してください");
             }
         }else {
@@ -120,20 +127,52 @@ public class GroupEditActivity extends AppCompatActivity {
                 @Override
                 //ダイアログのokが押されたら実行
                 public void onClick(DialogInterface dialog, int whichButton) {
-                    //memoをeditViewのデータで初期化
+                    //groupNameをeditViewのデータで初期化
+                    //editViewの中身がnullでないなら実行
                     groupName = editView.getText().toString();
-                    //arrayListをmemoで初期化
-                    arrayList.set(0, groupName);
-                    //arrayListをarrayAdapterに追加する
-                    arrayAdapter.add(arrayList.get(0));
-                    //arrayAdapterをlistViewに入れる
-                    listView.setAdapter(arrayAdapter);
-                    //listViewの要素数を追加
-                    itemNum++;
+                    //////////////////////////////////////////
+                    //重複してない状態
+                    original = true;
+                    //ListViewの要素分繰り返す
+                    for (int i = 0; i < itemNum; i++) {
+                        //もし重複しているなら実行
+                        //groupNameがarrayAdapterのi番目の要素と同じなら実行
+                        if (groupName .equals(arrayAdapter.getItem(i))) {
+                            //重複している状態に更新
+                            original = false;
+                            // 第3引数は、表示期間（LENGTH_SHORT、または、LENGTH_LONG）
+                            //トーストを表示
+                            Toast.makeText(GroupEditActivity.this, "同名のファイルがすでに存在します", Toast.LENGTH_SHORT).show();
+                            //トーストを中央に表示
+                            //Toast toast = Toast.makeText(GroupEditActivity.this, "同名のファイルがすでに存在します", Toast.LENGTH_SHORT);
+                            //toast.setGravity(Gravity.CENTER, 0, 0);
+                            //toast.show();
+
+                            break;
+                        }
+                    }
+
+
+                    if(groupName .equals("") == false && original) {
+                    //arrayListをgroupNameで初期化
+                        arrayList.set(0, groupName);
+                        //arrayListをarrayAdapterに追加する
+                        arrayAdapter.add(arrayList.get(0));
+                        //arrayAdapterをlistViewに入れる
+                        listView.setAdapter(arrayAdapter);
+                        //listViewの要素数を追加
+                        itemNum++;
+                    }
                     //TextViewに「」を代入
                     if (itemNum != 0){
                         textView.setText(" ");
                     }
+                }
+            });
+            dialog.setNegativeButton("cancel", new DialogInterface.OnClickListener() {
+                @Override
+                //ダイアログのokが押されたら実行
+                public void onClick(DialogInterface dialog, int whichButton) {
                 }
             });
             //ダイアログを表示
