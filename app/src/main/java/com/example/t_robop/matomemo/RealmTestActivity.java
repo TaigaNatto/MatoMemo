@@ -52,12 +52,12 @@ public class RealmTestActivity extends AppCompatActivity {
         RealmResults<RealmMemoEntity> memoResults = memoQuery.findAll();
         /***
             //取ってきたデータの中の0番目のメモ本文が欲しい時はこんな感じに
-            String text = memoResults.get(0).getMemo();
+            String text = results.get(0).getMemo();
 
             //取ってきたデータ全部欲しい時はこんな感じに
             ArrayList<String> array=new ArrayList<>();
-            for(int i=0;i<memoResults.size();i++){
-                array.add(memoResults.get(i));
+            for(int i=0;i<results.size();i++){
+                array.add(results.get(i));
             }
         ***/
         /******************/
