@@ -29,7 +29,6 @@ public class WritingActivity extends ActionBarActivity {
     TextView textView;
     EditText editText;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -116,6 +115,7 @@ public class WritingActivity extends ActionBarActivity {
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
                                 // 保存する ボタンクリック処理
+
                                 finish();
                             }
                         });
