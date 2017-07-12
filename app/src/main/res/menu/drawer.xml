@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item android:title="フォルダ">
+
+        <menu>
+            <item
+                android:id="@+id/createFolder"
+                android:title="フォルダ作成">
+
+            </item>
+        </menu>
+
+    </item>
+
+    <item android:title="教科">
+
+        <menu>
+            <item
+                android:id="@+id/item_1"
+                android:title="aaa">
+            </item>
+        </menu>
+
+    </item>
+
+</menu>

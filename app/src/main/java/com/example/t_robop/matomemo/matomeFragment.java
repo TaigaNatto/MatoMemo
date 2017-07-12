@@ -16,17 +16,21 @@ import java.util.ArrayList;
 
 public class matomeFragment extends Fragment {
 
+    ArrayAdapter<String> adapterMatome;
     ListView matomeListView;
 
+    //Fragmentで表示するViewを作成するメソッド
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
+        //まとめリストのレイアウトをViewとして作成
         matomeListView = (ListView)inflater.inflate(R.layout.activity_matome_tab,container,false);
 
-        ArrayList<String> matomeList = new ArrayList<>();
-        matomeList.add("まとめ");
+        //Adapterのインスタンスを作って、追加
+        adapterMatome = new ArrayAdapter<String>(getContext(), android.R.layout.simple_list_item_1);
 
-        ArrayAdapter<String> adapterMatome = new ArrayAdapter<String>(
-                getContext(), android.R.layout.simple_list_item_1, matomeList);
+        adapterMatome.add("まとめ");
+
+
         matomeListView.setAdapter(adapterMatome);
 
         return matomeListView;
