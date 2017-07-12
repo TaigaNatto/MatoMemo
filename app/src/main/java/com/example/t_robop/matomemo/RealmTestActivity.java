@@ -52,12 +52,12 @@ public class RealmTestActivity extends AppCompatActivity {
         RealmResults<RealmMemoEntity> memoResults = memoQuery.findAll();
         /***
             //取ってきたデータの中の0番目のメモ本文が欲しい時はこんな感じに
-            String text = memoResults.get(0).getMemo();
+            String text = results.get(0).getMemo();
 
             //取ってきたデータ全部欲しい時はこんな感じに
             ArrayList<String> array=new ArrayList<>();
-            for(int i=0;i<memoResults.size();i++){
-                array.add(memoResults.get(i));
+            for(int i=0;i<results.size();i++){
+                array.add(results.get(i));
             }
         ***/
         /******************/
@@ -107,6 +107,23 @@ public class RealmTestActivity extends AppCompatActivity {
         //トランザクション終了 (データを書き込む)
         realm.commitTransaction();
         /*************************/
+
+        /***データ消したいとき！***/
+        // クエリを発行
+        RealmQuery<RealmMemoEntity> delQuery  = realm.where(RealmMemoEntity.class);
+        //消したいデータを指定 (以下の場合はmemoデータの「memo」が「test」のものを指定)
+        query.equalTo("memo","test");
+        //指定されたデータを持つデータのみに絞り込む
+        final RealmResults<RealmMemoEntity> delR = delQuery.findAll();
+        // 変更操作はトランザクションの中で実行する必要あり
+        realm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                // すべてのオブジェクトを削除
+                delR.deleteAllFromRealm();
+            }
+        });
+        /***********************/
 
         //関連付け
         listView=(ListView)findViewById(R.id.list);
