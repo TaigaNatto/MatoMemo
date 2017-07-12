@@ -2,7 +2,6 @@ package com.example.t_robop.matomemo;
 
 import android.content.Intent;
 import android.support.design.widget.TabLayout;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -29,6 +28,7 @@ public class MatoMemoListActivity extends AppCompatActivity {
     TabLayout tabLayout;
     ViewPager viewPager;
     Viewpager_Adapter viewPagerAdapter;
+    String[] tabs_names;
 
     //NavigationDrawer内
     DrawerLayout drawerLayout;
@@ -50,6 +50,7 @@ public class MatoMemoListActivity extends AppCompatActivity {
 
         //Toolbar
         Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar);
+        toolbar.setTitle(" ");  //教科名をセット
         setSupportActionBar(toolbar);
 
         //Drawerのid
@@ -68,9 +69,9 @@ public class MatoMemoListActivity extends AppCompatActivity {
 
         //Debug用Drawer内のList表示
         arrayAdapter.add("未分類");
-        arrayAdapter.add("aka");
-        arrayAdapter.add("kiiro");
-        arrayAdapter.add("midori");
+        arrayAdapter.add("数学");
+        arrayAdapter.add("国語");
+        arrayAdapter.add("英語");
 
         //AdapterをListViewにセット
         drawerList.setAdapter(arrayAdapter);
@@ -79,6 +80,7 @@ public class MatoMemoListActivity extends AppCompatActivity {
             //Drawer内のItemのクリック処理
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
                 //Debug用Drawer内のItem名をToast表示
                 ListView list = (ListView)parent;
                 String msg = "ItemClick : " + (String)list.getItemAtPosition(position);
@@ -91,7 +93,7 @@ public class MatoMemoListActivity extends AppCompatActivity {
         matoMemoButton = (Button)findViewById(R.id.MatoMemoButton);
 
         //tabLayoutとViewPager
-        String[] tabs_names = getResources().getStringArray(R.array.tabs);  //string.xmlに書いてあるxmlファイルから配列取得
+        tabs_names = getResources().getStringArray(R.array.tabs);  //string.xmlに書いてあるxmlファイルから配列取得
         tabLayout = (TabLayout)findViewById(R.id.tabs); //tabLayoutのid取得
         viewPager = (ViewPager)findViewById(R.id.pager);    //viewPagerのid取得
 
@@ -189,4 +191,5 @@ public class MatoMemoListActivity extends AppCompatActivity {
 
         return true;
     }
+
 }
