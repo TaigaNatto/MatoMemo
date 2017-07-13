@@ -1,6 +1,9 @@
 package com.example.t_robop.matomemo;
 
+import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.database.Cursor;
 import android.graphics.Color;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -8,6 +11,8 @@ import android.os.Bundle;
 import android.util.SparseBooleanArray;
 import android.view.Gravity;
 import android.view.View;
+import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Adapter;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -20,15 +25,33 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.Objects;
 import java.util.concurrent.ScheduledExecutorService;
+
+import io.realm.Realm;
+import io.realm.RealmFieldType;
+
+import io.realm.RealmQuery;
+import io.realm.RealmResults;
+
+
+
+
+import static android.R.attr.alertDialogIcon;
 import static android.R.attr.checked;
+import static android.R.attr.dial;
 import static android.R.attr.id;
 
 public class GroupEditActivity extends AppCompatActivity {
     //ArrayListのString型でarrayListを作成
     ArrayList<String> arrayList;
+
+    ArrayList<String> arrayTemp;
+
     //ListViewでlistViewを作成
     ListView listView;
     //EditTextでeditViewを作成
+
+    Cursor cursor = null;
+
     EditText editView;
     //arrayListに入れる用
     String groupName = " ";
@@ -43,6 +66,10 @@ public class GroupEditActivity extends AppCompatActivity {
     //TextViewで「textView」を作成
     TextView textView;
 
+    /*** 神 ***/
+    Realm realm;
+    /*** ** ***/
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,9 +82,47 @@ public class GroupEditActivity extends AppCompatActivity {
         arrayList = new ArrayList<>();
         //arrayListに"memo"を追加
         arrayList.add(groupName);
+
+        /***これ必須だからみんな書いて***/
+        Realm.init(this);
+        realm = Realm.getDefaultInstance();
+        /*******************/
+
+
+
+
+
         //"arrayAdapter"をcheckBox付きのArrayAdapterでインスタンス化
         arrayAdapter = new ArrayAdapter<String>(
                 this, android.R.layout.simple_list_item_multiple_choice);
+
+
+        ////
+        ///フォルダのデータが欲しいとき！///
+        //検索用のクエリ作成
+        RealmQuery<RealmFolderEntity> folderQuery = realm.where(RealmFolderEntity.class);
+        //インスタンス生成し、その中にすべてのデータを入れる 今回なら全てのデータ
+        RealmResults<RealmFolderEntity> folderResults = folderQuery.findAll();
+        /***使い方は↑のメモと同じ***/
+        for(int i=0;i<folderResults.size();i++){
+            String text = folderResults.get(i).getFolderName();
+            //arrayListをgroupNameで初期化
+            arrayList.set(0, text);
+            //arrayListをarrayAdapterに追加する
+            arrayAdapter.add(arrayList.get(0));
+            //arrayAdapterをlistViewに入れる
+            listView.setAdapter(arrayAdapter);
+            //listViewの要素数を追加
+            itemNum++;
+            //グループがすでにあるとき、textViewを空白で更新
+            textView.setText(" ");
+        }
+
+        ////
+
+
+
+
         //listViewがタップされた事を取れるようにする
         listView.setOnItemClickListener(
                 new AdapterView.OnItemClickListener(){
@@ -91,14 +156,43 @@ public class GroupEditActivity extends AppCompatActivity {
     }
     //フローティングアクションボタンがタップされた際に実行
     public void plus(View v) {
+        //getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+
             //checkが1つもついていないとき実行
         if(checking) {
             //listViewの要素数分だけ繰り返す
             for (int x = itemNum - 1; x >= 0; x--) {
                 //もしチェックボックスにチェックがついているなら実行
                 if (listView.isItemChecked(x)) {
+
+                    String temp = (String)listView.getItemAtPosition(x);
+
                     //チェックがついてる行を削除
                     arrayAdapter.remove(arrayAdapter.getItem(x));
+
+
+
+
+                    ///////////////////////////////////////////
+                    ////String temp = arrayAdapter.getContext(x);
+
+                    RealmQuery<RealmFolderEntity> query  = realm.where(RealmFolderEntity.class);
+                    //消したいデータを指定 (以下の場合はmemoデータの「memo」が「test」のものを指定)
+                    query.equalTo("folderName",temp);
+                    //指定されたデータを持つデータのみに絞り込む
+                    final RealmResults<RealmFolderEntity> results = query.findAll();
+                    // 変更操作はトランザクションの中で実行する必要あり
+                    realm.executeTransaction(new Realm.Transaction() {
+             @Override
+             public void execute(Realm realm) {
+                 // すべてのオブジェクトを削除
+                 results.deleteAllFromRealm();
+             }
+         });
+
+
+
+
                     //listViewの要素数を1減らす
                     itemNum--;
                     //checkの状態を元にもどす
@@ -117,19 +211,34 @@ public class GroupEditActivity extends AppCompatActivity {
             //"editView"を使用可能に
             editView = new EditText(this);
             //ダイアログを使用可能に
-            AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-            //ダイアログの題名を"グループの名前"で追加
-            dialog.setTitle("グループの名前");
+            final AlertDialog.Builder dialog = new AlertDialog.Builder(this);
             //ダイアログにeditView(editText)を追加
             dialog.setView(editView);
-            //ダイアログの中に"OK"ボタンを追加
+            //ダイアログの題名を"グループの名前"で追加
+            dialog.setTitle("グループの名前");
+            dialog.create();
+
+            /*
+            editView.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+                @Override
+                public void onFocusChange(View v, boolean hasFocus) {
+                    if (hasFocus) {
+                        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+                    }
+                }
+            });
+            */
+
+
+
             dialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                 @Override
+
                 //ダイアログのokが押されたら実行
                 public void onClick(DialogInterface dialog, int whichButton) {
                     //groupNameをeditViewのデータで初期化
-                    //editViewの中身がnullでないなら実行
                     groupName = editView.getText().toString();
+
                     //////////////////////////////////////////
                     //重複してない状態
                     original = true;
@@ -143,7 +252,7 @@ public class GroupEditActivity extends AppCompatActivity {
                             // 第3引数は、表示期間（LENGTH_SHORT、または、LENGTH_LONG）
                             //トーストを表示
                             Toast.makeText(GroupEditActivity.this, "同名のファイルがすでに存在します", Toast.LENGTH_SHORT).show();
-                            //トーストを中央に表示
+                            ///***///トーストを中央に表示///***///
                             //Toast toast = Toast.makeText(GroupEditActivity.this, "同名のファイルがすでに存在します", Toast.LENGTH_SHORT);
                             //toast.setGravity(Gravity.CENTER, 0, 0);
                             //toast.show();
@@ -152,9 +261,10 @@ public class GroupEditActivity extends AppCompatActivity {
                         }
                     }
 
-
+                    //editViewの中身がnullでないなら実行
                     if(groupName .equals("") == false && original) {
-                    //arrayListをgroupNameで初期化
+                 //
+                 //arrayListをgroupNameで初期化
                         arrayList.set(0, groupName);
                         //arrayListをarrayAdapterに追加する
                         arrayAdapter.add(arrayList.get(0));
@@ -162,6 +272,20 @@ public class GroupEditActivity extends AppCompatActivity {
                         listView.setAdapter(arrayAdapter);
                         //listViewの要素数を追加
                         itemNum++;
+                 //
+
+                        /////////
+                        /***データを書き込みたいとき！***/
+                         //トランザクション開始
+                              realm.beginTransaction();
+                         //インスタンスを生成
+                              RealmFolderEntity model = realm.createObject(RealmFolderEntity.class);
+                         //書き込みたいデータをインスタンスに入れる
+                              model.setFolderName(groupName);
+                         //トランザクション終了 (データを書き込む)
+                              realm.commitTransaction();
+                        /******************************/
+
                     }
                     //TextViewに「」を代入
                     if (itemNum != 0){
@@ -175,8 +299,10 @@ public class GroupEditActivity extends AppCompatActivity {
                 public void onClick(DialogInterface dialog, int whichButton) {
                 }
             });
+
             //ダイアログを表示
             dialog.show();
+
         }
     }
 }

@@ -1,5 +1,6 @@
 package com.example.t_robop.matomemo;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -69,6 +70,11 @@ public class StartListActivity extends AppCompatActivity {
     }
 
 //↓↓↓↓↓↓↓↓ボタンを押したときの処理の確認用 ※実装とは直接関係ないです↓↓↓↓↓↓↓↓↓
+
+    public void Intent(View v) {
+        Intent intent=new Intent(this,GroupEditActivity.class);
+        startActivity(intent);
+    }
 
     public void plus(View v) {
         arrayAdapter.add(arrayList.get(0));

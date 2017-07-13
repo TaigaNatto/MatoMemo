@@ -32,4 +32,15 @@
         android:layout_marginTop="20dp"
         android:layout_marginBottom="20dp"/>
 
+    <Button
+        android:id="@+id/button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Intent"
+        android:layout_marginLeft="140dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginTop="50dp"
+        android:layout_marginBottom="20dp"
+        android:onClick="Intent"/>
+
 </RelativeLayout>
