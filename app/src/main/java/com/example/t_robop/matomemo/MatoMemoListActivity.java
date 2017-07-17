@@ -2,6 +2,8 @@ package com.example.t_robop.matomemo;
 
 import android.content.Intent;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -17,9 +19,12 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
-import android.widget.Toast;
+
+import java.util.ArrayList;
 
 import io.realm.Realm;
+import io.realm.RealmQuery;
+import io.realm.RealmResults;
 
 
 public class MatoMemoListActivity extends AppCompatActivity {
@@ -27,15 +32,20 @@ public class MatoMemoListActivity extends AppCompatActivity {
     //Tab
     TabLayout tabLayout;
     ViewPager viewPager;
-    Viewpager_Adapter viewPagerAdapter;
-    String[] tabs_names;
+    CustomFragmentPagerAdapter matomemoFragmentPagerAdapter;    //自作のFragment用
+    String[] tabs_names;    //tabの名前 /value/string.xml/string-arrayの"tabs"を参照
 
     //NavigationDrawer内
     DrawerLayout drawerLayout;
-    ListView drawerList;
-    ArrayAdapter<String> arrayAdapter;
+    ListView drawerListView;
+    ArrayAdapter<String> drawerArrayAdapter;
+
+    //Fragment
+    FragmentManager manager;
 
     Button matoMemoButton;
+
+    Toolbar toolbar;
 
     Realm realm;
 
@@ -48,9 +58,12 @@ public class MatoMemoListActivity extends AppCompatActivity {
         Realm.init(this);
         realm = Realm.getDefaultInstance();
 
+        //Debug用Database設定
+        SetFolderDataTest();
+
         //Toolbar
-        Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar);
-        toolbar.setTitle(" ");  //教科名をセット
+        toolbar = (Toolbar)findViewById(R.id.toolbar);
+        toolbar.setTitle("未分類");  //教科名をセット
         setSupportActionBar(toolbar);
 
         //Drawerのid
@@ -62,30 +75,38 @@ public class MatoMemoListActivity extends AppCompatActivity {
         toggle.syncState();
 
         //Drawer内のListViewのid
-        drawerList = (ListView)findViewById(R.id.left_drawer);
+        drawerListView = (ListView)findViewById(R.id.left_drawer);
 
         //Drawer内のArrayAdapterのインスタンス生成
-        arrayAdapter=new ArrayAdapter<String>(this,R.layout.drawer_list_item);
+        drawerArrayAdapter =new ArrayAdapter<String>(this,R.layout.drawer_list_item);
 
         //Debug用Drawer内のList表示
-        arrayAdapter.add("未分類");
-        arrayAdapter.add("数学");
-        arrayAdapter.add("国語");
-        arrayAdapter.add("英語");
+        drawerArrayAdapter.add("未分類");
+
+        //Databaseから教科(Folder)取得
+        ArrayList<String> SubjectName = this.GetFolderDataTest();
+        for(int i = 0; i<SubjectName.size(); i++){
+            drawerArrayAdapter.add(SubjectName.get(i)); //DatabaseからGetしてきた教科名をDrawerにセット
+        }
 
         //AdapterをListViewにセット
-        drawerList.setAdapter(arrayAdapter);
+        drawerListView.setAdapter(drawerArrayAdapter);
 
-        drawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        drawerListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             //Drawer内のItemのクリック処理
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-                //Debug用Drawer内のItem名をToast表示
-                ListView list = (ListView)parent;
-                String msg = "ItemClick : " + (String)list.getItemAtPosition(position);
-                Toast toast = Toast.makeText(MatoMemoListActivity.this,msg,Toast.LENGTH_SHORT);
-                toast.show();
+                //ToDo
+                //動的に追加された教科Listのクリック処理
+                //drawerArrayAdapterに教科Listがある
+                //処理内容：　教科クリックしたらToolBar.setTitleで教科名をセット
+
+                //CustomFragmentPagerAdapterのgetItemからfragment情報を取ってきて、memoFragmentのcallFromOutメソッドを呼び出す
+                Fragment fragment = matomemoFragmentPagerAdapter.getItem(0);
+                if(fragment != null && fragment instanceof memoFragment){
+                    ((memoFragment)fragment).callFromOut();
+                }
             }
         });
 
@@ -97,9 +118,9 @@ public class MatoMemoListActivity extends AppCompatActivity {
         tabLayout = (TabLayout)findViewById(R.id.tabs); //tabLayoutのid取得
         viewPager = (ViewPager)findViewById(R.id.pager);    //viewPagerのid取得
 
-        viewPagerAdapter = new Viewpager_Adapter(getSupportFragmentManager(),tabs_names);   //作成したfragmentとviewPagerのadapterを作成
-        viewPager.setAdapter(viewPagerAdapter); //viewPagerにfragmentをセット
-        //viewPager.addOnAdapterChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));   //tabLayoutでも移動できるようにする  //よくわかんないCastしてるけどコメントアウトしたらできた
+        manager = getSupportFragmentManager();  //Fragmentの取得
+        matomemoFragmentPagerAdapter = new CustomFragmentPagerAdapter(manager,tabs_names);  //自作のFragment用Adapterにmanagerを入れる
+        viewPager.setAdapter(matomemoFragmentPagerAdapter); //Fragment用AdapterをviewPagerに入れる
 
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener(){
             @Override
@@ -131,6 +152,35 @@ public class MatoMemoListActivity extends AppCompatActivity {
 
         tabLayout.setupWithViewPager(viewPager);    //tabLayoutとviewPagerの連携
 
+    }
+
+    //Debug用データベース設定    教科セット
+    public void SetFolderDataTest(){
+        realm.beginTransaction();   //transaction開始
+        RealmFolderEntity testFolder = realm.createObject(RealmFolderEntity.class); //Instance作成
+
+        //追加する教科
+        testFolder.setFolderName("数学");
+
+        //ToDo
+        //setFolderNameだと逐一上書きされてしまうので、ArrayListでSetするとかする必要あり
+
+        realm.commitTransaction();
+    }
+
+    //Debug用データベース設定　教科取得
+    public ArrayList GetFolderDataTest(){
+        //検索用のクエリ作成
+        RealmQuery<RealmFolderEntity> folderQuery = realm.where(RealmFolderEntity.class);
+        //インスタンス生成し、その中にすべてのデータを入れる 今回なら全てのデータ
+        RealmResults<RealmFolderEntity> folderResults = folderQuery.findAll();
+
+        ArrayList<String> arrayList = new ArrayList<>();
+        for(int i=0; i<folderResults.size(); i++){
+            arrayList.add(folderResults.get(i).getFolderName());    //全教科名をarrayListに追加
+        }
+
+        return arrayList;   //arrayListを返す
     }
 
     //画面下のButton処理
@@ -191,5 +241,4 @@ public class MatoMemoListActivity extends AppCompatActivity {
 
         return true;
     }
-
 }

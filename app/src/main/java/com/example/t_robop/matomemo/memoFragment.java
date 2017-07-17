@@ -4,12 +4,14 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import io.realm.Realm;
 
@@ -23,6 +25,13 @@ public class memoFragment extends Fragment {
     ListView memoListView = null;
 
     Realm realm;
+
+
+    public static memoFragment newInstance(){
+        memoFragment fragment = new memoFragment();
+        // Bundleとかここに書く
+        return fragment;
+    }
 
 
     //Fragmentで表示するViewを作成するメソッド
@@ -57,6 +66,11 @@ public class memoFragment extends Fragment {
         memoListView.setAdapter(adapterMemo);
 
         return memoListView;
+    }
+
+    //Fragmentを呼び出すためのpublicなメソッド
+    public void callFromOut(){
+        Log.d("test","fragment処理");
     }
 
 }

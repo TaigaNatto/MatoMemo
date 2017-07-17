@@ -10,14 +10,24 @@ import android.widget.ListView;
 
 import java.util.ArrayList;
 
+import io.realm.Realm;
+
 /**
  * Created by user on 2017/06/20.
  */
 
 public class matomeFragment extends Fragment {
 
-    ArrayAdapter<String> adapterMatome;
-    ListView matomeListView;
+    ArrayAdapter<String> adapterMatome = null;
+    ListView matomeListView = null;
+
+    Realm realm;
+
+    public static matomeFragment newInstance(){
+        matomeFragment fragment = new matomeFragment();
+        // Bundleとかここに書く
+        return fragment;
+    }
 
     //Fragmentで表示するViewを作成するメソッド
     @Override
