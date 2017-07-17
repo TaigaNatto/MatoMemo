@@ -3,6 +3,7 @@ package com.example.t_robop.matomemo;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -13,6 +14,10 @@ import org.w3c.dom.Text;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+
+import io.realm.Realm;
+import io.realm.RealmQuery;
+import io.realm.RealmResults;
 
 public class StartListActivity extends AppCompatActivity {
 
@@ -29,6 +34,10 @@ public class StartListActivity extends AppCompatActivity {
     String plusyo = "+";                                    //ボタンを押したときの処理の確認用 ※実装とは直接関係ないです
     String memowokakuyo = "memowokaku";                     //ボタンを押したときの処理の確認用 ※実装とは直接関係ないです
 
+    /*** 神 ***/
+    Realm realm;
+    /*** ** ***/
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -38,22 +47,38 @@ public class StartListActivity extends AppCompatActivity {
         listView = (ListView) findViewById(R.id.list);
         //"arrayList"をArrayListでインスタンス化
         arrayList = new ArrayList<>();
-        //arrayListに"memo"を追加
-        arrayList.add(mibunrui);
 
+        arrayList.add("groupName");
+        //arrayAdapterをインスタンス化
         arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1);
+
+        /***これ必須だからみんな書いて***/
+        Realm.init(this);
+        realm = Realm.getDefaultInstance();
+        /*******************/
+        ///フォルダのデータが欲しいとき！///
+        //検索用のクエリ作成
+        RealmQuery<RealmFolderEntity> folderQuery = realm.where(RealmFolderEntity.class);
+        //インスタンス生成し、その中にすべてのデータを入れる 今回なら全てのデータ
+        RealmResults<RealmFolderEntity> folderResults = folderQuery.findAll();
+        /***使い方は↑のメモと同じ***/
+        for(int i=0;i<folderResults.size();i++){
+            String text = folderResults.get(i).getFolderName();
+            //arrayListをtextで初期化
+            arrayList.set(0, text);
+            //arrayListをarrayAdapterに追加する
+            arrayAdapter.add(arrayList.get(0));
+            //arrayAdapterをlistViewに入れる
+            listView.setAdapter(arrayAdapter);
+        }
+
+        arrayList.set(0,"Listをタップして下さい");
 
         /*arrayList.add(memo);                                //ボタンを押したときの処理の確認用 ※実装とは直接関係ないです
         arrayList.add(memo2);                               //ボタンを押したときの処理の確認用 ※実装とは直接関係ないです
         arrayList.add(plusyo);                              //ボタンを押したときの処理の確認用 ※実装とは直接関係ないです
         arrayList.add(memowokakuyo);                        //ボタンを押したときの処理の確認用 ※実装とは直接関係ないです
         */
-
-        arrayAdapter.add(arrayList.get(0));
-        //arrayAdapter.add(arrayList.get(1));
-
-        listView.setAdapter(arrayAdapter);
-
 
         listView.setOnItemClickListener(
                 new AdapterView.OnItemClickListener() {
@@ -86,4 +111,16 @@ public class StartListActivity extends AppCompatActivity {
         listView.setAdapter(arrayAdapter);
     }
 
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if(keyCode== KeyEvent.KEYCODE_BACK){
+            // なんらかの処理
+
+            Intent intent=new Intent(this,FirstActivity.class);
+            startActivity(intent);
+
+            return true;
+        }
+        return false;
+    }
 }

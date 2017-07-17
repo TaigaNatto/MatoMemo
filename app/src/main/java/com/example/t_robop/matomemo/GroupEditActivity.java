@@ -3,6 +3,7 @@ package com.example.t_robop.matomemo;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.support.v7.app.AlertDialog;
@@ -10,6 +11,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.SparseBooleanArray;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
@@ -44,7 +46,7 @@ public class GroupEditActivity extends AppCompatActivity {
     //ArrayListのString型でarrayListを作成
     ArrayList<String> arrayList;
 
-    ArrayList<String> arrayTemp;
+    ArrayList<Integer> arrayNum;
 
     //ListViewでlistViewを作成
     ListView listView;
@@ -97,30 +99,42 @@ public class GroupEditActivity extends AppCompatActivity {
                 this, android.R.layout.simple_list_item_multiple_choice);
 
 
-        ////
+
         ///フォルダのデータが欲しいとき！///
         //検索用のクエリ作成
         RealmQuery<RealmFolderEntity> folderQuery = realm.where(RealmFolderEntity.class);
         //インスタンス生成し、その中にすべてのデータを入れる 今回なら全てのデータ
         RealmResults<RealmFolderEntity> folderResults = folderQuery.findAll();
         /***使い方は↑のメモと同じ***/
-        for(int i=0;i<folderResults.size();i++){
+        for(int i=1;i<folderResults.size();i++){
             String text = folderResults.get(i).getFolderName();
-            //arrayListをgroupNameで初期化
-            arrayList.set(0, text);
-            //arrayListをarrayAdapterに追加する
-            arrayAdapter.add(arrayList.get(0));
-            //arrayAdapterをlistViewに入れる
-            listView.setAdapter(arrayAdapter);
-            //listViewの要素数を追加
-            itemNum++;
+            //arrayListをtextで初期化
+            arrayList.set(i - 1, text);
             //グループがすでにあるとき、textViewを空白で更新
             textView.setText(" ");
+            ////データベースで実装
+            // arrayListをarrayAdapterに追加する
+            // arrayAdapter.add(arrayList.get(i));
+            //listViewの要素数を追加
+            itemNum++;
         }
 
         ////
+        //listViewの要素数分だけ繰り返す
+        for(int i = 0;i < itemNum;i++) {
+            //listViewの要素数分だけ繰り返す
+            for (int j = 0; j < itemNum; j++) {
+                //arrayNum(j)とiが同じなら実行
+                if (arrayNum.get(j) == i) {
 
-
+                    //arrayListをarrayAdapterに追加する
+                    arrayAdapter.add(arrayList.get(i));
+                    //arrayAdapterをlistViewに入れる
+                    listView.setAdapter(arrayAdapter);
+                    break;
+                }
+            }
+        }
 
 
         //listViewがタップされた事を取れるようにする
@@ -170,10 +184,14 @@ public class GroupEditActivity extends AppCompatActivity {
                     //チェックがついてる行を削除
                     arrayAdapter.remove(arrayAdapter.getItem(x));
 
+                    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                    arrayNum.remove(arrayNum.get(x));
 
+                    for(int i = 1;i<=itemNum;i++){
+                        arrayNum.set(i,i);
 
-
-                    ///////////////////////////////////////////
+                    }
+                    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
                     ////String temp = arrayAdapter.getContext(x);
 
                     RealmQuery<RealmFolderEntity> query  = realm.where(RealmFolderEntity.class);
@@ -203,6 +221,7 @@ public class GroupEditActivity extends AppCompatActivity {
             }
             //checkBoxの中身を初期化
             listView.setAdapter(arrayAdapter);
+
             //TextViewに「フォルダを作成してください」を代入
             if (itemNum == 0) {
                 textView.setText("フォルダを作成してください");
@@ -245,8 +264,8 @@ public class GroupEditActivity extends AppCompatActivity {
                     //ListViewの要素分繰り返す
                     for (int i = 0; i < itemNum; i++) {
                         //もし重複しているなら実行
-                        //groupNameがarrayAdapterのi番目の要素と同じなら実行
-                        if (groupName .equals(arrayAdapter.getItem(i))) {
+                        //groupNameがarrayAdapterのi番目の要素と同じか、"未分類"なら実行
+                        if (groupName .equals(arrayAdapter.getItem(i)) || groupName .equals("未分類")) {
                             //重複している状態に更新
                             original = false;
                             // 第3引数は、表示期間（LENGTH_SHORT、または、LENGTH_LONG）
@@ -265,11 +284,17 @@ public class GroupEditActivity extends AppCompatActivity {
                     if(groupName .equals("") == false && original) {
                  //
                  //arrayListをgroupNameで初期化
-                        arrayList.set(0, groupName);
+                        arrayList.set(itemNum, groupName);
                         //arrayListをarrayAdapterに追加する
-                        arrayAdapter.add(arrayList.get(0));
+                        arrayAdapter.add(arrayList.get(itemNum));
                         //arrayAdapterをlistViewに入れる
                         listView.setAdapter(arrayAdapter);
+
+                        //実装時は別の処理////////////////////////////////////////////////////////////////////////////////////
+                        //
+                        arrayNum.add(itemNum);
+
+
                         //listViewの要素数を追加
                         itemNum++;
                  //
@@ -304,5 +329,24 @@ public class GroupEditActivity extends AppCompatActivity {
             dialog.show();
 
         }
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if(keyCode== KeyEvent.KEYCODE_BACK){
+            // なんらかの処理
+
+            Intent intent=new Intent(this,StartListActivity.class);
+
+            intent.putExtra("ID",arrayNum);
+
+            startActivity(intent);
+
+
+            GroupEditActivity arrayNum = (GroupEditActivity) getIntent().getSerializableExtra("ID");
+
+            return true;
+        }
+        return false;
     }
 }
