@@ -63,7 +63,7 @@ public class MatoMemoListActivity extends AppCompatActivity {
 
         //Toolbar
         toolbar = (Toolbar)findViewById(R.id.toolbar);
-        toolbar.setTitle("未分類");  //教科名をセット
+        toolbar.setTitle("未分類");  //教科名はDrawer内の教科をクリックすると変わる
         setSupportActionBar(toolbar);
 
         //Drawerのid
@@ -84,10 +84,7 @@ public class MatoMemoListActivity extends AppCompatActivity {
         drawerArrayAdapter.add("未分類");
 
         //Databaseから教科(Folder)取得
-        ArrayList<String> SubjectName = this.GetFolderDataTest();
-        for(int i = 0; i<SubjectName.size(); i++){
-            drawerArrayAdapter.add(SubjectName.get(i)); //DatabaseからGetしてきた教科名をDrawerにセット
-        }
+        GetFolderDataTest();
 
         //AdapterをListViewにセット
         drawerListView.setAdapter(drawerArrayAdapter);
@@ -97,15 +94,17 @@ public class MatoMemoListActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-                //ToDo
                 //動的に追加された教科Listのクリック処理
                 //drawerArrayAdapterに教科Listがある
-                //処理内容：　教科クリックしたらToolBar.setTitleで教科名をセット
+                Object item = parent.getItemAtPosition(position);   //クリックしたpositionからItemを取得
 
-                //CustomFragmentPagerAdapterのgetItemからfragment情報を取ってきて、memoFragmentのcallFromOutメソッドを呼び出す
+                //教科クリックしたらToolBar.setTitleで教科名をセット
+                toolbar.setTitle(item.toString());
+
+                //CustomFragmentPagerAdapterのgetItemからfragment情報を取ってきて、memoFragmentのGetMemoDataTestメソッドを呼び出す
                 Fragment fragment = matomemoFragmentPagerAdapter.getItem(0);
                 if(fragment != null && fragment instanceof memoFragment){
-                    ((memoFragment)fragment).callFromOut();
+                    ((memoFragment)fragment).GetMemoDataTest(item.toString());
                 }
             }
         });
@@ -169,18 +168,15 @@ public class MatoMemoListActivity extends AppCompatActivity {
     }
 
     //Debug用データベース設定　教科取得
-    public ArrayList GetFolderDataTest(){
+    public void GetFolderDataTest(){
         //検索用のクエリ作成
         RealmQuery<RealmFolderEntity> folderQuery = realm.where(RealmFolderEntity.class);
         //インスタンス生成し、その中にすべてのデータを入れる 今回なら全てのデータ
         RealmResults<RealmFolderEntity> folderResults = folderQuery.findAll();
 
-        ArrayList<String> arrayList = new ArrayList<>();
         for(int i=0; i<folderResults.size(); i++){
-            arrayList.add(folderResults.get(i).getFolderName());    //全教科名をarrayListに追加
+            drawerArrayAdapter.add(folderResults.get(i).getFolderName());    //全教科名をDrawerのAdapterに追加
         }
-
-        return arrayList;   //arrayListを返す
     }
 
     //画面下のButton処理
