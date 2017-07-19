@@ -28,7 +28,7 @@ public class memoFragment extends Fragment {
 
     Realm realm;
 
-    //
+    //Fragmentの初期化  呼び出し元: CustomFragmentPagerAdapter
     public static memoFragment newInstance(){
         memoFragment fragment = new memoFragment();
         // Bundleとかここに書く
@@ -44,45 +44,38 @@ public class memoFragment extends Fragment {
         Realm.init(getActivity());
         realm = Realm.getDefaultInstance();
 
-        SetMemoDataTest();  //Debug用データセット
-
         //メモリストのレイアウトをViewとして作成
         memoListView = (ListView)inflater.inflate(R.layout.activity_memo_tab,container,false);
 
         //Adapterのインスタンスを作成
         adapterMemo = new ArrayAdapter<String>(getContext(), android.R.layout.simple_list_item_1);
 
-        adapterMemo.add("ただのメモ");
+        GetMemoDataTest("未分類"); //Activity起動時にはデフォルトで未分類のメモを取得
 
-        memoListView.setAdapter(adapterMemo);
+        memoListView.setAdapter(adapterMemo);   //メモを画面に表示
 
         return memoListView;
     }
 
     //Debug用データベース設定    教科別メモセット
-    //ToDo  
-    public void SetMemoDataTest(){
+    //ToDo
+    public void SetMemoDataTest(String subjectName){
         //トランザクション開始
         realm.beginTransaction();
         //インスタンスを生成
         RealmMemoEntity testMemo = realm.createObject(RealmMemoEntity.class);
 
-        //ToDo
-        //未分類フォルダに未分類メモ1を入れる
-        //数学フォルダに数学メモ1を入れる
-        //書き込みたいデータをインスタンスに入れる
-        testMemo.setFolder("未分類");
-        testMemo.setMemo("未分類メモ");
-
+        //Debug用　Drawer内でタップした教科のメモをDebug用に作成したセット
+        testMemo.setFolder(subjectName);
+        testMemo.setMemo(subjectName+"メモ");
 
         //トランザクション終了 (データを書き込む)
         realm.commitTransaction();
 
-        //ToDo
-        //setFolderNameだと逐一上書きされてしまうので、ArrayListでSetするとかする必要あり
+
     }
 
-    //Debug用データベース設定    教科別メモ取得
+    //データベース設定    教科別メモ取得
     public void GetMemoDataTest(String subjectName){    //引数：　Drawer内でクリックした教科名
         //検索用のクエリ作成
         RealmQuery<RealmMemoEntity> memoQuery = realm.where(RealmMemoEntity.class);

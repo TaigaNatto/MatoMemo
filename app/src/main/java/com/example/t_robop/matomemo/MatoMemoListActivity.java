@@ -1,5 +1,6 @@
 package com.example.t_robop.matomemo;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -47,6 +48,8 @@ public class MatoMemoListActivity extends AppCompatActivity {
 
     Toolbar toolbar;
 
+    Object item  = null;
+
     Realm realm;
 
     @Override
@@ -58,12 +61,13 @@ public class MatoMemoListActivity extends AppCompatActivity {
         Realm.init(this);
         realm = Realm.getDefaultInstance();
 
-        //Debug用Database設定
-        SetFolderDataTest();
+        //Intent元からのデータ受け取り
+        Intent intent = getIntent();
+        String subjectName = intent.getStringExtra("folder");
 
         //Toolbar
         toolbar = (Toolbar)findViewById(R.id.toolbar);
-        toolbar.setTitle("未分類");  //教科名はDrawer内の教科をクリックすると変わる
+        toolbar.setTitle(subjectName);  //intent元でタップされた教科名を設定
         setSupportActionBar(toolbar);
 
         //Drawerのid
@@ -80,10 +84,10 @@ public class MatoMemoListActivity extends AppCompatActivity {
         //Drawer内のArrayAdapterのインスタンス生成
         drawerArrayAdapter =new ArrayAdapter<String>(this,R.layout.drawer_list_item);
 
-        //Debug用Drawer内のList表示
+        //Drawer内のList初期表示
         drawerArrayAdapter.add("未分類");
 
-        //Databaseから教科(Folder)取得
+        //Databaseから教科(Folder)取得してdrawerArrayAdapterにセット
         GetFolderDataTest();
 
         //AdapterをListViewにセット
@@ -96,16 +100,14 @@ public class MatoMemoListActivity extends AppCompatActivity {
 
                 //動的に追加された教科Listのクリック処理
                 //drawerArrayAdapterに教科Listがある
-                Object item = parent.getItemAtPosition(position);   //クリックしたpositionからItemを取得
+                String item = parent.getItemAtPosition(position).toString();   //クリックしたpositionからItemを取得
 
                 //教科クリックしたらToolBar.setTitleで教科名をセット
                 toolbar.setTitle(item.toString());
 
-                //CustomFragmentPagerAdapterのgetItemからfragment情報を取ってきて、memoFragmentのGetMemoDataTestメソッドを呼び出す
-                Fragment fragment = matomemoFragmentPagerAdapter.getItem(0);
-                if(fragment != null && fragment instanceof memoFragment){
-                    ((memoFragment)fragment).GetMemoDataTest(item.toString());
-                }
+                //intent元でタップされた教科名のメモを表示
+                showMemoDataTest(item);
+
             }
         });
 
@@ -119,6 +121,10 @@ public class MatoMemoListActivity extends AppCompatActivity {
 
         manager = getSupportFragmentManager();  //Fragmentの取得
         matomemoFragmentPagerAdapter = new CustomFragmentPagerAdapter(manager,tabs_names);  //自作のFragment用Adapterにmanagerを入れる
+
+        //intent元でタップされた教科名のメモを表示
+        showMemoDataTest(subjectName);
+
         viewPager.setAdapter(matomemoFragmentPagerAdapter); //Fragment用AdapterをviewPagerに入れる
 
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener(){
@@ -153,20 +159,6 @@ public class MatoMemoListActivity extends AppCompatActivity {
 
     }
 
-    //Debug用データベース設定    教科セット
-    public void SetFolderDataTest(){
-        realm.beginTransaction();   //transaction開始
-        RealmFolderEntity testFolder = realm.createObject(RealmFolderEntity.class); //Instance作成
-
-        //追加する教科
-        testFolder.setFolderName("数学");
-
-        //ToDo
-        //setFolderNameだと逐一上書きされてしまうので、ArrayListでSetするとかする必要あり
-
-        realm.commitTransaction();
-    }
-
     //Debug用データベース設定　教科取得
     public void GetFolderDataTest(){
         //検索用のクエリ作成
@@ -176,6 +168,15 @@ public class MatoMemoListActivity extends AppCompatActivity {
 
         for(int i=0; i<folderResults.size(); i++){
             drawerArrayAdapter.add(folderResults.get(i).getFolderName());    //全教科名をDrawerのAdapterに追加
+        }
+    }
+
+    //intent元でタップされた教科名のメモを表示
+    public void showMemoDataTest(String subject){
+        Fragment fragment = matomemoFragmentPagerAdapter.getItem(0);    //CustomFragmentPagerAdapterのgetItemからfragment情報を取ってくる
+        if(fragment != null && fragment instanceof memoFragment){
+            ((memoFragment)fragment).SetMemoDataTest(subject);  //Debug用　タップした教科名のメモをデータベースに設定
+            ((memoFragment)fragment).GetMemoDataTest(subject);  //タップされた教科名のメモをデータベースから取ってくる
         }
     }
 
