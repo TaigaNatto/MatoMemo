@@ -35,7 +35,6 @@ public class memoFragment extends Fragment {
         return fragment;
     }
 
-
     //Fragmentで表示するViewを作成するメソッド
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle saveInstanceState){
@@ -50,7 +49,8 @@ public class memoFragment extends Fragment {
         //Adapterのインスタンスを作成
         adapterMemo = new ArrayAdapter<String>(getContext(), android.R.layout.simple_list_item_1);
 
-        GetMemoDataTest("未分類"); //Activity起動時にはデフォルトで未分類のメモを取得
+        //ToDo StartListActivityからIntentされたときにタップした教科名のメモを表示させる
+        //SetMemoDataTestとGetMemoDataTestを使いたいけど、MatoMemoListActivityのフィールドでnullで宣言しているsubjectNameを取ってきてしまう
 
         memoListView.setAdapter(adapterMemo);   //メモを画面に表示
 
