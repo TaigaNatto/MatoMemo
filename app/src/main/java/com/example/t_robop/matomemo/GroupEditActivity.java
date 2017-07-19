@@ -45,7 +45,6 @@ import static android.R.attr.id;
 public class GroupEditActivity extends AppCompatActivity {
     //ArrayListのString型でarrayListを作成
     ArrayList<String> arrayList;
-
     ArrayList<Integer> arrayNum;
 
     //ListViewでlistViewを作成
@@ -85,6 +84,16 @@ public class GroupEditActivity extends AppCompatActivity {
         //arrayListに"memo"を追加
         arrayList.add(groupName);
 
+     /*   //"arrayList"をArrayListでインスタンス化
+        arrayNum = new ArrayList<>();
+        //set
+        arrayNum.add(0);
+        arrayNum.add(1);
+        arrayNum.add(2);
+        arrayNum.add(3);
+        arrayNum.add(4);
+       */
+
         /***これ必須だからみんな書いて***/
         Realm.init(this);
         realm = Realm.getDefaultInstance();
@@ -109,17 +118,19 @@ public class GroupEditActivity extends AppCompatActivity {
         for(int i=1;i<folderResults.size();i++){
             String text = folderResults.get(i).getFolderName();
             //arrayListをtextで初期化
-            arrayList.set(i - 1, text);
+            arrayList.set(0, text);
             //グループがすでにあるとき、textViewを空白で更新
             textView.setText(" ");
             ////データベースで実装
             // arrayListをarrayAdapterに追加する
-            // arrayAdapter.add(arrayList.get(i));
+             arrayAdapter.add(arrayList.get(0));
             //listViewの要素数を追加
             itemNum++;
+            //arrayAdapterをlistViewに入れる
+            listView.setAdapter(arrayAdapter);
         }
 
-        ////
+        /*///
         //listViewの要素数分だけ繰り返す
         for(int i = 0;i < itemNum;i++) {
             //listViewの要素数分だけ繰り返す
@@ -128,13 +139,13 @@ public class GroupEditActivity extends AppCompatActivity {
                 if (arrayNum.get(j) == i) {
 
                     //arrayListをarrayAdapterに追加する
-                    arrayAdapter.add(arrayList.get(i));
+                    arrayAdapter.add(arrayList.get(j));
                     //arrayAdapterをlistViewに入れる
                     listView.setAdapter(arrayAdapter);
                     break;
                 }
             }
-        }
+        }*/
 
 
         //listViewがタップされた事を取れるようにする
@@ -185,12 +196,11 @@ public class GroupEditActivity extends AppCompatActivity {
                     arrayAdapter.remove(arrayAdapter.getItem(x));
 
                     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                    arrayNum.remove(arrayNum.get(x));
+                    //arrayNum.remove(arrayNum.get(x));
 
-                    for(int i = 1;i<=itemNum;i++){
-                        arrayNum.set(i,i);
-
-                    }
+                    //for(int i = 1;i<=itemNum;i++){
+                    //    arrayNum.set(i,i);
+                    //}
                     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
                     ////String temp = arrayAdapter.getContext(x);
 
@@ -249,7 +259,7 @@ public class GroupEditActivity extends AppCompatActivity {
             */
 
 
-
+            //ダイアログのokが押されたら実行
             dialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                 @Override
 
@@ -284,15 +294,15 @@ public class GroupEditActivity extends AppCompatActivity {
                     if(groupName .equals("") == false && original) {
                  //
                  //arrayListをgroupNameで初期化
-                        arrayList.set(itemNum, groupName);
+                        arrayList.set(0, groupName);
                         //arrayListをarrayAdapterに追加する
-                        arrayAdapter.add(arrayList.get(itemNum));
+                        arrayAdapter.add(arrayList.get(0));
                         //arrayAdapterをlistViewに入れる
                         listView.setAdapter(arrayAdapter);
 
                         //実装時は別の処理////////////////////////////////////////////////////////////////////////////////////
                         //
-                        arrayNum.add(itemNum);
+                        //arrayNum.add(itemNum);
 
 
                         //listViewの要素数を追加
@@ -338,15 +348,13 @@ public class GroupEditActivity extends AppCompatActivity {
 
             Intent intent=new Intent(this,StartListActivity.class);
 
-            intent.putExtra("ID",arrayNum);
+            //intent.putExtra("ID",arrayNum);
 
             startActivity(intent);
-
-
-            GroupEditActivity arrayNum = (GroupEditActivity) getIntent().getSerializableExtra("ID");
 
             return true;
         }
         return false;
     }
+
 }

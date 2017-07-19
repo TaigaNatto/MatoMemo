@@ -33,6 +33,7 @@ public class StartListActivity extends AppCompatActivity {
     String memo2 = "cccddd";                                //ボタンを押したときの処理の確認用 ※実装とは直接関係ないです
     String plusyo = "+";                                    //ボタンを押したときの処理の確認用 ※実装とは直接関係ないです
     String memowokakuyo = "memowokaku";                     //ボタンを押したときの処理の確認用 ※実装とは直接関係ないです
+    //ArrayList<Integer> arrayNum;
 
     /*** 神 ***/
     Realm realm;
@@ -117,6 +118,7 @@ public class StartListActivity extends AppCompatActivity {
             // なんらかの処理
 
             Intent intent=new Intent(this,FirstActivity.class);
+            //intent.putExtra("ID",arrayNum);
             startActivity(intent);
 
             return true;
