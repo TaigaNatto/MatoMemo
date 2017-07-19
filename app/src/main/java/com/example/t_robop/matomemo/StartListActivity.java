@@ -28,7 +28,7 @@ public class StartListActivity extends AppCompatActivity {
     //ArrayAdapterのString型でarrayAdapterを作成
     ArrayAdapter<String> arrayAdapter;
 
-    String mibunrui = "未分類";
+    String text = "未分類";
     String memo = "aaabbb";                                 //ボタンを押したときの処理の確認用 ※実装とは直接関係ないです
     String memo2 = "cccddd";                                //ボタンを押したときの処理の確認用 ※実装とは直接関係ないです
     String plusyo = "+";                                    //ボタンを押したときの処理の確認用 ※実装とは直接関係ないです
@@ -81,18 +81,25 @@ public class StartListActivity extends AppCompatActivity {
         arrayList.add(memowokakuyo);                        //ボタンを押したときの処理の確認用 ※実装とは直接関係ないです
         */
 
+
         listView.setOnItemClickListener(
                 new AdapterView.OnItemClickListener() {
                     @Override
                     //listViewがタップされたときに実行
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        text = (String)listView.getItemAtPosition(position);
 
-                        mibunrui = position + "番目のアイテムがクリックされました";
-                        arrayList.set(0,mibunrui);
+                        Intent intent=new Intent(getApplicationContext(),MatoMemoListActivity.class);
+                        intent.putExtra("folder",text);
+
+                        startActivity(intent);
                     }
 
 
                 });
+
+        Intent intent = new Intent(this.getApplicationContext(), GroupEditActivity.class);
+
     }
 
 //↓↓↓↓↓↓↓↓ボタンを押したときの処理の確認用 ※実装とは直接関係ないです↓↓↓↓↓↓↓↓↓
@@ -117,7 +124,7 @@ public class StartListActivity extends AppCompatActivity {
         if(keyCode== KeyEvent.KEYCODE_BACK){
             // なんらかの処理
 
-            Intent intent=new Intent(this,FirstActivity.class);
+            Intent intent=new Intent(getApplicationContext(),FirstActivity.class);
             //intent.putExtra("ID",arrayNum);
             startActivity(intent);
 
