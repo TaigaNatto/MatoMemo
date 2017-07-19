@@ -18,21 +18,24 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:text="memo"
-            android:onClick="memo_v"/>
+            android:onClick="memo_v"
+            android:id="@+id/memo_v"/>
 
         <Button
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:text="folder"
-            android:onClick="folder_v"/>
+            android:onClick="folder_v"
+            android:id="@+id/folder_v"/>
 
         <Button
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:text="word"
-            android:onClick="word_v"/>
+            android:onClick="word_v"
+            android:id="@+id/word_v"/>
 
     </LinearLayout>
 
@@ -53,8 +56,9 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_weight="1"
-        android:text="メモ追加テスト"
-        android:onClick="add_v"/>
+        android:text="メモをテストで追加"
+        android:onClick="add_v"
+        android:id="@+id/add_v"/>
 
     <Button
         android:layout_width="match_parent"
