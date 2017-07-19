@@ -53,6 +53,10 @@ public class StartListActivity extends AppCompatActivity {
         //arrayAdapterをインスタンス化
         arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1);
 
+        arrayAdapter.add("未分類");
+        //arrayAdapterをlistViewに入れる
+        listView.setAdapter(arrayAdapter);
+
         /***これ必須だからみんな書いて***/
         Realm.init(this);
         realm = Realm.getDefaultInstance();
