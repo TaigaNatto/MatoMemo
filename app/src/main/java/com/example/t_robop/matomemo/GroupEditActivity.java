@@ -115,7 +115,7 @@ public class GroupEditActivity extends AppCompatActivity {
         //インスタンス生成し、その中にすべてのデータを入れる 今回なら全てのデータ
         RealmResults<RealmFolderEntity> folderResults = folderQuery.findAll();
         /***使い方は↑のメモと同じ***/
-        for(int i=1;i<folderResults.size();i++){
+        for(int i=0;i<folderResults.size();i++){
             String text = folderResults.get(i).getFolderName();
             //arrayListをtextで初期化
             arrayList.set(0, text);
