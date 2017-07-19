@@ -22,7 +22,8 @@
         <activity android:name=".MatoMemoListActivity" />
         <activity android:name=".RealmTestActivity" />
         <activity android:name=".WritingActivity" />
-        <activity android:name=".DBLogActivity"></activity>
+        <activity android:name=".DBLogActivity" />
+        <activity android:name=".MatomeActivity"></activity>
     </application>
 
 </manifest>

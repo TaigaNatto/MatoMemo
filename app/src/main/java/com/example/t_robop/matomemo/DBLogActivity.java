@@ -2,8 +2,10 @@ package com.example.t_robop.matomemo;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 
 import io.realm.Realm;
@@ -14,6 +16,15 @@ public class DBLogActivity extends AppCompatActivity {
 
     ListView listView;
     ArrayAdapter arrayAdapter;
+
+    Button memoBtn;
+    Button folderBtn;
+    Button wordBtn;
+
+    Button addBtn;
+
+    //0memo1folder2word
+    int listFlag=0;
 
     /*** 神 ***/
     Realm realm;
@@ -32,19 +43,30 @@ public class DBLogActivity extends AppCompatActivity {
         listView=(ListView)findViewById(R.id.log_list);
         arrayAdapter=new ArrayAdapter(this,android.R.layout.simple_list_item_1);
 
+        memoBtn=(Button)findViewById(R.id.memo_v);
+        folderBtn=(Button)findViewById(R.id.folder_v);
+        wordBtn=(Button)findViewById(R.id.word_v);
+        addBtn=(Button)findViewById(R.id.add_v);
+
         loadRealm("memo");
 
     }
 
     public void memo_v(View v){
+        addBtn.setText("メモをテストで追加");
+        listFlag=0;
         loadRealm("memo");
     }
 
     public void folder_v(View v){
+        addBtn.setText("フォルダーをテストで追加");
+        listFlag=1;
         loadRealm("folder");
     }
 
     public void word_v(View v){
+        addBtn.setText("単語をテストで追加");
+        listFlag=2;
         loadRealm("word");
     }
 
@@ -60,6 +82,7 @@ public class DBLogActivity extends AppCompatActivity {
                 RealmResults<RealmMemoEntity> memoR = memoQuery.findAll();
                 for (RealmMemoEntity test:memoR){
                     arrayAdapter.add(test.getMemo());
+                    Log.d("SSS", String.valueOf(test.getDate()));
                 }
             case "folder":
                 //検索用のクエリ作成
@@ -83,18 +106,43 @@ public class DBLogActivity extends AppCompatActivity {
     }
 
     public void add_v(View v){
-        /***データを書き込みたいとき！***/
+
         //トランザクション開始
         realm.beginTransaction();
-        //インスタンスを生成
-        RealmMemoEntity model = realm.createObject(RealmMemoEntity.class);
-        //書き込みたいデータをインスタンスに入れる
-        model.setMemo("test");
-        //トランザクション終了 (データを書き込む)
-        realm.commitTransaction();
-        /******************************/
 
-        loadRealm("memo");
+        switch (listFlag) {
+
+            case 0:
+                //インスタンスを生成
+                RealmMemoEntity model_m = realm.createObject(RealmMemoEntity.class);
+                //書き込みたいデータをインスタンスに入れる
+                model_m.setMemo("test");
+
+                //トランザクション終了 (データを書き込む)
+                realm.commitTransaction();
+
+                loadRealm("memo");
+            case 1:
+                //インスタンスを生成
+                RealmFolderEntity model_f = realm.createObject(RealmFolderEntity.class);
+                //書き込みたいデータをインスタンスに入れる
+                model_f.setFolderName("test");
+
+                //トランザクション終了 (データを書き込む)
+                realm.commitTransaction();
+
+                loadRealm("folder");
+            case 2:
+                //インスタンスを生成
+                RealmWordEntity model_w = realm.createObject(RealmWordEntity.class);
+                //書き込みたいデータをインスタンスに入れる
+                model_w.setWordName("test");
+
+                //トランザクション終了 (データを書き込む)
+                realm.commitTransaction();
+
+                loadRealm("memo");
+        }
     }
 
     //削除
