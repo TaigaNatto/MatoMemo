@@ -1,17 +1,12 @@
 package com.example.t_robop.matomemo;
 
-import android.app.Activity;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import io.realm.Realm;
 import io.realm.RealmQuery;
@@ -21,17 +16,20 @@ import io.realm.RealmResults;
  * Created by user on 2017/06/20.
  */
 
-public class memoFragment extends Fragment {
+public class MemoFragment extends Fragment {
 
-    ArrayAdapter<String> adapterMemo = null;
-    ListView memoListView = null;
+    //ListView memoListView = null;   //メモのListView
+    ArrayAdapter<String> adapterMemo = null;    //ListViewのAdapter
 
     Realm realm;
 
-    //Fragmentの初期化  呼び出し元: CustomFragmentPagerAdapter
-    public static memoFragment newInstance(){
-        memoFragment fragment = new memoFragment();
+    //MemoFragmentのインスタンス化メソッド
+    public static MemoFragment newInstance(String subjectName){
         // Bundleとかここに書く
+        Bundle args = new Bundle();
+        args.putString("SUBJECT",subjectName);  //StartListActivityでクリックされた教科名を受け取って保存
+        MemoFragment fragment = new MemoFragment(); //Fragmentの初期化
+        fragment.setArguments(args);
         return fragment;
     }
 
@@ -43,14 +41,17 @@ public class memoFragment extends Fragment {
         Realm.init(getActivity());
         realm = Realm.getDefaultInstance();
 
-        //メモリストのレイアウトをViewとして作成
-        memoListView = (ListView)inflater.inflate(R.layout.activity_memo_tab,container,false);
+        //メモのListViewのレイアウトをインフレート
+        ListView memoListView = (ListView)inflater.inflate(R.layout.activity_memo_tab,container,false);
 
         //Adapterのインスタンスを作成
-        adapterMemo = new ArrayAdapter<String>(getContext(), android.R.layout.simple_list_item_1);
+        adapterMemo = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1);
 
-        //ToDo StartListActivityからIntentされたときにタップした教科名のメモを表示させる
-        //SetMemoDataTestとGetMemoDataTestを使いたいけど、MatoMemoListActivityのフィールドでnullで宣言しているsubjectNameを取ってきてしまう
+        Bundle args = getArguments();
+        String subject = args.getString("SUBJECT"); //初期表示の教科名を保存
+        //ToDo 別画面で作成されてデータベースに保存されているメモのリストを呼び出す
+        setMemoDataTest(subject);   //Debug用データベース設定    StartListActivityでタップした教科名のメモ一覧をデータベースにセット
+        getMemoDataList(subject);   //StartListActivityでタップした教科名のメモ一覧をデータベースから取ってきて表示
 
         memoListView.setAdapter(adapterMemo);   //メモを画面に表示
 
@@ -59,7 +60,7 @@ public class memoFragment extends Fragment {
 
     //Debug用データベース設定    教科別メモセット
     //ToDo
-    public void SetMemoDataTest(String subjectName){
+    public void setMemoDataTest(String subjectName){
         //トランザクション開始
         realm.beginTransaction();
         //インスタンスを生成
@@ -72,11 +73,10 @@ public class memoFragment extends Fragment {
         //トランザクション終了 (データを書き込む)
         realm.commitTransaction();
 
-
     }
 
-    //データベース設定    教科別メモ取得
-    public void GetMemoDataTest(String subjectName){    //引数：　Drawer内でクリックした教科名
+    //データベースから教科別メモ取得
+    public void getMemoDataList(String subjectName){    //引数：　Drawer内でクリックした教科名
         //検索用のクエリ作成
         RealmQuery<RealmMemoEntity> memoQuery = realm.where(RealmMemoEntity.class);
 
