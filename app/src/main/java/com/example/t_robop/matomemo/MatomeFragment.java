@@ -8,35 +8,33 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
-import java.util.ArrayList;
-
 import io.realm.Realm;
 
 /**
  * Created by user on 2017/06/20.
  */
+//ToDo まとめListの設計確認
+public class MatomeFragment extends Fragment {
 
-public class matomeFragment extends Fragment {
-
+    //ListView matomeListView = null;
     ArrayAdapter<String> adapterMatome = null;
-    ListView matomeListView = null;
 
     Realm realm;
 
-    public static matomeFragment newInstance(){
-        matomeFragment fragment = new matomeFragment();
+    public static MatomeFragment newInstance(){
         // Bundleとかここに書く
+        MatomeFragment fragment = new MatomeFragment();
         return fragment;
     }
 
     //Fragmentで表示するViewを作成するメソッド
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
-        //まとめリストのレイアウトをViewとして作成
-        matomeListView = (ListView)inflater.inflate(R.layout.activity_matome_tab,container,false);
+        //まとめのListViewのレイアウトをインフレート
+        ListView matomeListView = (ListView)inflater.inflate(R.layout.activity_matome_tab,container,false);
 
         //Adapterのインスタンスを作って、追加
-        adapterMatome = new ArrayAdapter<String>(getContext(), android.R.layout.simple_list_item_1);
+        adapterMatome = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1);
 
         adapterMatome.add("まとめ");
 
