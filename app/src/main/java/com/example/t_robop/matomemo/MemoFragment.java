@@ -59,11 +59,26 @@ public class MemoFragment extends Fragment {
 
         memoListView.setAdapter(adapterMemo);   //メモを画面に表示
 
+        //メモリストのItemタップ時の処理     WritingActivityへのIntent
         memoListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
                 //ToDo メモリストのItemをタップしたときに、・日付　・時間　・メモ内容　・教科名　のデータを持ってWritingActivityにIntent
                 matoMemoListActivity.move();    //WritingActivityへのIntentメソッド   //処理内容はMatoMemoListActivityにある
+            }
+        });
+
+        //メモリストのItem長押し時の処理     選択メモの削除
+        memoListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int position, long id) {
+                //ToDo 選択メモをリストから削除・realmから削除
+                String item = (String)adapterView.getItemAtPosition(position);   //クリックしたpositionからItemを取得
+                adapterMemo.remove(item);   //リストから削除
+
+                removeMemoData(item);   //データベースから削除    //ToDo ダイアログ表示して消去確認メッセ出そう
+
+                return false;
             }
         });
 
@@ -110,5 +125,23 @@ public class MemoFragment extends Fragment {
         }
     }
 
+    //選択されたItemをデータベースから削除
+    //ToDo このままだとメモタイトル同名のものが全てデータベースから消えてしまう
+    public void removeMemoData(String selectedItem){
+        // クエリを発行
+        RealmQuery<RealmMemoEntity> delQuery  = realm.where(RealmMemoEntity.class);
+        //消したいデータを指定 (以下の場合はmemoデータの「memo」が「test」のものを指定)
+        delQuery.equalTo("memo",selectedItem);
+        //指定されたデータを持つデータのみに絞り込む
+        final RealmResults<RealmMemoEntity> delR = delQuery.findAll();
+        // 変更操作はトランザクションの中で実行する必要あり
+        realm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                // すべてのオブジェクトを削除
+                delR.deleteAllFromRealm();
+            }
+        });
+    }
 
 }

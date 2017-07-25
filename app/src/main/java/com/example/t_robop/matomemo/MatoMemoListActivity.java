@@ -228,11 +228,14 @@ public class MatoMemoListActivity extends AppCompatActivity {
         {
             case R.id.tag_settings:
                 Log.d("menu","タグ設定へ");  //TagEditActivityへIntent
+                intent = new Intent(this, TagEditActivity.class);
                 break;
 
+            /*
             case R.id.important_setting:
                 Log.d("menu","重要度設定へ");     //ImportantEditActivityへIntent
                 break;
+             */
 
             case R.id.editFolder:
                 intent = new Intent(this,GroupEditActivity.class);  //GroupEditActivityへIntent
