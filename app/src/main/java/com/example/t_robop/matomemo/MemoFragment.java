@@ -1,10 +1,12 @@
 package com.example.t_robop.matomemo;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
@@ -20,6 +22,8 @@ public class MemoFragment extends Fragment {
 
     //ListView memoListView = null;   //メモのListView
     ArrayAdapter<String> adapterMemo = null;    //ListViewのAdapter
+
+    private MatoMemoListActivity matoMemoListActivity;
 
     Realm realm;
 
@@ -55,7 +59,22 @@ public class MemoFragment extends Fragment {
 
         memoListView.setAdapter(adapterMemo);   //メモを画面に表示
 
+        memoListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                //ToDo メモリストのItemをタップしたときに、・日付　・時間　・メモ内容　・教科名　のデータを持ってWritingActivityにIntent
+                matoMemoListActivity.move();    //WritingActivityへのIntentメソッド   //処理内容はMatoMemoListActivityにある
+            }
+        });
+
         return memoListView;
+    }
+
+    //MatoMemoListActivityとの連携  横線あるけど気にしないで
+    @Override
+    public void onAttach(Activity activity){
+        matoMemoListActivity = (MatoMemoListActivity)activity;
+        super.onAttach(matoMemoListActivity);
     }
 
     //Debug用データベース設定    教科別メモセット

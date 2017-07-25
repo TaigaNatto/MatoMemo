@@ -177,6 +177,13 @@ public class MatoMemoListActivity extends AppCompatActivity {
         }
     }
 
+    //ToDo メモリストのItemをタップしたときに、・日付　・時間　・メモ内容　・教科名　のデータを持ってWritingActivityにIntent
+    //WritingActivityへのIntent処理
+    public void move(){
+        Intent intent = new Intent(this, WritingActivity.class);
+        startActivity(intent);
+    }
+
     //画面下のButton処理
     public void MatoMemoClick(View v){
         String buttonText = (String) matoMemoButton.getText();  //ButtonのTextを取得
