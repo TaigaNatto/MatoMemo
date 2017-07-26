@@ -18,16 +18,23 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.Calendar;
+
+import io.realm.Realm;
+
 import static com.example.t_robop.matomemo.R.id.txt;
 import static com.example.t_robop.matomemo.R.id.txtmemo;
 
 public class WritingActivity extends ActionBarActivity {
 
-    int kari = 1;
+    int kari = 0;
     //仮にメモを新規作成する場合は０、編集するときは１としています。
 
     TextView textView;
     EditText editText;
+
+    Realm realm;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,6 +102,9 @@ public class WritingActivity extends ActionBarActivity {
 
         boolean result = true;
 
+        Realm.init(this);
+        realm = Realm.getDefaultInstance();
+
         switch (id) {
             case android.R.id.home:
 
@@ -115,6 +125,33 @@ public class WritingActivity extends ActionBarActivity {
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
                                 // 保存する ボタンクリック処理
+
+
+                                if (kari == 0) {
+                                    //新規の場合は今日の日付を取得
+                                    final Calendar c = Calendar.getInstance();
+                                    int newYear = c.get(Calendar.YEAR);
+                                    int newMonth = c.get(Calendar.MONTH);
+                                    int newDay = c.get(Calendar.DAY_OF_MONTH);
+                                    int newdate = newYear + newMonth + newDay;
+
+                                    //トランザクション開始
+                                    realm.beginTransaction();
+                                    //インスタンスを生成
+                                    RealmMemoEntity model = realm.createObject(RealmMemoEntity.class);
+                                    //書き込みたいデータをインスタンスに入れる
+                                    model.setDate(newdate);
+                                    //トランザクション終了 (データを書き込む)
+                                    realm.commitTransaction();
+                                }
+                                //トランザクション開始
+                                realm.beginTransaction();
+                                //インスタンスを生成
+                                RealmMemoEntity model = realm.createObject(RealmMemoEntity.class);
+                                //書き込みたいデータをインスタンスに入れる
+                                model.setMemo(editText.getText().toString());
+                                //トランザクション終了 (データを書き込む)
+                                realm.commitTransaction();
 
                                 finish();
                             }
