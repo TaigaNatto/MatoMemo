@@ -8,12 +8,14 @@
         android:title="タグ設定"
         app:showAsAction="never"/>
 
+    <!--
     <item
         android:id="@+id/important_setting"
         android:orderInCategory="100"
         android:title="重要度設定"
         app:showAsAction="never"
         />
+    -->
 
     <item
         android:id="@+id/editFolder"

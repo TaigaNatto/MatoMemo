@@ -155,6 +155,14 @@ public class MatoMemoListActivity extends AppCompatActivity {
 
     }
 
+    //ToDo intentして戻ってきたときに変更されたデータが適用されていない
+    //Activityが表示されるときに呼ばれるメソッド
+    @Override
+    protected void onResume(){
+        super.onResume();
+
+    }
+
     //データベースから教科取得
     public void getFolderDataList(){
         //検索用のクエリ作成
@@ -175,6 +183,13 @@ public class MatoMemoListActivity extends AppCompatActivity {
             ((MemoFragment)fragment).setMemoDataTest(subject);  //Debug用　タップした教科名のメモをデータベースに設定
             ((MemoFragment)fragment).getMemoDataList(subject);  //タップされた教科名のメモをデータベースから取ってくる
         }
+    }
+
+    //ToDo メモリストのItemをタップしたときに、・日付　・時間　・メモ内容　・教科名　のデータを持ってWritingActivityにIntent
+    //WritingActivityへのIntent処理
+    public void move(){
+        Intent intent = new Intent(this, WritingActivity.class);
+        startActivity(intent);
     }
 
     //画面下のButton処理
@@ -221,11 +236,14 @@ public class MatoMemoListActivity extends AppCompatActivity {
         {
             case R.id.tag_settings:
                 Log.d("menu","タグ設定へ");  //TagEditActivityへIntent
+                intent = new Intent(this, TagEditActivity.class);
                 break;
 
+            /*
             case R.id.important_setting:
                 Log.d("menu","重要度設定へ");     //ImportantEditActivityへIntent
                 break;
+             */
 
             case R.id.editFolder:
                 intent = new Intent(this,GroupEditActivity.class);  //GroupEditActivityへIntent
