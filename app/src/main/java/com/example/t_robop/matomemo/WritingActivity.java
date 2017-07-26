@@ -41,6 +41,9 @@ public class WritingActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_writing);
 
+        Realm.init(this);
+        realm = Realm.getDefaultInstance();
+
         textView = (TextView) findViewById(R.id.txt);
         editText = (EditText) findViewById(R.id.txtmemo);
 
@@ -102,76 +105,79 @@ public class WritingActivity extends ActionBarActivity {
 
         boolean result = true;
 
+        /*
         Realm.init(this);
         realm = Realm.getDefaultInstance();
-
-        switch (id) {
-            case android.R.id.home:
-
-                // 確認ダイアログの生成
-                AlertDialog.Builder alertDlg = new AlertDialog.Builder(this);
-                alertDlg.setTitle("");
-                alertDlg.setMessage("メモの内容を保存しますか？");
-                alertDlg.setPositiveButton(
-                        "キャンセル",
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                // キャンセル ボタンクリック処理
-
-                            }
-                        });
-                alertDlg.setNeutralButton(
-                        "保存する",
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                // 保存する ボタンクリック処理
+        */
 
 
-                                if (kari == 0) {
-                                    //新規の場合は今日の日付を取得
-                                    final Calendar c = Calendar.getInstance();
-                                    int newYear = c.get(Calendar.YEAR);
-                                    int newMonth = c.get(Calendar.MONTH);
-                                    int newDay = c.get(Calendar.DAY_OF_MONTH);
-                                    int newdate = newYear + newMonth + newDay;
+            switch (id) {
+                case android.R.id.home:
 
-                                    //トランザクション開始
-                                    realm.beginTransaction();
-                                    //インスタンスを生成
-                                    RealmMemoEntity model = realm.createObject(RealmMemoEntity.class);
-                                    //書き込みたいデータをインスタンスに入れる
-                                    model.setDate(newdate);
-                                    //トランザクション終了 (データを書き込む)
-                                    realm.commitTransaction();
-                                }
-                                //トランザクション開始
-                                realm.beginTransaction();
-                                //インスタンスを生成
-                                RealmMemoEntity model = realm.createObject(RealmMemoEntity.class);
-                                //書き込みたいデータをインスタンスに入れる
-                                model.setMemo(editText.getText().toString());
-                                //トランザクション終了 (データを書き込む)
-                                realm.commitTransaction();
+                        // 確認ダイアログの生成
+                        AlertDialog.Builder alertDlg = new AlertDialog.Builder(this);
+                        alertDlg.setTitle("");
+                        alertDlg.setMessage("メモの内容を保存しますか？");
+                        alertDlg.setPositiveButton(
+                                "キャンセル",
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        // キャンセル ボタンクリック処理
 
-                                finish();
-                            }
-                        });
-                alertDlg.setNegativeButton(
-                        "保存しないで戻る",
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                // 保存しないで戻る ボタンクリック処理
-                                finish();
-                            }
-                        });
+                                    }
+                                });
+                        alertDlg.setNeutralButton(
+                                "保存する",
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        // 保存する ボタンクリック処理
 
-                // 表示
-                alertDlg.create().show();
 
-                break;
-            default:
-                result = super.onOptionsItemSelected(item);
-        }
+                                 /*       if (kari == 0) {
+                                            //新規の場合は今日の日付を取得
+                                            final Calendar c = Calendar.getInstance();
+                                            int newYear = c.get(Calendar.YEAR);
+                                            int newMonth = c.get(Calendar.MONTH);
+                                            int newDay = c.get(Calendar.DAY_OF_MONTH);
+                                            int newdate = newYear + newMonth + newDay;
+
+                                            //トランザクション開始
+                                            realm.beginTransaction();
+                                            //インスタンスを生成
+                                            RealmMemoEntity model = realm.createObject(RealmMemoEntity.class);
+                                            //書き込みたいデータをインスタンスに入れる
+                                            model.setDate(newdate);
+                                            //トランザクション終了 (データを書き込む)
+                                            realm.commitTransaction();
+                                        }*/
+                                        //トランザクション開始
+                                        realm.beginTransaction();
+                                        //インスタンスを生成
+                                        RealmMemoEntity model = realm.createObject(RealmMemoEntity.class);
+                                        //書き込みたいデータをインスタンスに入れる
+                                        model.setMemo(editText.getText().toString());
+                                        //トランザクション終了 (データを書き込む)
+                                        realm.commitTransaction();
+
+                                        finish();
+                                    }
+                                });
+                        alertDlg.setNegativeButton(
+                                "保存しないで戻る",
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        // 保存しないで戻る ボタンクリック処理
+                                        finish();
+                                    }
+                                });
+
+                        // 表示
+                        alertDlg.create().show();
+
+                    break;
+                default:
+                    result = super.onOptionsItemSelected(item);
+            }
 
         return result;
     }
