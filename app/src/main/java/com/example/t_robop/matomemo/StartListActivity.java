@@ -1,8 +1,10 @@
 package com.example.t_robop.matomemo;
 
+import android.app.ListActivity;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.AdapterView;
@@ -29,7 +31,6 @@ public class StartListActivity extends AppCompatActivity {
     ArrayAdapter<String> arrayAdapter;
 
     String text = "未分類";
-    String memo = "aaabbb";                                 //ボタンを押したときの処理の確認用 ※実装とは直接関係ないです
     String memo2 = "cccddd";                                //ボタンを押したときの処理の確認用 ※実装とは直接関係ないです
     String plusyo = "+";                                    //ボタンを押したときの処理の確認用 ※実装とは直接関係ないです
     String memowokakuyo = "memowokaku";                     //ボタンを押したときの処理の確認用 ※実装とは直接関係ないです
@@ -39,10 +40,16 @@ public class StartListActivity extends AppCompatActivity {
     Realm realm;
     /*** ** ***/
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start_list);
+
+        Toolbar toolbar = (Toolbar)findViewById(R.id.tool_bar);
+
+        setSupportActionBar(toolbar);
+
 
         //レイアウトで作ったListViewをjavaで使えるようにする
         listView = (ListView) findViewById(R.id.list);
@@ -110,6 +117,7 @@ public class StartListActivity extends AppCompatActivity {
 
     public void Intent(View v) {
         Intent intent=new Intent(this,GroupEditActivity.class);
+
         startActivity(intent);
     }
 
@@ -127,13 +135,28 @@ public class StartListActivity extends AppCompatActivity {
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if(keyCode== KeyEvent.KEYCODE_BACK){
             // なんらかの処理
+            //Class activityName = getCallingActivity().getClass();
 
-            Intent intent=new Intent(getApplicationContext(),FirstActivity.class);
-            //intent.putExtra("ID",arrayNum);
-            startActivity(intent);
+            //Intent intent=new Intent(getApplicationContext(),GroupEditActivity.class);
+            //startActivity(intent);
+
+
+            int activityNum = 0;
+            Intent intent = getIntent();
+            activityNum = intent.getIntExtra("Date",0);
+
+            if(activityNum == 1) {
+                Intent intents = new Intent(this, GroupEditActivity.class);
+                startActivity(intents);
+            }else {
+                Intent intents = new Intent(this, FirstActivity.class);
+                startActivity(intents);
+            }
+
 
             return true;
         }
         return false;
     }
+
 }
