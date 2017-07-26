@@ -155,6 +155,14 @@ public class MatoMemoListActivity extends AppCompatActivity {
 
     }
 
+    //ToDo intentして戻ってきたときに変更されたデータが適用されていない
+    //Activityが表示されるときに呼ばれるメソッド
+    @Override
+    protected void onResume(){
+        super.onResume();
+
+    }
+
     //データベースから教科取得
     public void getFolderDataList(){
         //検索用のクエリ作成
