@@ -1,6 +1,7 @@
 package com.example.t_robop.matomemo;
 
 import android.app.Dialog;
+import android.app.ListActivity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -83,6 +84,8 @@ public class GroupEditActivity extends AppCompatActivity {
         arrayList = new ArrayList<>();
         //arrayListに"memo"を追加
         arrayList.add(groupName);
+
+        //activityName = getCallingActivity().getClass();
 
      /*   //"arrayList"をArrayListでインスタンス化
         arrayNum = new ArrayList<>();
@@ -345,13 +348,29 @@ public class GroupEditActivity extends AppCompatActivity {
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if(keyCode== KeyEvent.KEYCODE_BACK){
             // なんらかの処理
+            int activityNum = 0;
+            Intent intent = getIntent();
+            activityNum = intent.getIntExtra("Date",0);
 
-            Intent intent=new Intent(this,StartListActivity.class);
+            //Intent intent=new Intent(this,StartListActivity.class);
+            /*Class activityName = getCallingActivity().getClass();
 
+            Intent intent=new Intent(getApplicationContext(),activityName);
+            startActivity(intent);
+            */
             //intent.putExtra("ID",arrayNum);
 
-            startActivity(intent);
-
+           // startActivity(intent);
+            finish();
+            /*
+            if(activityNum == 1) {
+                Intent intents = new Intent(this, StartListActivity.class);
+                startActivity(intents);
+            }else {
+                Intent intents = new Intent(this, ListActivity.class);
+                startActivity(intents);
+            }
+            */
             return true;
         }
         return false;
