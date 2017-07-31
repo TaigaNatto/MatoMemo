@@ -18,7 +18,7 @@ import io.realm.RealmResults;
  * Created by user on 2017/06/20.
  */
 
-public class MemoFragment extends Fragment {
+public class MemoFragment extends Fragment implements AdapterView.OnItemClickListener, AdapterView.OnItemLongClickListener {
 
     //ListView memoListView = null;   //メモのListView
     ArrayAdapter<String> adapterMemo = null;    //ListViewのAdapter
@@ -60,27 +60,10 @@ public class MemoFragment extends Fragment {
         memoListView.setAdapter(adapterMemo);   //メモを画面に表示
 
         //メモリストのItemタップ時の処理     WritingActivityへのIntent
-        memoListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-                //ToDo メモリストのItemをタップしたときに、・日付　・時間　・メモ内容　・教科名　のデータを持ってWritingActivityにIntent
-                matoMemoListActivity.move();    //WritingActivityへのIntentメソッド   //処理内容はMatoMemoListActivityにある
-            }
-        });
+        memoListView.setOnItemClickListener(this);
 
         //メモリストのItem長押し時の処理     選択メモの削除
-        memoListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int position, long id) {
-                //ToDo 選択メモをリストから削除・realmから削除
-                String item = (String)adapterView.getItemAtPosition(position);   //クリックしたpositionからItemを取得
-                adapterMemo.remove(item);   //リストから削除
-
-                removeMemoData(item);   //データベースから削除    //ToDo ダイアログ表示して消去確認メッセ出そう
-
-                return false;
-            }
-        });
+        memoListView.setOnItemLongClickListener(this);
 
         return memoListView;
     }
@@ -144,4 +127,19 @@ public class MemoFragment extends Fragment {
         });
     }
 
+    @Override
+    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+        //ToDo メモリストのItemをタップしたときに、・日付　・時間　・メモ内容　・教科名　のデータを持ってWritingActivityにIntent
+        matoMemoListActivity.move();    //WritingActivityへのIntentメソッド   //処理内容はMatoMemoListActivityにある
+    }
+
+    @Override
+    public boolean onItemLongClick(AdapterView<?> adapterView, View view, int position, long l) {
+        //ToDo 選択メモをリストから削除・realmから削除
+        String item = (String)adapterView.getItemAtPosition(position);   //クリックしたpositionからItemを取得
+        adapterMemo.remove(item);   //リストから削除
+
+        removeMemoData(item);   //データベースから削除    //ToDo ダイアログ表示して消去確認メッセ出そう
+        return false;
+    }
 }
