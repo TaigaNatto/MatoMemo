@@ -24,17 +24,17 @@ import io.realm.RealmQuery;
 import io.realm.RealmResults;
 
 
-public class MatoMemoListActivity extends AppCompatActivity {
+public class MatoMemoListActivity extends AppCompatActivity implements AdapterView.OnItemClickListener, ViewPager.OnPageChangeListener {
 
     //Tab
-    //TabLayout tabLayout;
-    //ViewPager viewPager;
+    TabLayout tabLayout;
+    ViewPager viewPager;
     CustomFragmentPagerAdapter matomemoFragmentPagerAdapter;    //自作のViewPager用Adapter
-    //String[] tabs_names;    //tabの名前 /value/string.xml/string-arrayの"tabs"を参照
+    String[] tabNames;    //tabの名前 /value/string.xml/string-arrayの"tabs"を参照
 
     //NavigationDrawer内
-    //DrawerLayout drawerLayout;
-    //ListView drawerListView;
+    DrawerLayout drawerLayout;
+    ListView drawerListView;
     ArrayAdapter<String> drawerArrayAdapter;
 
     //画面下のButton
@@ -47,8 +47,9 @@ public class MatoMemoListActivity extends AppCompatActivity {
     Realm realm;
 
     //StartListActivityから受け取った教科名
-    //String subjectName = null;
+    String subjectName = null;
 
+    /*
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -58,11 +59,11 @@ public class MatoMemoListActivity extends AppCompatActivity {
         Realm.init(this);
         realm = Realm.getDefaultInstance();
 
-        //Intent元からのデータ受け取り
+        //StartListActivityでタップした教科名の受け取り
         Intent intent = getIntent();
         String subjectName = intent.getStringExtra("folder");   //StartListActivityから受け取った教科名
 
-        //Toolbar
+        //Toolbar   //ToDo onResumeへ
         toolbar = (Toolbar)findViewById(R.id.toolbar);
         toolbar.setTitle(subjectName);  //intent元でタップされた教科名を設定
         setSupportActionBar(toolbar);
@@ -133,12 +134,10 @@ public class MatoMemoListActivity extends AppCompatActivity {
             public void onPageSelected(int position) {  //ページがpositionの番号になったとき呼ばれるメソッド
                 switch (position){
                     case 0:
-                        Log.d("position","onPageSelected"+ String.valueOf(position));
                         matoMemoButton.setText(R.string.WriteMemo); //"メモを書く"をButtonのTextにセット
                         break;
 
                     case 1:
-                        Log.d("position","onPageSelected"+ String.valueOf(position));
                         matoMemoButton.setText(R.string.MakeMatome);    //"まとめを作る"をButtonのTextにセット
                         break;
                 }
@@ -154,6 +153,35 @@ public class MatoMemoListActivity extends AppCompatActivity {
         tabLayout.setupWithViewPager(viewPager);    //tabLayoutとviewPagerの紐付け
 
     }
+    */
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_matomemo_list);
+
+        //Database初期化
+        Realm.init(this);
+        realm = Realm.getDefaultInstance();
+
+        //UI部品の取得
+        toolbar = (Toolbar)findViewById(R.id.toolbar);
+        drawerLayout = (DrawerLayout)findViewById(R.id.drawerLayout);
+        drawerListView = (ListView)findViewById(R.id.left_drawer);
+        matoMemoButton = (Button)findViewById(R.id.MatoMemoButton);
+        tabNames = getResources().getStringArray(R.array.tabs);
+        tabLayout = (TabLayout)findViewById(R.id.tabs);
+        viewPager = (ViewPager)findViewById(R.id.pager);
+
+        //Intent受取準備
+        Intent intent = getIntent();
+        subjectName = intent.getStringExtra("folder");
+
+        drawerListView.setOnItemClickListener(this);
+
+        viewPager.addOnPageChangeListener(this);
+
+    }
 
     //ToDo intentして戻ってきたときに変更されたデータが適用されていない
     //Activityが表示されるときに呼ばれるメソッド
@@ -161,6 +189,36 @@ public class MatoMemoListActivity extends AppCompatActivity {
     protected void onResume(){
         super.onResume();
 
+        //Toolbar表示
+        toolbar.setTitle(subjectName);  //intent元でタップされた教科名を設定
+        setSupportActionBar(toolbar);
+
+        //DrawerToggleの表示
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this,drawerLayout,toolbar,R.string.drawer_open,R.string.drawer_close);
+        drawerLayout.addDrawerListener(toggle);
+        toggle.syncState();
+
+        //Drawer内のArrayAdapterのインスタンス生成
+        drawerArrayAdapter =new ArrayAdapter<>(this,R.layout.drawer_list_item);
+
+        //Drawer内のList初期表示
+        drawerArrayAdapter.add("未分類");
+
+        //AdapterをListViewにセット
+        drawerListView.setAdapter(drawerArrayAdapter);
+
+        //Fragment操作準備
+        matomemoFragmentPagerAdapter = new CustomFragmentPagerAdapter(getSupportFragmentManager(),tabNames);
+
+        //AdapterにFragment追加
+        matomemoFragmentPagerAdapter.addFragment(MemoFragment.newInstance(subjectName));
+        matomemoFragmentPagerAdapter.addFragment(MatomeFragment.newInstance());
+
+        getFolderDataList();
+
+        viewPager.setAdapter(matomemoFragmentPagerAdapter);
+
+        tabLayout.setupWithViewPager(viewPager);
     }
 
     //データベースから教科取得
@@ -180,7 +238,7 @@ public class MatoMemoListActivity extends AppCompatActivity {
     public void showMemoDataTest(String subject){
         Fragment fragment = matomemoFragmentPagerAdapter.getItem(0);    //CustomFragmentPagerAdapterのgetItemからfragment情報を取ってくる
         if(fragment != null && fragment instanceof MemoFragment){
-            ((MemoFragment)fragment).setMemoDataTest(subject);  //Debug用　タップした教科名のメモをデータベースに設定
+            ((MemoFragment)fragment).setMemoDataTest(subject);  //Debug用　タップした教科名のメモをデータベースに設定      //ToDo 新規で教科フォルダを作った際に、まだメモが一個も作成されていないのでNull処理を追加必要
             ((MemoFragment)fragment).getMemoDataList(subject);  //タップされた教科名のメモをデータベースから取ってくる
         }
     }
@@ -236,7 +294,7 @@ public class MatoMemoListActivity extends AppCompatActivity {
         {
             case R.id.tag_settings:
                 Log.d("menu","タグ設定へ");  //TagEditActivityへIntent
-                intent = new Intent(this, TagEditActivity.class);
+                intent = new Intent(this,TagEditActivity.class);
                 break;
 
             /*
@@ -253,5 +311,41 @@ public class MatoMemoListActivity extends AppCompatActivity {
         startActivity(intent);
 
         return true;
+    }
+
+    @Override
+    public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+        //動的に追加された教科Listのクリック処理
+        //drawerArrayAdapterに教科Listがある
+        String item = (String)adapterView.getItemAtPosition(position);   //クリックしたpositionからItemを取得
+
+        //教科クリックしたらToolBar.setTitleで教科名をセット
+        toolbar.setTitle(item);
+
+        //intent元でタップされた教科名のメモを表示
+        showMemoDataTest(item);
+    }
+
+    @Override
+    public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+    }
+
+    @Override
+    public void onPageSelected(int position) {
+        switch (position){
+            case 0:
+                matoMemoButton.setText(R.string.WriteMemo); //"メモを書く"をButtonのTextにセット
+                break;
+
+            case 1:
+                matoMemoButton.setText(R.string.MakeMatome);    //"まとめを作る"をButtonのTextにセット
+                break;
+        }
+    }
+
+    @Override
+    public void onPageScrollStateChanged(int state) {
+
     }
 }
