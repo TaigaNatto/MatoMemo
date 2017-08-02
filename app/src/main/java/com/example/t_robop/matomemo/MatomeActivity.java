@@ -1,11 +1,15 @@
 package com.example.t_robop.matomemo;
 
+import android.content.DialogInterface;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
@@ -48,6 +52,12 @@ public class MatomeActivity extends AppCompatActivity {
         listView = (ListView) findViewById(R.id.list_matome);
 
         idList=new ArrayList<>();
+
+        //ツールバー表示
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeButtonEnabled(true);
 
         //intentのときに「まとめのid」をもらってくるものとする
         int id = 0;
@@ -110,6 +120,8 @@ public class MatomeActivity extends AppCompatActivity {
 
         //トランザクション終了 (データを書き込む)
         realm.commitTransaction();
+
+        /***************************/
 
 
         //検索用のクエリ作成
@@ -198,14 +210,13 @@ public class MatomeActivity extends AppCompatActivity {
         //アダプターをセット
         listView.setAdapter(matomeAdapter);
 
+    }
 
-        // FloatingActionButton
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.marker_change);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //マーカー表示非表示切り替え
-            }
-        });
+    //左上のバックボタン
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        //Activity終了
+        finish();
+        return true;
     }
 }

@@ -103,14 +103,9 @@ public class GroupEditActivity extends AppCompatActivity {
         /*******************/
 
 
-
-
-
         //"arrayAdapter"をcheckBox付きのArrayAdapterでインスタンス化
         arrayAdapter = new ArrayAdapter<String>(
                 this, android.R.layout.simple_list_item_multiple_choice);
-
-
 
         ///フォルダのデータが欲しいとき！///
         //検索用のクエリ作成

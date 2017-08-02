@@ -9,16 +9,9 @@ import io.realm.RealmObject;
 //単語保存用
 public class RealmWordEntity extends RealmObject {
 
-    private String wordName;//☆の場合はここに☆入れて
     private String color;//マーカーカラー
     private String tagName;//タグ付ける場合はこいつ使って
-
-    public void setWordName(String wordName){
-        this.wordName=wordName;
-    }
-    public String getWordName(){
-        return this.wordName;
-    }
+    private int tagNum;
 
     public void setColor(String color){
         this.color=color;
@@ -32,6 +25,13 @@ public class RealmWordEntity extends RealmObject {
     }
     public String getTagName(){
         return this.tagName;
+    }
+
+    public void setTagNum(int num){
+        this.tagNum=num;
+    }
+    public int getTagNum(){
+        return this.tagNum;
     }
 
 }
