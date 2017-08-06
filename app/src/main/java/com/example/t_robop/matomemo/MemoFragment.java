@@ -1,32 +1,27 @@
 package com.example.t_robop.matomemo;
 
-import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.ListFragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-
-import java.util.List;
 
 import io.realm.Realm;
 import io.realm.RealmQuery;
 import io.realm.RealmResults;
 
-/**
- * Created by user on 2017/06/20.
- */
 
-public class MemoFragment extends ListFragment implements AdapterView.OnItemClickListener, AdapterView.OnItemLongClickListener {
+public class MemoFragment extends Fragment implements OnItemClickListener, OnItemLongClickListener {
 
     //ListView memoListView = null;   //メモのListView
     ArrayAdapter<String> adapterMemo = null;    //ListViewのAdapter
-
-    private MatoMemoListActivity matoMemoListActivity;
 
     Realm realm;
 
@@ -44,6 +39,7 @@ public class MemoFragment extends ListFragment implements AdapterView.OnItemClic
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle saveInstanceState){
 
+        //ToDo メモが無い場合はTextViewで「メモなし」を表示 (優先度低)
         //メモのListViewのレイアウトをインフレート
         ListView memoListView = (ListView)inflater.inflate(R.layout.activity_memo_tab,container,false);
 
@@ -70,13 +66,6 @@ public class MemoFragment extends ListFragment implements AdapterView.OnItemClic
         memoListView.setAdapter(adapterMemo);   //メモを画面に表示
 
         return memoListView;
-    }
-
-    //MatoMemoListActivityとの連携  横線あるけど気にしないで
-    @Override
-    public void onAttach(Activity activity){
-        matoMemoListActivity = (MatoMemoListActivity)activity;
-        super.onAttach(matoMemoListActivity);
     }
 
     //Debug用データベース設定    教科別メモセット
@@ -115,7 +104,7 @@ public class MemoFragment extends ListFragment implements AdapterView.OnItemClic
     //Drawerクリック時のメモリスト更新
     public void reloadMemoData(String subject){
         adapterMemo.clear();
-        getMemoDataList(subject);
+        getMemoDataList(subject);    //データベースから教科別メモ取得
         adapterMemo.notifyDataSetChanged();
     }
 
@@ -138,16 +127,20 @@ public class MemoFragment extends ListFragment implements AdapterView.OnItemClic
         });
     }
 
-    //ToDo Intent処理できてない
+
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-        //ToDo メモリストのItemをタップしたときに、・日付　・時間　・メモ内容　・教科名　のデータを持ってWritingActivityにIntent
-        matoMemoListActivity.move();    //WritingActivityへのIntentメソッド   //処理内容はMatoMemoListActivityにある
+        //ToDo メモリストのItemをタップしたときに、・日付　・時間　・メモ内容　・教科名　のデータを持ってWritingActivityにIntent (まだ使用確認)
+        Log.d("test","onItemClick");
+        Intent intent = new Intent(getActivity(),WritingActivity.class);
+        intent.putExtra("Writing Status",1);    //数値受け渡し　1: メモ確認　0: 新規作成   //ここでは1を送る
+        startActivity(intent);
     }
+
 
     @Override
     public boolean onItemLongClick(AdapterView<?> adapterView, View view, int position, long l) {
-
+        Log.d("test","onLongItemClick");
         String item = (String)adapterView.getItemAtPosition(position);   //クリックしたpositionからItemを取得
         adapterMemo.remove(item);   //リストから削除
 

@@ -114,18 +114,6 @@ public class MatoMemoListActivity extends AppCompatActivity implements AdapterVi
         tabLayout.setupWithViewPager(viewPager);    //tabLayoutにviewpagerをセット
     }
 
-    /*
-    //Activityが表示されるときに呼ばれるメソッド
-    @Override
-    protected void onResume(){
-        super.onResume();
-
-        //Toolbar表示
-        toolbar.setTitle(subjectName);  //intent元でタップされた教科名を設定
-        setSupportActionBar(toolbar);
-    }
-    */
-
     //Activityが再度開始された時
     @Override
     public void onRestart(){
@@ -183,7 +171,6 @@ public class MatoMemoListActivity extends AppCompatActivity implements AdapterVi
         toolbar.setTitle(item);
 
         //Drawer内でタップされた教科名のメモを表示
-        //ToDo 別画面で作成されてデータベースに保存されているメモのリストを呼び出す
         Fragment fragment = matomemoFragmentPagerAdapter.getItem(0);    //CustomFragmentPagerAdapterのgetItemからfragment情報を取ってくる
         if(fragment != null && fragment instanceof MemoFragment){
             ((MemoFragment)fragment).reloadMemoData(item);
@@ -225,18 +212,12 @@ public class MatoMemoListActivity extends AppCompatActivity implements AdapterVi
         }
     }
 
+    //Drawer内の教科リストの更新
     private void reloadDrawerList(){
         drawerArrayAdapter.clear();
         drawerArrayAdapter.add("未分類");
         getFolderDataList();
         drawerArrayAdapter.notifyDataSetChanged();
-    }
-
-    //ToDo メモリストのItemをタップしたときに、・日付　・時間　・メモ内容　・教科名　のデータを持ってWritingActivityにIntent
-    //WritingActivityへのIntent処理
-    public void move(){
-        Intent intent = new Intent(this, WritingActivity.class);
-        startActivity(intent);
     }
 
     //画面下のButton処理
