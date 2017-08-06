@@ -1,8 +1,10 @@
 package com.example.t_robop.matomemo;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -141,10 +143,32 @@ public class MemoFragment extends Fragment implements OnItemClickListener, OnIte
     @Override
     public boolean onItemLongClick(AdapterView<?> adapterView, View view, int position, long l) {
         Log.d("test","onLongItemClick");
-        String item = (String)adapterView.getItemAtPosition(position);   //クリックしたpositionからItemを取得
-        adapterMemo.remove(item);   //リストから削除
+        final String item = (String)adapterView.getItemAtPosition(position);   //クリックしたpositionからItemを取得
 
-        removeMemoData(item);   //データベースから削除    //ToDo ダイアログ表示して消去確認メッセ出そう
-        return false;
+        //消去確認のダイアログ
+        AlertDialog.Builder alertDig = new AlertDialog.Builder(getActivity());
+        alertDig.setTitle("");
+        alertDig.setMessage("メモを消去しますか？");
+
+        alertDig.setNegativeButton("NO", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                //No処理
+            }
+        });
+
+        alertDig.setPositiveButton("YES", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                //YES処理
+                adapterMemo.remove(item);   //リストから削除
+
+                removeMemoData(item);   //データベースから削除
+            }
+        });
+
+        alertDig.create().show();
+
+        return true;
     }
 }
