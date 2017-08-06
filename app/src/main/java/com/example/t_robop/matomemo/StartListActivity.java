@@ -5,12 +5,17 @@ import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.SpinnerAdapter;
 
 import org.w3c.dom.Text;
 
@@ -46,9 +51,14 @@ public class StartListActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start_list);
 
-        Toolbar toolbar = (Toolbar)findViewById(R.id.tool_bar);
 
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeButtonEnabled(true);
+
+
 
 
         //レイアウトで作ったListViewをjavaで使えるようにする
@@ -56,7 +66,7 @@ public class StartListActivity extends AppCompatActivity {
         //"arrayList"をArrayListでインスタンス化
         arrayList = new ArrayList<>();
 
-        arrayList.add("groupName");
+        //arrayList.add("groupName");
         //arrayAdapterをインスタンス化
         arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1);
 
@@ -77,14 +87,15 @@ public class StartListActivity extends AppCompatActivity {
         for(int i=0;i<folderResults.size();i++){
             String text = folderResults.get(i).getFolderName();
             //arrayListをtextで初期化
-            arrayList.set(0, text);
+            //arrayList.set(0, text);
             //arrayListをarrayAdapterに追加する
-            arrayAdapter.add(arrayList.get(0));
+            //arrayAdapter.add(arrayList.get(0));
+            arrayAdapter.add(text);
             //arrayAdapterをlistViewに入れる
             listView.setAdapter(arrayAdapter);
         }
 
-        arrayList.set(0,"Listをタップして下さい");
+        //arrayList.set(0,"Listをタップして下さい");
 
         /*arrayList.add(memo);                                //ボタンを押したときの処理の確認用 ※実装とは直接関係ないです
         arrayList.add(memo2);                               //ボタンを押したときの処理の確認用 ※実装とは直接関係ないです
@@ -99,7 +110,7 @@ public class StartListActivity extends AppCompatActivity {
                     //listViewがタップされたときに実行
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                         text = (String)listView.getItemAtPosition(position);
-
+                        //
                         Intent intent=new Intent(getApplicationContext(),MatoMemoListActivity.class);
                         intent.putExtra("folder",text);
 
@@ -127,10 +138,11 @@ public class StartListActivity extends AppCompatActivity {
     }
 
     public void memowokaku(View v){
-        arrayAdapter.add(arrayList.get(0));
-        listView.setAdapter(arrayAdapter);
+        Intent intents = new Intent(this, WritingActivity.class);
+        startActivity(intents);
     }
-
+    //バックキーの処理
+    /*
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if(keyCode== KeyEvent.KEYCODE_BACK){
@@ -146,10 +158,14 @@ public class StartListActivity extends AppCompatActivity {
             activityNum = intent.getIntExtra("Date",0);
 
             if(activityNum == 1) {
-                Intent intents = new Intent(this, GroupEditActivity.class);
+                //finish();
+                Intent intents = new Intent(this, MatoMemoListActivity.class);
+                intents.putExtra("Date",0);
                 startActivity(intents);
             }else {
-                Intent intents = new Intent(this, FirstActivity.class);
+                //finish();
+                Intent intents = new Intent(this, GroupEditActivity.class);
+                intents.putExtra("Date",0);
                 startActivity(intents);
             }
 
@@ -157,6 +173,45 @@ public class StartListActivity extends AppCompatActivity {
             return true;
         }
         return false;
+    }*/
+    //メニューバーの作成
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu){
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.options,menu);  //res\menu\optionsのlayoutを読み込む
+        return true;
+    }
+
+    //ToDo Intent先の作成とIntent処理の追加
+    //メニューが選択されたときの処理
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        Intent intent = null;
+
+        //addしたときのIDで識別
+        switch(item.getItemId())
+        {
+            case android.R.id.home:
+                finish();
+                break;
+            case R.id.tag_settings:
+                Log.d("menu","タグ設定へ");  //TagEditActivityへIntent
+                break;
+
+            case R.id.important_setting:
+                Log.d("menu","重要度設定へ");     //ImportantEditActivityへIntent
+                break;
+
+            case R.id.editFolder:
+                //finish();
+                intent = new Intent(this,GroupEditActivity.class);  //GroupEditActivityへIntent
+                startActivity(intent);
+                break;
+
+        }
+        //startActivity(intent);
+
+        return true;
     }
 
 }
