@@ -4,6 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:fitsSystemWindows="true"
     tools:context="com.example.t_robop.matomemo.WritingActivity">
 
     <android.support.v7.widget.Toolbar
@@ -14,6 +15,23 @@
         android:minHeight="?attr/actionBarSize"
         android:background="?attr/colorPrimary">
     </android.support.v7.widget.Toolbar>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
+
+        <com.example.t_robop.matomemo.DetectableSoftKeyLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:id="@+id/liner_layout">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:layout_weight="1">
 
 
     <EditText
@@ -30,7 +48,42 @@
         android:layout_height="match_parent"
         android:windowSoftInputMode="stateAlwaysHidden"/>
 
+    </LinearLayout>
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        android:layout_weight="8">
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="マーカー"
+            android:layout_weight="1"
+            android:id="@+id/mark_button"
+            android:onClick="marker_mode"/>
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="数式"
+            android:layout_weight="1"
+            android:visibility="invisible"/>
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="ゴジラ"
+            android:layout_weight="1"
+            android:visibility="invisible"/>
+
+    </LinearLayout>
+
+        </com.example.t_robop.matomemo.DetectableSoftKeyLayout>
+
+
+    </ScrollView>
 
 
 </LinearLayout>

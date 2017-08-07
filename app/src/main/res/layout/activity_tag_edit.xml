@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.t_robop.matomemo.MatomeActivity">
+    tools:context="com.example.t_robop.matomemo.TagEditActivity">
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar"
@@ -18,7 +18,20 @@
     <ListView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/list_matome"
-        android:layout_below="@+id/toolbar"></ListView>
+        android:id="@+id/tag_list"
+        android:layout_below="@+id/toolbar">
+    </ListView>
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/plusmark"
+        android:layout_margin="35dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:onClick="plus"
+        />
+
 
 </RelativeLayout>

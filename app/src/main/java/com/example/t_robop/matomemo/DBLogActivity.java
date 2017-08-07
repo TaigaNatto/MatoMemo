@@ -82,7 +82,6 @@ public class DBLogActivity extends AppCompatActivity {
                 RealmResults<RealmMemoEntity> memoR = memoQuery.findAll();
                 for (RealmMemoEntity test:memoR){
                     arrayAdapter.add(test.getMemo());
-                    Log.d("SSS", String.valueOf(test.getDate()));
                 }
             case "folder":
                 //検索用のクエリ作成
@@ -98,7 +97,7 @@ public class DBLogActivity extends AppCompatActivity {
                 //インスタンス生成し、その中にすべてのデータを入れる 今回なら全てのデータ
                 RealmResults<RealmWordEntity> wordR = wordQuery.findAll();
                 for (RealmWordEntity test:wordR){
-                    arrayAdapter.add(test.getWordName());
+                    arrayAdapter.add(test.getTagName());
                 }
         }
         listView.setAdapter(arrayAdapter);
@@ -136,7 +135,7 @@ public class DBLogActivity extends AppCompatActivity {
                 //インスタンスを生成
                 RealmWordEntity model_w = realm.createObject(RealmWordEntity.class);
                 //書き込みたいデータをインスタンスに入れる
-                model_w.setWordName("test");
+                model_w.setTagName("test");
 
                 //トランザクション終了 (データを書き込む)
                 realm.commitTransaction();
