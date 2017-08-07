@@ -184,21 +184,8 @@ public class FolderCreateActivity extends AppCompatActivity implements OnDateSet
     @Override
     public void onClick(View view) {
 
-        //まとめタイトルをDatabaseに保存
-        saveMatomeTitle();
-
-        //まとめ期間をDatabaseに保存
-        saveMatomeTime();
-
-        //ListViewチェックボックスで選択されているものを配列に代入
-        SparseBooleanArray array = listView.getCheckedItemPositions();
-        for(int i = 0; i<array.size(); i++){
-            int at = array.keyAt(i);
-            if (array.get(at)) {
-                Log.d("example", "選択されている項目:" + listView.getItemAtPosition(at).toString()); //選択されているListの文字列を取得
-                Log.d("example", "そのキー" + at);  //選択されているListの要素数を取得
-            }
-        }
+        //まとめをデータベースに保存
+        saveMatome();
 
         finish();
     }
@@ -218,6 +205,41 @@ public class FolderCreateActivity extends AppCompatActivity implements OnDateSet
             listView.setAdapter(arrayAdapter);
 
         }
+    }
+
+    //todo Realmに保存するならまとめなきゃ
+    //まとめを保存する
+    public void saveMatome(){
+        //トランザクション開始
+        realm.beginTransaction();
+        RealmMatomeEntity model = realm.createObject(RealmMatomeEntity.class);
+
+        if(edittext.length() !=0) {
+            model.setMatomeName(edittext.getText().toString());
+
+        }else{
+            model.setMatomeName("タイトル未設定");
+        }
+
+        model.setStartDate(frontDate);
+        model.setEndDate(rearDate);
+
+        //ListViewチェックボックスで選択されているものを配列に代入
+        SparseBooleanArray array = listView.getCheckedItemPositions();
+        for(int i = 0; i<array.size(); i++){
+            int at = array.keyAt(i);
+            if (array.get(at)) {
+                Log.d("example", "選択されている項目:" + listView.getItemAtPosition(at).toString()); //選択されているListの文字列を取得
+                Log.d("example", "そのキー" + at);  //選択されているListの要素数を取得
+                MatomeWord mWord= realm.createObject(MatomeWord.class);
+                mWord.setTagName(listView.getItemAtPosition(at).toString());
+                //書き込みたいデータをインスタンスに入れる
+                model.words.add(mWord);
+            }
+        }
+
+        //トランザクション終了
+        realm.commitTransaction();
     }
 
     //まとめタイトルをDatabaseに保存
