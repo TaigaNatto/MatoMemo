@@ -82,7 +82,6 @@ public class DBLogActivity extends AppCompatActivity {
                 RealmResults<RealmMemoEntity> memoR = memoQuery.findAll();
                 for (RealmMemoEntity test:memoR){
                     arrayAdapter.add(test.getMemo());
-                    Log.d("SSS", String.valueOf(test.getDate()));
                 }
             case "folder":
                 //検索用のクエリ作成

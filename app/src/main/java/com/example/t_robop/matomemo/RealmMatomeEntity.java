@@ -20,6 +20,7 @@ public class RealmMatomeEntity extends RealmObject {
     private int endDate=-1;
     //まとめ設定で指定された単語リスト(単語一覧参照先のid)
     public RealmList<MatomeWord> words;
+    //まとめ設定でしていされた
 
     public int getId(){
         return this.id;

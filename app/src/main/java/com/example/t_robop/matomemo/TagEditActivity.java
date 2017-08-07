@@ -153,6 +153,7 @@ public class TagEditActivity extends AppCompatActivity {
                                     if(dialogEdit.getText().toString().length()!=0){
                                         //既に同じ名前のタグが存在してるか確認
                                         int checkList=checkListItem(dialogEdit.getText().toString());
+                                        //存在してない場合は追加
                                         if(checkList==-1) {
                                             //保存処理
                                             //wordのオブジェクトの作成
@@ -175,6 +176,7 @@ public class TagEditActivity extends AppCompatActivity {
                                             //トランザクション終了 (データを書き込む)
                                             realm.commitTransaction();
                                         }
+                                        //存在してれば更新
                                         else {
                                             //トランザクション開始
                                             realm.beginTransaction();
