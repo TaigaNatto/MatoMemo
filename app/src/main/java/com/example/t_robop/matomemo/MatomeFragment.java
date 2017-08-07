@@ -52,7 +52,7 @@ public class MatomeFragment extends Fragment implements OnItemClickListener, OnI
         String subject = args.getString("SUBJECT"); //初期表示の教科名を保存
 
         //ToDo 別画面で作成されてデータベースに保存されているメモのリストを呼び出す
-        //getMatomeDataList(subject);   //StartListActivityでタップした教科名のメモ一覧をデータベースから取ってきて表示
+        //getMatomeDataList(subject);   //StartListActivityでタップした教科名のメモ一覧をデータベースから取ってきて表示   //ToDo 落ちてる
 
         matomeListView.setOnItemClickListener(this);
 

@@ -31,15 +31,15 @@ import io.realm.RealmQuery;
 import io.realm.RealmResults;
 
 
-public class FolderCreateActivity extends AppCompatActivity implements OnDateSetListener {
+public class FolderCreateActivity extends AppCompatActivity implements OnDateSetListener, View.OnClickListener {
 
-    private TextView textViewfront;
-    private TextView textViewrear;
-    EditText edittext;
-    ListView listView;
+    private TextView textViewfront; //まとめ期間開始日のTextView
+    private TextView textViewrear;  //まとめ期間終了日のTextView
+    EditText edittext;  //まとめタイトル
+    ListView listView;  //タグ表示
     DatePick newFragment;
     DatePick secondFragment;
-    int flag=0;
+    int flag=0;     // 1:まとめ期間開始　2: まとめ期間終了
 
     Realm realm;
 
@@ -68,8 +68,6 @@ public class FolderCreateActivity extends AppCompatActivity implements OnDateSet
     ArrayAdapter<String> arrayAdapter;
 
 
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -82,10 +80,13 @@ public class FolderCreateActivity extends AppCompatActivity implements OnDateSet
 
         listView = (ListView) findViewById(R.id.tagList);
 
+        Button btn = (Button)findViewById(R.id.createbutton);
+
         newFragment = new DatePick(2017,1,1);
         secondFragment=new DatePick(2017,1,1);
 
 
+        //ToolBar
         Toolbar toolbar = (Toolbar) findViewById(R.id.tool_bar);
         setSupportActionBar(toolbar);
 
@@ -93,11 +94,9 @@ public class FolderCreateActivity extends AppCompatActivity implements OnDateSet
         getSupportActionBar().setHomeButtonEnabled(true);
 
 
-
        // ((FolderCreateActivity)getActivity()).getSupportActionBar().
 
-        /***realmの初期化***/
-        /***これ必須だからみんな書いて***/
+
         Realm.init(this);
         realm = Realm.getDefaultInstance();
 
@@ -108,78 +107,33 @@ public class FolderCreateActivity extends AppCompatActivity implements OnDateSet
         arrayAdapter = new ArrayAdapter<String>(
                 this, android.R.layout.simple_list_item_multiple_choice);
 
+
         //DatabaseからTagの一覧を取得
-        /****単語のデータが欲しいとき！**/
-        //検索用のクエリ作成
-        RealmQuery<RealmWordEntity> wordQuery = realm.where(RealmWordEntity.class);
-        //インスタンス生成し、その中にすべてのデータを入れる 今回なら全てのデータ
-        RealmResults<RealmWordEntity> wordResults = wordQuery.findAll();
-        //取ってきたデータ全部欲しい時はこんな感じに
-        for(int i=0;i<wordResults.size();i++){
-
-            wordlist.add(wordResults.get(i));
-            //arrayAdapterにwordlistを入れる
-            arrayAdapter.add(wordlist.get(i).getTagName());
-            //arrayAdapterをlistViewに入れる
-            listView.setAdapter(arrayAdapter);
-
-        }
-
-         Button btn = (Button)findViewById(R.id.createbutton);
-
-        btn.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-
-                if(edittext.length() !=0) {
-
-                    //トランザクション開始
-                    realm.beginTransaction();
-                    //インスタンスを生成
-                    RealmFolderEntity model = realm.createObject(RealmFolderEntity.class);
-                    //書き込みたいデータをインスタンスに入れる
-                    model.setFolderName(edittext.getText().toString());
-                    //トランザクション終了 (データを書き込む)
-                    realm.commitTransaction();
-
-                }else{
-                    //トランザクション開始
-                    realm.beginTransaction();
-                    //インスタンスを生成
-                    RealmFolderEntity model = realm.createObject(RealmFolderEntity.class);
-                    //書き込みたいデータをインスタンスに入れる
-                    model.setFolderName("タイトル未設定");
-                    //トランザクション終了 (データを書き込む)
-                    realm.commitTransaction();
-                }
+        getTagDataList();
 
 
-                //日付の保存
-                //トランザクション開始
-                realm.beginTransaction();
-                //インスタンスを生成
-                RealmMatomeEntity model = realm.createObject(RealmMatomeEntity.class);
-                //書き込みたいデータをインスタンスに入れる
-                model.setStartDate(frontDate);
-                //トランザクション終了 (データを書き込む)
-                realm.commitTransaction();
+        btn.setOnClickListener(this);
 
-
-                //トランザクション開始
-                realm.beginTransaction();
-                //インスタンスを生成
-                RealmMatomeEntity rearmodel = realm.createObject(RealmMatomeEntity.class);
-                //書き込みたいデータをインスタンスに入れる
-                rearmodel.setEndDate(rearDate);
-                //トランザクション終了 (データを書き込む)
-                realm.commitTransaction();
-
-               finish();
-            }
-        });
     }
 
+
+    public void showDatePickerDialog(View v) {
+        switch (v.getId()) {
+            //まとめ期間開始日
+            case R.id.button1:
+                newFragment = new DatePick(frontYear,frontMonth,frontDay);
+                newFragment.show(getSupportFragmentManager(), "datePicker");
+                flag=1;
+                break;
+
+            //まとめ期間終了日
+            case R.id.button2:
+                secondFragment = new DatePick(rearYear,rearMonth,rearDay);
+                secondFragment.show(getSupportFragmentManager(), "datePicker");
+                flag=2;
+                break;
+        }
+    }
 
     @Override
     public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
@@ -221,20 +175,101 @@ public class FolderCreateActivity extends AppCompatActivity implements OnDateSet
         //yearV[flag]=year;
     }
 
-    public void showDatePickerDialog(View v) {
-        switch (v.getId()) {
-            case R.id.button1:
-                newFragment = new DatePick(frontYear,frontMonth,frontDay);
-                newFragment.show(getSupportFragmentManager(), "datePicker");
-                flag=1;
-                break;
+    //ボタン処理
+    @Override
+    public void onClick(View view) {
 
-            case R.id.button2:
-                secondFragment = new DatePick(rearYear,rearMonth,rearDay);
-                secondFragment.show(getSupportFragmentManager(), "datePicker");
-                flag=2;
-                break;
+        //まとめタイトルをDatabaseに保存
+        saveMatomeTitle();
+
+        //まとめ期間をDatabaseに保存
+        saveMatomeTime();
+
+        finish();
+    }
+
+    //DatabaseからTagの一覧を取得
+    public void getTagDataList(){
+        RealmQuery<RealmWordEntity> wordQuery = realm.where(RealmWordEntity.class);
+
+        RealmResults<RealmWordEntity> wordResults = wordQuery.findAll();
+        //取ってきたデータ全部欲しい時はこんな感じに
+        for(int i=0;i<wordResults.size();i++){
+
+            wordlist.add(wordResults.get(i));
+            //arrayAdapterにwordlistを入れる
+            arrayAdapter.add(wordlist.get(i).getTagName());
+            //arrayAdapterをlistViewに入れる
+            listView.setAdapter(arrayAdapter);
+
         }
+    }
+
+    //まとめタイトルをDatabaseに保存
+    public void saveMatomeTitle(){
+
+        realm.beginTransaction();
+        RealmMatomeEntity model = realm.createObject(RealmMatomeEntity.class);
+
+        if(edittext.length() !=0) {
+            model.setMatomeName(edittext.getText().toString());
+
+        }else{
+            model.setMatomeName("タイトル未設定");
+        }
+
+        realm.commitTransaction();
+    }
+
+    //まとめ期間開始日をDatabaseに保存
+    public void saveMatomeTime(){
+
+        realm.beginTransaction();
+
+        //まとめ期間開始日をDatabaseに保存
+        RealmMatomeEntity frontModel = realm.createObject(RealmMatomeEntity.class);
+        frontModel.setStartDate(frontDate);
+
+        //まとめ期間終了日をDatabaseに保存
+        RealmMatomeEntity rearModel = realm.createObject(RealmMatomeEntity.class);
+        rearModel.setEndDate(rearDate);
+
+        realm.commitTransaction();
+    }
+
+    private void saveMemoCheckedDialog(){
+
+        // 確認ダイアログの生成
+        AlertDialog.Builder alertDlg = new AlertDialog.Builder(this);
+        alertDlg.setTitle("");
+        alertDlg.setMessage("メモの内容を保存しますか？");
+        alertDlg.setPositiveButton(
+                "キャンセル",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        // キャンセル ボタンクリック処理
+
+                    }
+                });
+        alertDlg.setNeutralButton(
+                "保存する",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        // 保存する ボタンクリック処理
+                        finish();
+                    }
+                });
+        alertDlg.setNegativeButton(
+                "保存しないで戻る",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        // 保存しないで戻る ボタンクリック処理
+                        finish();
+                    }
+                });
+
+        // 表示
+        alertDlg.create().show();
     }
 
     //メニューバーの作成
@@ -245,65 +280,22 @@ public class FolderCreateActivity extends AppCompatActivity implements OnDateSet
         return true;
     }
 
-    //ToDo Intent先の作成とIntent処理の追加
-    //メニューが選択されたときの処理
-    //戻るボタンを押したときの処理
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
+        //int id = item.getItemId();
 
-        Intent intent = null;
+        Intent intent;
 
         boolean result = true;
 
-        /*
-        Realm.init(this);
-        realm = Realm.getDefaultInstance();
-        */
-
-
-        switch (id) {
+        switch (item.getItemId()) {
+            //戻るボタンを押したときの処理
             case android.R.id.home:
 
-
-                    // 確認ダイアログの生成
-                    AlertDialog.Builder alertDlg = new AlertDialog.Builder(this);
-                    alertDlg.setTitle("");
-                    alertDlg.setMessage("メモの内容を保存しますか？");
-                    alertDlg.setPositiveButton(
-                            "キャンセル",
-                            new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int which) {
-                                    // キャンセル ボタンクリック処理
-
-                                }
-                            });
-                    alertDlg.setNeutralButton(
-                            "保存する",
-                            new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int which) {
-                                    // 保存する ボタンクリック処理
-
-
-
-                                    finish();
-                                }
-                            });
-                    alertDlg.setNegativeButton(
-                            "保存しないで戻る",
-                            new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int which) {
-                                    // 保存しないで戻る ボタンクリック処理
-                                    finish();
-                                }
-                            });
-
-                    // 表示
-                    alertDlg.create().show();
-
-
+                saveMemoCheckedDialog();
                 break;
 
+            //メニューが選択されたときの処理
             case R.id.tag_settings:
                 Log.d("menu", "タグ設定へ");  //TagEditActivityへIntent
                 intent = new Intent(this, TagEditActivity.class);
