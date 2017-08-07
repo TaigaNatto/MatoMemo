@@ -1,7 +1,14 @@
 package com.example.t_robop.matomemo;
 
+import android.os.Bundle;
+import android.os.Debug;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.ViewPager;
+import android.util.Log;
+import android.view.ViewGroup;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,8 +49,39 @@ public class CustomFragmentPagerAdapter extends FragmentPagerAdapter {
         return tabTitles[position];
     }
 
+    @Override
+    public int getItemPosition(Object object){
+        return POSITION_NONE;
+    }
+
+    @Override
+    public void destroyItem(ViewGroup container, int position, Object object){
+        super.destroyItem(container, position, object);
+
+        if(position <= getCount()){
+            FragmentManager manager = ((Fragment)object).getFragmentManager();
+            FragmentTransaction transaction = manager.beginTransaction();
+            transaction.remove((Fragment)object);
+            transaction.commit();
+        }
+    }
+
     //Fragmentの追加メソッド
-    public void addFragment(Fragment ft){
+    public List<Fragment> addFragment(Fragment ft){
         mFragments.add(ft);
+        return null;
+    }
+
+    public void destroyAllItem(ViewPager pager){
+        for(int i=0; i<getCount() - 1; i++){
+            try{
+                Object object = this.instantiateItem(pager,i);
+                if(object != null){
+                    destroyItem(pager,i,object);
+                }
+            }catch (Exception e){
+                Log.d("destroyAllItem",e.toString());
+            }
+        }
     }
 }
