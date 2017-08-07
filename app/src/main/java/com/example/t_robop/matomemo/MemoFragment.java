@@ -32,7 +32,7 @@ public class MemoFragment extends Fragment implements OnItemClickListener, OnIte
         // Bundleとかここに書く
         Bundle args = new Bundle();
         args.putString("SUBJECT",subjectName);  //StartListActivityでクリックされた教科名を受け取って保存  @KEY SUBJECT
-        MemoFragment fragment = new MemoFragment(); //Fragmentの初期化
+        MemoFragment fragment = new MemoFragment();
         fragment.setArguments(args);
         return fragment;
     }
@@ -42,14 +42,11 @@ public class MemoFragment extends Fragment implements OnItemClickListener, OnIte
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle saveInstanceState){
 
         //ToDo メモが無い場合はTextViewで「メモなし」を表示 (優先度低)
-        //メモのListViewのレイアウトをインフレート
         ListView memoListView = (ListView)inflater.inflate(R.layout.activity_memo_tab,container,false);
 
-        //Database初期化
         Realm.init(getActivity());
         realm = Realm.getDefaultInstance();
 
-        //Adapterのインスタンスを作成
         adapterMemo = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1);
 
         //値の受け渡し
@@ -59,13 +56,11 @@ public class MemoFragment extends Fragment implements OnItemClickListener, OnIte
         //ToDo 別画面で作成されてデータベースに保存されているメモのリストを呼び出す
         getMemoDataList(subject);   //StartListActivityでタップした教科名のメモ一覧をデータベースから取ってきて表示
 
-        //メモリストのItemタップ時の処理     WritingActivityへのIntent
         memoListView.setOnItemClickListener(this);
 
-        //メモリストのItem長押し時の処理     選択メモの削除
         memoListView.setOnItemLongClickListener(this);
 
-        memoListView.setAdapter(adapterMemo);   //メモを画面に表示
+        memoListView.setAdapter(adapterMemo);
 
         return memoListView;
     }
@@ -73,16 +68,15 @@ public class MemoFragment extends Fragment implements OnItemClickListener, OnIte
     //Debug用データベース設定    教科別メモセット
     //ToDo
     public void setMemoDataTest(String subjectName){
-        //トランザクション開始
+
         realm.beginTransaction();
-        //インスタンスを生成
+
         RealmMemoEntity testMemo = realm.createObject(RealmMemoEntity.class);
 
         //Debug用　Drawer内でタップした教科のメモをDebug用に作成したセット
         testMemo.setFolder(subjectName);
         testMemo.setMemo(subjectName+"メモ");
 
-        //トランザクション終了 (データを書き込む)
         realm.commitTransaction();
 
     }

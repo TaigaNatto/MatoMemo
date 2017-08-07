@@ -20,6 +20,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -73,7 +74,6 @@ public class MatoMemoListActivity extends AppCompatActivity implements AdapterVi
         tabNames = getResources().getStringArray(R.array.tabs);
         tabLayout = (TabLayout)findViewById(R.id.tabs);
         viewPager = (ViewPager)findViewById(R.id.pager);
-
 
         //StartListActivityからのIntent受取
         Intent intent = getIntent();
@@ -176,6 +176,7 @@ public class MatoMemoListActivity extends AppCompatActivity implements AdapterVi
         //教科クリックしたらToolBar.setTitleで教科名をセット
         toolbar.setTitle(item);
 
+
         //Drawer内でタップされた教科名のメモを表示
         Fragment fragmentPage0 = matomemoFragmentPagerAdapter.getItem(0);    //CustomFragmentPagerAdapterのgetItemからfragment情報を取ってくる
         Fragment fragmentPage1 = matomemoFragmentPagerAdapter.getItem(1);
@@ -185,8 +186,9 @@ public class MatoMemoListActivity extends AppCompatActivity implements AdapterVi
         }
 
         if(fragmentPage1 != null && fragmentPage1 instanceof MatomeFragment){
-            ((MatomeFragment)fragmentPage1).reloadMatomeData(item);
+            //((MatomeFragment)fragmentPage1).reloadMatomeData(item);           //ToDo 落ちる
         }
+
     }
 
     @Override
@@ -222,6 +224,7 @@ public class MatoMemoListActivity extends AppCompatActivity implements AdapterVi
         for(int i=0; i<folderResults.size(); i++){
             drawerArrayAdapter.add(folderResults.get(i).getFolderName());    //全教科名をDrawerのAdapterに追加
         }
+        //ToDo arrayListに入れて返す
     }
 
     //Drawer内の教科リストの更新
@@ -254,6 +257,7 @@ public class MatoMemoListActivity extends AppCompatActivity implements AdapterVi
     //Drawer内のButtonクリック処理
     public void editFolder(View v){
         Intent intent = new Intent(this,GroupEditActivity.class);   //GroupEditActivityにIntent
+        intent.putExtra("Writing Status",0);    //数値受け渡し　1: メモ確認　0: 新規作成   //ここでは0を送る
         startActivity(intent);
     }
 }
