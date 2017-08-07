@@ -25,6 +25,8 @@ public class MemoFragment extends Fragment implements OnItemClickListener, OnIte
     //ListView memoListView = null;   //メモのListView
     ArrayAdapter<String> adapterMemo = null;    //ListViewのAdapter
 
+    private String nowSubjectName;  //現在表示しているメモの教科名
+
     Realm realm;
 
     //MemoFragmentのインスタンス化メソッド
@@ -49,12 +51,12 @@ public class MemoFragment extends Fragment implements OnItemClickListener, OnIte
 
         adapterMemo = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1);
 
-        //値の受け渡し
+        //MatomemoListActivityとの値の受け渡し
         Bundle args = getArguments();
-        String subject = args.getString("SUBJECT"); //初期表示の教科名を保存
+        nowSubjectName = args.getString("SUBJECT"); //初期表示の教科名を保存
 
         //ToDo 別画面で作成されてデータベースに保存されているメモのリストを呼び出す
-        getMemoDataList(subject);   //StartListActivityでタップした教科名のメモ一覧をデータベースから取ってきて表示
+        getMemoDataList(nowSubjectName);   //StartListActivityでタップした教科名のメモ一覧をデータベースから取ってきて表示
 
         memoListView.setOnItemClickListener(this);
 
@@ -99,6 +101,8 @@ public class MemoFragment extends Fragment implements OnItemClickListener, OnIte
 
     //Drawerクリック時のメモリスト更新
     public void reloadMemoData(String subject){
+        nowSubjectName = subject;   //Drawerでクリックされた教科名をフィールド変数に代入
+
         adapterMemo.clear();
         getMemoDataList(subject);    //データベースから教科別メモ取得
         adapterMemo.notifyDataSetChanged();
@@ -126,10 +130,10 @@ public class MemoFragment extends Fragment implements OnItemClickListener, OnIte
     //メモリストのクリック処理
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-        //ToDo メモリストのItemをタップしたときに、・日付　・時間　・メモ内容　・教科名　のデータを持ってWritingActivityにIntent (仕様確認)
-        Log.d("test","onItemClick");
+        //ToDo メモリストのItemをタップしたときに、教科名　のデータを持ってWritingActivityにIntent
         Intent intent = new Intent(getActivity(),WritingActivity.class);
-        intent.putExtra("Writing Status",1);    //数値受け渡し　1: メモ確認　0: 新規作成   //ここでは1を送る
+        intent.putExtra("MODE",1);    //数値受け渡し　1: メモ確認　0: 新規作成   //ここでは1を送る
+        intent.putExtra("SUBJECT NAME",nowSubjectName);     //教科名受け渡し
         startActivity(intent);
     }
 
