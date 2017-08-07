@@ -21,6 +21,7 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -49,12 +50,12 @@ public class FolderCreateActivity extends AppCompatActivity implements OnDateSet
     int frontYear = c.get(Calendar.YEAR);
     int frontMonth = c.get(Calendar.MONTH);
     int frontDay = c.get(Calendar.DAY_OF_MONTH);
-    int frontDate = 0;
+    int frontDate = 99999999;
 
     int rearYear = c.get(Calendar.YEAR);
     int rearMonth = c.get(Calendar.MONTH);
     int rearDay = c.get(Calendar.DAY_OF_MONTH);
-    int rearDate = 0;
+    int rearDate = 99999999;
 
     int yearV[]= new int[2];
 
@@ -184,25 +185,35 @@ public class FolderCreateActivity extends AppCompatActivity implements OnDateSet
     public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
         switch (flag) {
             case 1:
-                textViewfront.setText(String.valueOf(year) + "/ " + String.valueOf(monthOfYear + 1) + "/ " + String.valueOf(dayOfMonth));
                 Log.d("date",String.valueOf(year));
                 Log.d("date",String.valueOf(monthOfYear));
                 Log.d("date",String.valueOf(dayOfMonth));
                 frontYear = year;
-                frontMonth = monthOfYear;
+                frontMonth = monthOfYear+1;
                 frontDay = dayOfMonth;
                 frontDate = frontYear*10000 + frontMonth*100 + frontDay;
 
+                if(frontDate<rearDate){
+                    textViewfront.setText(String.valueOf(frontYear) + "/ " + String.valueOf(frontMonth) + "/ " + String.valueOf(frontDay));
+                }else{
+                    Toast.makeText(this, "誤った日付が設定されています。", Toast.LENGTH_LONG).show();
+                }
+
                 break;
             case 2:
-                textViewrear.setText(String.valueOf(year) + "/ " + String.valueOf(monthOfYear + 1) + "/ " + String.valueOf(dayOfMonth));
                 Log.d("date",String.valueOf(year));
                 Log.d("date",String.valueOf(monthOfYear));
                 Log.d("date",String.valueOf(dayOfMonth));
                 rearYear = year;
-                rearMonth = monthOfYear;
+                rearMonth = monthOfYear+1;
                 rearDay = dayOfMonth;
                 rearDate = rearYear*10000 + rearMonth*100 + rearDay;
+
+                if(frontDate<rearDate){
+                    textViewrear.setText(String.valueOf(rearYear) + "/ " + String.valueOf(rearMonth) + "/ " + String.valueOf(rearDay));
+                }else{
+                    Toast.makeText(this, "誤った日付が設定されています。", Toast.LENGTH_LONG).show();
+                }
 
                 break;
         }
