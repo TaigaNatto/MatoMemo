@@ -16,7 +16,7 @@
     </android.support.v7.widget.Toolbar>
 
     <EditText
-        android:id="@+id/txtDate"
+        android:id="@+id/txtmatome"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="まとめ名前入力"/>
@@ -44,35 +44,38 @@
             android:id="@+id/button2"
             android:text="日付"
             android:onClick="showDatePickerDialog"/>
+
+
     </LinearLayout>
 
-    <CheckBox
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="タグ1"
-        android:id="@+id/checkbox1"
-        android:checked="true"
-        android:clickable="true"
-        android:enabled="true"/>
+        android:orientation="vertical">
 
-    <CheckBox
-        android:layout_width="wrap_content"
+    <ListView
+        android:layout_width="match_parent"
+        android:layout_height="367dp"
+        android:id="@+id/tagList">
+
+    </ListView>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="タグ2"
-        android:id="@+id/checkbox2"
-        android:checked="true"
-        android:clickable="true"
-        android:enabled="true"/>
+        android:orientation="horizontal">
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/createbutton"
+            android:layout_alignParentBottom="true"
+            android:text="まとめ作成"
+            android:onClick="matomecreateClick"/>
 
 
-    <CheckBox
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="タグ3"
-        android:id="@+id/checkbox3"
-        android:checked="true"
-        android:clickable="true"
-        android:enabled="true"/>
-
+    </LinearLayout>
 
 </LinearLayout>
