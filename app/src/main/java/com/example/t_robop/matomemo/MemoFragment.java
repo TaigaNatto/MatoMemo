@@ -55,8 +55,8 @@ public class MemoFragment extends Fragment implements OnItemClickListener, OnIte
         //値の受け渡し
         Bundle args = getArguments();
         String subject = args.getString("SUBJECT"); //初期表示の教科名を保存
+
         //ToDo 別画面で作成されてデータベースに保存されているメモのリストを呼び出す
-        setMemoDataTest(subject);   //Debug用データベース設定    StartListActivityでタップした教科名のメモ一覧をデータベースにセット
         getMemoDataList(subject);   //StartListActivityでタップした教科名のメモ一覧をデータベースから取ってきて表示
 
         //メモリストのItemタップ時の処理     WritingActivityへのIntent
@@ -115,7 +115,7 @@ public class MemoFragment extends Fragment implements OnItemClickListener, OnIte
     public void removeMemoData(String selectedItem){
         // クエリを発行
         RealmQuery<RealmMemoEntity> delQuery  = realm.where(RealmMemoEntity.class);
-        //消したいデータを指定 (以下の場合はmemoデータの「memo」が「test」のものを指定)
+        //消したいデータを指定
         delQuery.equalTo("memo",selectedItem);
         //指定されたデータを持つデータのみに絞り込む
         final RealmResults<RealmMemoEntity> delR = delQuery.findAll();
@@ -129,17 +129,17 @@ public class MemoFragment extends Fragment implements OnItemClickListener, OnIte
         });
     }
 
-
+    //メモリストのクリック処理
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-        //ToDo メモリストのItemをタップしたときに、・日付　・時間　・メモ内容　・教科名　のデータを持ってWritingActivityにIntent (まだ使用確認)
+        //ToDo メモリストのItemをタップしたときに、・日付　・時間　・メモ内容　・教科名　のデータを持ってWritingActivityにIntent (仕様確認)
         Log.d("test","onItemClick");
         Intent intent = new Intent(getActivity(),WritingActivity.class);
         intent.putExtra("Writing Status",1);    //数値受け渡し　1: メモ確認　0: 新規作成   //ここでは1を送る
         startActivity(intent);
     }
 
-
+    //メモリストのロングクリック処理
     @Override
     public boolean onItemLongClick(AdapterView<?> adapterView, View view, int position, long l) {
         Log.d("test","onLongItemClick");
@@ -169,6 +169,6 @@ public class MemoFragment extends Fragment implements OnItemClickListener, OnIte
 
         alertDig.create().show();
 
-        return true;
+        return true;    //ここtrueじゃないと通常クリックも呼ばれてしまう
     }
 }

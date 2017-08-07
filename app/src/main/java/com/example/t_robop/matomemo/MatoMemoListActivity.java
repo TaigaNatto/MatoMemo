@@ -33,9 +33,9 @@ import io.realm.RealmResults;
 public class MatoMemoListActivity extends AppCompatActivity implements AdapterView.OnItemClickListener, ViewPager.OnPageChangeListener {
 
     //Tab
-    TabLayout tabLayout;
-    ViewPager viewPager;
-    CustomFragmentPagerAdapter matomemoFragmentPagerAdapter;    //自作のViewPager用Adapter
+    private TabLayout tabLayout;
+    private ViewPager viewPager;
+    private CustomFragmentPagerAdapter matomemoFragmentPagerAdapter;    //自作のViewPager用Adapter
     String[] tabNames;    //tabの名前 /value/string.xml/string-arrayの"tabs"を参照
 
     //NavigationDrawer内
@@ -53,9 +53,9 @@ public class MatoMemoListActivity extends AppCompatActivity implements AdapterVi
     Realm realm;
 
     //StartListActivityから受け取った教科名
-    String subjectName = null;
+    //String subjectName = null;
 
-
+    //Acitivityの初回起動時
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -74,44 +74,50 @@ public class MatoMemoListActivity extends AppCompatActivity implements AdapterVi
         tabLayout = (TabLayout)findViewById(R.id.tabs);
         viewPager = (ViewPager)findViewById(R.id.pager);
 
-        //Intent受取準備
+
+        //StartListActivityからのIntent受取
         Intent intent = getIntent();
-        subjectName = intent.getStringExtra("folder");
+        String subjectName = intent.getStringExtra("folder");   //ToDo 教科名空欄の場合の例外処理
+
 
         //Toolbar表示
         toolbar.setTitle(subjectName);  //intent元でタップされた教科名を設定
         setSupportActionBar(toolbar);
+
 
         //DrawerToggleの表示
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this,drawerLayout,toolbar,R.string.drawer_open,R.string.drawer_close);
         drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
 
-        //Drawer内のArrayAdapterのインスタンス生成
+
         drawerArrayAdapter =new ArrayAdapter<>(this,R.layout.drawer_list_item);
 
         //Drawer内のList初期表示
         drawerArrayAdapter.add("未分類");
 
-        viewPager.addOnPageChangeListener(this);    //viewPagerのスクロールリスナー
+        viewPager.addOnPageChangeListener(this);
+
 
         getFolderDataList();    //Databaseから教科(Folder)取得してdrawerArrayAdapterにセット
 
-        //AdapterをListViewにセット
+
         drawerListView.setAdapter(drawerArrayAdapter);
 
-        drawerListView.setOnItemClickListener(this);    //DrawerListのクリックリスナー
+        drawerListView.setOnItemClickListener(this);
+
 
         //Fragment操作準備
         matomemoFragmentPagerAdapter = new CustomFragmentPagerAdapter(getSupportFragmentManager(),tabNames);
 
-        //AdapterにFragment追加
-        matomemoFragmentPagerAdapter.addFragment(MemoFragment.newInstance(subjectName));    //MemoFragment classのnewInstanceメソッドを起動
-        matomemoFragmentPagerAdapter.addFragment(MatomeFragment.newInstance());
+        //newInstanceメソッドでAdapterにFragment追加
+        matomemoFragmentPagerAdapter.addFragment(MemoFragment.newInstance(subjectName));
+        matomemoFragmentPagerAdapter.addFragment(MatomeFragment.newInstance(subjectName));
 
-        viewPager.setAdapter(matomemoFragmentPagerAdapter);     //viewPagerにadapterをセット
 
-        tabLayout.setupWithViewPager(viewPager);    //tabLayoutにviewpagerをセット
+        viewPager.setAdapter(matomemoFragmentPagerAdapter);
+
+        tabLayout.setupWithViewPager(viewPager);
     }
 
     //Activityが再度開始された時
@@ -160,7 +166,7 @@ public class MatoMemoListActivity extends AppCompatActivity implements AdapterVi
         return true;
     }
 
-    //ToDo 非同期処理　(無くても動いた)
+    //ToDo 非同期処理　(無くても動くけど...)
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
         //動的に追加された教科Listのクリック処理
@@ -171,9 +177,15 @@ public class MatoMemoListActivity extends AppCompatActivity implements AdapterVi
         toolbar.setTitle(item);
 
         //Drawer内でタップされた教科名のメモを表示
-        Fragment fragment = matomemoFragmentPagerAdapter.getItem(0);    //CustomFragmentPagerAdapterのgetItemからfragment情報を取ってくる
-        if(fragment != null && fragment instanceof MemoFragment){
-            ((MemoFragment)fragment).reloadMemoData(item);
+        Fragment fragmentPage0 = matomemoFragmentPagerAdapter.getItem(0);    //CustomFragmentPagerAdapterのgetItemからfragment情報を取ってくる
+        Fragment fragmentPage1 = matomemoFragmentPagerAdapter.getItem(1);
+
+        if(fragmentPage0 != null && fragmentPage0 instanceof MemoFragment){
+            ((MemoFragment)fragmentPage0).reloadMemoData(item);
+        }
+
+        if(fragmentPage1 != null && fragmentPage1 instanceof MatomeFragment){
+            ((MatomeFragment)fragmentPage1).reloadMatomeData(item);
         }
     }
 

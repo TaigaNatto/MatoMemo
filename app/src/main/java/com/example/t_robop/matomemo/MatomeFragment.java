@@ -15,10 +15,10 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import io.realm.Realm;
+import io.realm.RealmQuery;
+import io.realm.RealmResults;
 
-/**
- * Created by user on 2017/06/20.
- */
+
 //ToDo まとめListの設計確認
 public class MatomeFragment extends Fragment implements OnItemClickListener, OnItemLongClickListener {
 
@@ -27,9 +27,12 @@ public class MatomeFragment extends Fragment implements OnItemClickListener, OnI
 
     Realm realm;
 
-    public static MatomeFragment newInstance(){
-        // Bundleとかここに書く
+    //MatomeFragmentのインスタンス化メソッド
+    public static MatomeFragment newInstance(String subjectName){
+        Bundle args = new Bundle();
+        args.putString("SUBJECT",subjectName);  //StartListActivityでクリックされた教科名を受け取って保存  @KEY SUBJECT
         MatomeFragment fragment = new MatomeFragment();
+        fragment.setArguments(args);
         return fragment;
     }
 
@@ -46,7 +49,12 @@ public class MatomeFragment extends Fragment implements OnItemClickListener, OnI
         //Adapterのインスタンスを作って、追加
         adapterMatome = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1);
 
-        adapterMatome.add("まとめ");
+        //値の受け渡し
+        Bundle args = getArguments();
+        String subject = args.getString("SUBJECT"); //初期表示の教科名を保存
+
+        //ToDo 別画面で作成されてデータベースに保存されているメモのリストを呼び出す
+        getMatomeDataList(subject);   //StartListActivityでタップした教科名のメモ一覧をデータベースから取ってきて表示
 
         //まとめリストのItemタップ時の処理
         matomeListView.setOnItemClickListener(this);
@@ -61,7 +69,18 @@ public class MatomeFragment extends Fragment implements OnItemClickListener, OnI
 
     //データベースから教科別まとめ取得
     public void getMatomeDataList(String subjectName){
+        //検索用のクエリ作成
+        RealmQuery<RealmMatomeEntity> matomeQuery = realm.where(RealmMatomeEntity.class);
 
+        matomeQuery = matomeQuery.equalTo("matome",subjectName);
+
+        RealmResults<RealmMatomeEntity> matomeResults = matomeQuery.findAll();
+
+        adapterMatome.clear();
+
+        for(int i=0; i<matomeResults.size(); i++){
+            adapterMatome.add(matomeResults.get(i).getMatomeName());    //メモをListViewのAdapterに入れる
+        }
     }
 
     //Drawerクリック時のまとめリスト更新
@@ -73,7 +92,20 @@ public class MatomeFragment extends Fragment implements OnItemClickListener, OnI
 
     //選択されたItemをデータベースから削除
     public void removeMatomeData(String selectedItem){
-
+        // クエリを発行
+        RealmQuery<RealmMatomeEntity> delQuery  = realm.where(RealmMatomeEntity.class);
+        //消したいデータを指定 (以下の場合はmemoデータの「memo」が「test」のものを指定)
+        delQuery.equalTo("matome",selectedItem);
+        //指定されたデータを持つデータのみに絞り込む
+        final RealmResults<RealmMatomeEntity> delR = delQuery.findAll();
+        // 変更操作はトランザクションの中で実行する必要あり
+        realm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                // すべてのオブジェクトを削除
+                delR.deleteAllFromRealm();
+            }
+        });
     }
 
     //まとめ内容へIntent
