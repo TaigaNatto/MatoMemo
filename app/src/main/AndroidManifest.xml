@@ -21,10 +21,14 @@
         <activity android:name=".FolderCreateActivity" />
         <activity android:name=".MatoMemoListActivity" />
         <activity android:name=".RealmTestActivity" />
-        <activity android:name=".WritingActivity" />
+        <activity
+            android:name=".WritingActivity"
+            android:windowSoftInputMode="adjustResize" />
         <activity android:name=".DBLogActivity" />
         <activity android:name=".MatomeActivity" />
-        <activity android:name=".TagEditActivity"></activity>
+        <activity android:name=".TagEditActivity" />
+        <activity android:name=".KeyboardResizeTestActivity"
+            android:windowSoftInputMode="adjustResize"></activity>
     </application>
 
 </manifest>

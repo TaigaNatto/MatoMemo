@@ -61,7 +61,8 @@ public class MatomeAdapter extends BaseAdapter {
             String word=this.matomeList.get(position).getMarckWords().get(i);
             //色変える時はこの辺に書いて
             //取得した単語の部分にマーカーを付与
-            txtStr = giveMarck(txtStr,word,"#ff0000");
+            WritingActivity wa=new WritingActivity();
+            txtStr = wa.giveMark(txtStr,word,"#ff0000");
         }
 
         //表示するレイアウトの決定
@@ -70,10 +71,6 @@ public class MatomeAdapter extends BaseAdapter {
         return convertView;
     }
 
-    //単語にマーカー付けてくれる最高のメソッド
-    public String giveMarck(String memo,String word,String color){
-        String text=memo.replaceAll(word,"<span style=background-color:"+color+">"+word+"</span>");
-        return text;
-    }
+
 
 }

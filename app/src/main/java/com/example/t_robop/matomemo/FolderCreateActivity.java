@@ -3,6 +3,10 @@ package com.example.t_robop.matomemo;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.app.DatePickerDialog.OnDateSetListener;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.DatePicker;
@@ -11,7 +15,7 @@ import android.widget.TextView;
 import java.util.Calendar;
 
 
-public class FolderCreateActivity extends FragmentActivity implements OnDateSetListener {
+public class FolderCreateActivity extends ActionBarActivity implements OnDateSetListener {
 
     private TextView textViewfront;
     private TextView textViewrear;
@@ -43,7 +47,15 @@ public class FolderCreateActivity extends FragmentActivity implements OnDateSetL
         secondFragment=new DatePick(2017,1,1);
 
 
+        Toolbar toolbar = (Toolbar)findViewById(R.id.tool_bar);
+        setSupportActionBar(toolbar);
 
+        ActionBar actionBar=getSupportActionBar();
+
+        Log.d("SSSS",getSupportActionBar().toString());
+
+        actionBar.setDisplayHomeAsUpEnabled(true);
+        actionBar.setHomeButtonEnabled(true);
     }
 
     @Override
