@@ -11,10 +11,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.ButtonBarLayout;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.util.SparseBooleanArray;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
@@ -107,6 +109,9 @@ public class FolderCreateActivity extends AppCompatActivity implements OnDateSet
         arrayAdapter = new ArrayAdapter<String>(
                 this, android.R.layout.simple_list_item_multiple_choice);
 
+        listView.setItemsCanFocus(false);
+
+        listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
 
         //DatabaseからTagの一覧を取得
         getTagDataList();
@@ -184,6 +189,16 @@ public class FolderCreateActivity extends AppCompatActivity implements OnDateSet
 
         //まとめ期間をDatabaseに保存
         saveMatomeTime();
+
+        //ListViewチェックボックスで選択されているものを配列に代入
+        SparseBooleanArray array = listView.getCheckedItemPositions();
+        for(int i = 0; i<array.size(); i++){
+            int at = array.keyAt(i);
+            if (array.get(at)) {
+                Log.d("example", "選択されている項目:" + listView.getItemAtPosition(at).toString()); //選択されているListの文字列を取得
+                Log.d("example", "そのキー" + at);  //選択されているListの要素数を取得
+            }
+        }
 
         finish();
     }
