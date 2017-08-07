@@ -1,19 +1,15 @@
 package com.example.t_robop.matomemo;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.LinearLayoutCompat;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.Html;
 import android.text.TextWatcher;
-import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.ActionMode;
 import android.view.Menu;
@@ -21,32 +17,27 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 
 import io.realm.Realm;
 import io.realm.RealmQuery;
 import io.realm.RealmResults;
 
-import static com.example.t_robop.matomemo.R.id.txt;
 import static com.example.t_robop.matomemo.R.id.txtmemo;
 
 public class WritingActivity extends ActionBarActivity implements TextWatcher {
 
-    int kari = 0;
-    //仮にメモを新規作成する場合は０、編集するときは１としています。
+    Intent intent=new Intent();
+    int mode = intent.getIntExtra("MODE",0);
+    //メモを新規作成する場合は０、編集するときは１としています。
 
     int change = 0;
 
@@ -62,9 +53,14 @@ public class WritingActivity extends ActionBarActivity implements TextWatcher {
 
     //markする色を保持する(デフォルトは白)
     String tempColor="#ffffff";
+    //markするタグを保持する
+    String tempTagName=null;
 
     //タグ一覧を保持する
     String tags[];
+
+    //設定されたタグデータの保持
+    ArrayList<MatomeWord> mWordList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,9 +78,11 @@ public class WritingActivity extends ActionBarActivity implements TextWatcher {
         //キーボード検知用のリスナーをセット
         layout.setListener(listner);
 
+        mWordList=new ArrayList<>();
+
         editText.addTextChangedListener(this);
 
-        if (kari == 0) {
+        if (mode == 0) {
 
             textView.setVisibility(View.GONE);
 
@@ -147,8 +145,11 @@ public class WritingActivity extends ActionBarActivity implements TextWatcher {
                 switch(id) {
                     case R.id.mark:
                         // 独自の処理
-                        wordMark();
-                        Log.d("SSSS","マークされたよ！");
+                        if(tempTagName!=null) {
+                            //マーカー付け
+                            wordMark();
+                            Log.d("SSSS", "マークされたよ！");
+                        }
                         return true;
                 }
                 return false;
@@ -245,7 +246,12 @@ public class WritingActivity extends ActionBarActivity implements TextWatcher {
                                 public void onClick(DialogInterface dialog, int which) {
                                     // 保存する ボタンクリック処理
 
-                                    if (kari == 0) {
+                                    //トランザクション開始
+                                    realm.beginTransaction();
+                                    //インスタンスを生成
+                                    RealmMemoEntity model = realm.createObject(RealmMemoEntity.class);
+
+                                    if (mode == 0) {
                                         //新規の場合は今日の日付を取得
                                         final Calendar c = Calendar.getInstance();
                                         int newYear = c.get(Calendar.YEAR);
@@ -254,21 +260,20 @@ public class WritingActivity extends ActionBarActivity implements TextWatcher {
 
                                         int Today = newYear * 10000 + newMonth * 100 + newDay;
 
-
-                                        //トランザクション開始
-                                        realm.beginTransaction();
-                                        //インスタンスを生成
-                                        RealmMemoEntity model = realm.createObject(RealmMemoEntity.class);
                                         //書き込みたいデータをインスタンスに入れる
                                         model.setDate(Today);
-                                        //トランザクション終了 (データを書き込む)
-                                        realm.commitTransaction();
 
+                                        //タグが１つでもセットされてれば
+                                        if(mWordList.size()>0){
+                                            for (int i = 0; i< mWordList.size(); i++){
+                                                MatomeWord mWord= realm.createObject(MatomeWord.class);
+                                                mWord.setWord(mWordList.get(i).getWord());
+                                                mWord.setTagName(mWordList.get(i).getTagName());
+                                                model.words.add(mWord);
+                                            }
+                                        }
                                     }
-                                    //トランザクション開始
-                                    realm.beginTransaction();
-                                    //インスタンスを生成
-                                    RealmMemoEntity model = realm.createObject(RealmMemoEntity.class);
+
                                     //書き込みたいデータをインスタンスに入れる
                                     model.setMemo(editText.getText().toString());
                                     //トランザクション終了 (データを書き込む)
@@ -365,8 +370,10 @@ public class WritingActivity extends ActionBarActivity implements TextWatcher {
                             wordQuery.equalTo("tagName",tags[checkedItems.get(0)]);
                             //インスタンス生成し、その中にすべてのデータを入れる 今回なら全てのデータ
                             RealmResults<RealmWordEntity> wordResults = wordQuery.findAll();
-                            //色を変更
+                            //設定する色を変更
                             tempColor=wordResults.get(0).getColor();
+                            //設定するタグを変更
+                            tempTagName=wordResults.get(0).getTagName();
                         }
                     }
                 })
@@ -374,7 +381,7 @@ public class WritingActivity extends ActionBarActivity implements TextWatcher {
                 .show();
     }
 
-    //選択した文字列にmakerを付けてくれるメソッド
+    //選択した文字列にmakerを付けてくれるうえに保存までしてくれるメソッド
     public void wordMark(){
         //選択の始めの位置を取得
         int start=editText.getSelectionStart();
@@ -384,6 +391,11 @@ public class WritingActivity extends ActionBarActivity implements TextWatcher {
         String text=editText.getText().toString().substring(start,end);
         //色を変えてEditTextにセット
         editText.setText(Html.fromHtml(giveMark(editText.getText().toString(),text,tempColor)));
+        //一時保存
+        MatomeWord mWord = new MatomeWord();
+        mWord.setTagName(tempTagName);
+        mWord.setWord(text);
+        mWordList.add(mWord);
     }
 
     //単語にマーカー付けてくれる最高のメソッド
