@@ -67,7 +67,7 @@ public class MemoFragment extends Fragment implements OnItemClickListener, OnIte
         return memoListView;
     }
 
-    //Debug用データベース設定    教科別メモセット
+    /*Debug用データベース設定    教科別メモセット
     //ToDo
     public void setMemoDataTest(String subjectName){
 
@@ -82,7 +82,9 @@ public class MemoFragment extends Fragment implements OnItemClickListener, OnIte
         realm.commitTransaction();
 
     }
+    */
 
+    //ToDo 西村がfolderとメモを紐付けてデータベースに保存する処理を追記するので、それまで待ち 　→　メモ内容をadapterにaddする
     //データベースから教科別メモ取得
     public void getMemoDataList(String subjectName){    //引数：　Drawer内でクリックした教科名
         //検索用のクエリ作成
@@ -90,7 +92,7 @@ public class MemoFragment extends Fragment implements OnItemClickListener, OnIte
 
         memoQuery = memoQuery.equalTo("folder",subjectName);  //引数で受け取った教科名のメモを取得
 
-        RealmResults<RealmMemoEntity> memoResults = memoQuery.findAll();    //インスタンス生成し、その中に取得したすべてのデータを入れる
+        RealmResults<RealmMemoEntity> memoResults = memoQuery.findAll();
 
         adapterMemo.clear();    //一旦Listを全部削除
 

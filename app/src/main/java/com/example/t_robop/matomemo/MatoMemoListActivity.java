@@ -139,23 +139,17 @@ public class MatoMemoListActivity extends AppCompatActivity implements AdapterVi
         return true;
     }
 
-    //ToDo Intent先の作成とIntent処理の追加
     //メニューが選択されたときの処理
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         Intent intent = null;
+        int requestCode = 123;
 
         //addしたときのIDで識別
         switch(item.getItemId()) {
             case R.id.tag_settings:
                 intent = new Intent(this, TagEditActivity.class);   //TagEditActivityへIntent
                 break;
-
-            /*
-            case R.id.important_setting:
-                Log.d("menu","重要度設定へ");     //ImportantEditActivityへIntent
-                break;
-             */
 
             case R.id.editFolder:
                 intent = new Intent(this, GroupEditActivity.class);  //GroupEditActivityへIntent
@@ -165,7 +159,8 @@ public class MatoMemoListActivity extends AppCompatActivity implements AdapterVi
                 break;
 
         }
-        startActivity(intent);
+        //startActivity(intent);
+        startActivityForResult(intent,requestCode);
 
         return true;
     }
@@ -183,7 +178,7 @@ public class MatoMemoListActivity extends AppCompatActivity implements AdapterVi
         toolbar.setTitle(item);
 
 
-        //Drawer内でタップされた教科名のメモを表示
+        //Drawer内でタップされた教科名のメモリストを表示
         Fragment fragmentPage0 = matomemoFragmentPagerAdapter.getItem(0);    //CustomFragmentPagerAdapterのgetItemからfragment情報を取ってくる     //ToDo 変数fragmentPageをリファクター
         Fragment fragmentPage1 = matomemoFragmentPagerAdapter.getItem(1);
 
@@ -192,7 +187,7 @@ public class MatoMemoListActivity extends AppCompatActivity implements AdapterVi
         }
 
         if(fragmentPage1 != null && fragmentPage1 instanceof MatomeFragment){
-            //((MatomeFragment)fragmentPage1).reloadMatomeData(item);           //ToDo 落ちる
+            ((MatomeFragment)fragmentPage1).reloadMatomeData(item);
         }
 
     }
@@ -245,6 +240,7 @@ public class MatoMemoListActivity extends AppCompatActivity implements AdapterVi
     public void MatoMemoClick(View v){      //ToDo メソッド名リファクター
         String buttonText = (String) matoMemoButton.getText();  //ButtonのTextを取得    //ToDo 変数名リファクター
         Intent intent = null;
+        int requestCode = 123;
 
         switch (buttonText){
             case "メモを書く":
@@ -258,13 +254,55 @@ public class MatoMemoListActivity extends AppCompatActivity implements AdapterVi
                 break;
         }
 
-        startActivity(intent);  //Intent!!!
-
+        //startActivity(intent);  //Intent!!!
+        startActivityForResult(intent,requestCode);
     }
 
     //Drawer内のButtonクリック処理
     public void intentEditFolder(View v){     //ToDo メソッド名リファクター
+        int requestCode = 123;
+
         Intent intent = new Intent(this,GroupEditActivity.class);   //GroupEditActivityにIntent
-        startActivity(intent);
+        //startActivity(intent);
+        startActivityForResult(intent,requestCode);
+    }
+
+
+    //startActivityForResultで起動させたActivityが、finish()により破棄されたときにコール
+    //@param
+    // requestCode : startActivityForResultの第二引数で指定した値
+    // resultCode : 起動先のActivity.setResultの第一引数が渡される
+    // Intent data : 起動先Activityから送られてくるIntent
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data){
+        super.onActivityResult(requestCode,resultCode,data);
+
+        switch (requestCode){
+            case 123:
+                if(resultCode == RESULT_OK){
+                    //ToDo ページのリロード処理
+
+                    //reloadDrawerList();
+
+                    /*Drawer内でタップされた教科名のメモリストを表示
+                    Fragment fragmentPage0 = matomemoFragmentPagerAdapter.getItem(0);    //CustomFragmentPagerAdapterのgetItemからfragment情報を取ってくる     //ToDo 変数fragmentPageをリファクター
+                    Fragment fragmentPage1 = matomemoFragmentPagerAdapter.getItem(1);
+
+                    if(fragmentPage0 != null && fragmentPage0 instanceof MemoFragment){
+                        ((MemoFragment)fragmentPage0).reloadMemoData(item);
+                    }
+
+                    if(fragmentPage1 != null && fragmentPage1 instanceof MatomeFragment){
+                        //((MatomeFragment)fragmentPage1).reloadMatomeData(item);           //ToDo 落ちる get時の処理内容を確認
+                    }
+                    */
+                }else if (resultCode == RESULT_CANCELED){
+
+                }
+                break;
+
+            default:
+                break;
+        }
     }
 }

@@ -25,12 +25,14 @@ public class MatomeFragment extends Fragment implements OnItemClickListener, OnI
     //ListView matomeListView = null;
     ArrayAdapter<String> adapterMatome = null;
 
+    private String nowSubjectName;
+
     Realm realm;
 
     //MatomeFragmentのインスタンス化メソッド
-    public static MatomeFragment newInstance(String subjectName){
+    public static MatomeFragment newInstance(String subjectName) {
         Bundle args = new Bundle();
-        args.putString("SUBJECT",subjectName);  //StartListActivityでクリックされた教科名を受け取って保存  @KEY SUBJECT
+        args.putString("SUBJECT", subjectName);  //StartListActivityでクリックされた教科名を受け取って保存  @KEY SUBJECT
         MatomeFragment fragment = new MatomeFragment();
         fragment.setArguments(args);
         return fragment;
@@ -38,8 +40,8 @@ public class MatomeFragment extends Fragment implements OnItemClickListener, OnI
 
     //Fragmentで表示するViewを作成するメソッド
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
-        ListView matomeListView = (ListView)inflater.inflate(R.layout.activity_matome_tab,container,false);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        ListView matomeListView = (ListView) inflater.inflate(R.layout.activity_matome_tab, container, false);
 
         //Database初期化
         Realm.init(getActivity());
@@ -49,10 +51,10 @@ public class MatomeFragment extends Fragment implements OnItemClickListener, OnI
 
         //値の受け渡し
         Bundle args = getArguments();
-        String subject = args.getString("SUBJECT"); //初期表示の教科名を保存
+        nowSubjectName = args.getString("SUBJECT"); //初期表示の教科名を保存
 
         //ToDo 別画面で作成されてデータベースに保存されているメモのリストを呼び出す
-        //getMatomeDataList(subject);   //StartListActivityでタップした教科名のメモ一覧をデータベースから取ってきて表示   //ToDo 落ちてる
+        getMatomeDataList(nowSubjectName);   //StartListActivityでタップした教科名のメモ一覧をデータベースから取ってきて表示   //ToDo 落ちてる
 
         matomeListView.setOnItemClickListener(this);
 
@@ -64,34 +66,36 @@ public class MatomeFragment extends Fragment implements OnItemClickListener, OnI
     }
 
     //データベースから教科別まとめ取得してAdapterにセット
-    public void getMatomeDataList(String subjectName){
+    public void getMatomeDataList(String subjectName) {
 
         RealmQuery<RealmMatomeEntity> matomeQuery = realm.where(RealmMatomeEntity.class);
 
-        matomeQuery = matomeQuery.equalTo("matome",subjectName);
+        matomeQuery = matomeQuery.equalTo("folder", subjectName);
 
         RealmResults<RealmMatomeEntity> matomeResults = matomeQuery.findAll();
 
         adapterMatome.clear();
 
-        for(int i=0; i<matomeResults.size(); i++){
+        for (int i = 0; i < matomeResults.size(); i++) {
             adapterMatome.add(matomeResults.get(i).getMatomeName());
         }
     }
 
     //Drawerクリック時のまとめリスト更新
-    public void reloadMatomeData(String subject){
+    public void reloadMatomeData(String subject) {
+        nowSubjectName = subject;
+
         adapterMatome.clear();
         getMatomeDataList(subject);
         adapterMatome.notifyDataSetChanged();
     }
 
     //選択されたItemをデータベースから削除
-    public void removeMatomeData(String selectedItem){
+    public void removeMatomeData(String selectedItem) {
 
-        RealmQuery<RealmMatomeEntity> delQuery  = realm.where(RealmMatomeEntity.class);
+        RealmQuery<RealmMatomeEntity> delQuery = realm.where(RealmMatomeEntity.class);
         //消したいデータを指定
-        delQuery.equalTo("matome",selectedItem);
+        delQuery.equalTo("matome", selectedItem);
 
         final RealmResults<RealmMatomeEntity> delR = delQuery.findAll();
 
@@ -107,14 +111,15 @@ public class MatomeFragment extends Fragment implements OnItemClickListener, OnI
     //まとめ内容へIntent
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-        Intent intent = new Intent(getActivity(),MatomeActivity.class);     //MatomeActivityへIntent
+        Intent intent = new Intent(getActivity(), MatomeActivity.class);     //MatomeActivityへIntent
+        intent.putExtra("SUBJECT NAME", nowSubjectName);
         startActivity(intent);
     }
 
     //ダイアログ表示してまとめの消去
     @Override
     public boolean onItemLongClick(AdapterView<?> adapterView, View view, int position, long l) {
-        final String item = (String)adapterView.getItemAtPosition(position);   //クリックしたpositionからItemを取得
+        final String item = (String) adapterView.getItemAtPosition(position);   //クリックしたpositionからItemを取得
 
         //消去確認のダイアログ
         AlertDialog.Builder alertDig = new AlertDialog.Builder(getActivity());
