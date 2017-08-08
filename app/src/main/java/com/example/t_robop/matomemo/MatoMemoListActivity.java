@@ -129,6 +129,7 @@ public class MatoMemoListActivity extends AppCompatActivity implements AdapterVi
     public void onRestart(){
         super.onRestart();
         reloadDrawerList();     //DrawerArrayAdapterの更新
+        reloadFragmentData(nowSubjectName);     //fragmentのListViewを更新
     }
 
     //メニューバーの作成
@@ -143,7 +144,6 @@ public class MatoMemoListActivity extends AppCompatActivity implements AdapterVi
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         Intent intent = null;
-        int requestCode = 123;
 
         //addしたときのIDで識別
         switch(item.getItemId()) {
@@ -159,8 +159,7 @@ public class MatoMemoListActivity extends AppCompatActivity implements AdapterVi
                 break;
 
         }
-        //startActivity(intent);
-        startActivityForResult(intent,requestCode);
+        startActivity(intent);
 
         return true;
     }
@@ -177,19 +176,7 @@ public class MatoMemoListActivity extends AppCompatActivity implements AdapterVi
         //教科クリックしたらToolBar.setTitleで教科名をセット
         toolbar.setTitle(item);
 
-
-        //Drawer内でタップされた教科名のメモリストを表示
-        Fragment fragmentPage0 = matomemoFragmentPagerAdapter.getItem(0);    //CustomFragmentPagerAdapterのgetItemからfragment情報を取ってくる     //ToDo 変数fragmentPageをリファクター
-        Fragment fragmentPage1 = matomemoFragmentPagerAdapter.getItem(1);
-
-        if(fragmentPage0 != null && fragmentPage0 instanceof MemoFragment){
-            ((MemoFragment)fragmentPage0).reloadMemoData(item);
-        }
-
-        if(fragmentPage1 != null && fragmentPage1 instanceof MatomeFragment){
-            ((MatomeFragment)fragmentPage1).reloadMatomeData(item);
-        }
-
+        reloadFragmentData(item);
     }
 
     @Override
@@ -236,6 +223,20 @@ public class MatoMemoListActivity extends AppCompatActivity implements AdapterVi
         drawerArrayAdapter.notifyDataSetChanged();
     }
 
+    public void reloadFragmentData(String subjectName){
+        //Drawer内でタップされた教科名のメモリストを表示
+        Fragment fragmentPage0 = matomemoFragmentPagerAdapter.getItem(0);    //CustomFragmentPagerAdapterのgetItemからfragment情報を取ってくる     //ToDo 変数fragmentPageをリファクター
+        Fragment fragmentPage1 = matomemoFragmentPagerAdapter.getItem(1);
+
+        if(fragmentPage0 != null && fragmentPage0 instanceof MemoFragment){
+            ((MemoFragment)fragmentPage0).reloadMemoData(subjectName);
+        }
+
+        if(fragmentPage1 != null && fragmentPage1 instanceof MatomeFragment){
+            ((MatomeFragment)fragmentPage1).reloadMatomeData(subjectName);
+        }
+    }
+
     //画面下のButton処理
     public void MatoMemoClick(View v){      //ToDo メソッド名リファクター
         String buttonText = (String) matoMemoButton.getText();  //ButtonのTextを取得    //ToDo 変数名リファクター
@@ -254,55 +255,14 @@ public class MatoMemoListActivity extends AppCompatActivity implements AdapterVi
                 break;
         }
 
-        //startActivity(intent);  //Intent!!!
-        startActivityForResult(intent,requestCode);
+        startActivity(intent);  //Intent!!!
     }
 
     //Drawer内のButtonクリック処理
     public void intentEditFolder(View v){     //ToDo メソッド名リファクター
-        int requestCode = 123;
 
         Intent intent = new Intent(this,GroupEditActivity.class);   //GroupEditActivityにIntent
-        //startActivity(intent);
-        startActivityForResult(intent,requestCode);
+        startActivity(intent);
     }
 
-
-    //startActivityForResultで起動させたActivityが、finish()により破棄されたときにコール
-    //@param
-    // requestCode : startActivityForResultの第二引数で指定した値
-    // resultCode : 起動先のActivity.setResultの第一引数が渡される
-    // Intent data : 起動先Activityから送られてくるIntent
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data){
-        super.onActivityResult(requestCode,resultCode,data);
-
-        switch (requestCode){
-            case 123:
-                if(resultCode == RESULT_OK){
-                    //ToDo ページのリロード処理
-
-                    //reloadDrawerList();
-
-                    /*Drawer内でタップされた教科名のメモリストを表示
-                    Fragment fragmentPage0 = matomemoFragmentPagerAdapter.getItem(0);    //CustomFragmentPagerAdapterのgetItemからfragment情報を取ってくる     //ToDo 変数fragmentPageをリファクター
-                    Fragment fragmentPage1 = matomemoFragmentPagerAdapter.getItem(1);
-
-                    if(fragmentPage0 != null && fragmentPage0 instanceof MemoFragment){
-                        ((MemoFragment)fragmentPage0).reloadMemoData(item);
-                    }
-
-                    if(fragmentPage1 != null && fragmentPage1 instanceof MatomeFragment){
-                        //((MatomeFragment)fragmentPage1).reloadMatomeData(item);           //ToDo 落ちる get時の処理内容を確認
-                    }
-                    */
-                }else if (resultCode == RESULT_CANCELED){
-
-                }
-                break;
-
-            default:
-                break;
-        }
-    }
 }
