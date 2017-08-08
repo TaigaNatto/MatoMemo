@@ -33,8 +33,8 @@ public class MatomeActivity extends AppCompatActivity {
     //表示する要素のリスト
     ArrayList<MatomeObject> matomeObjects;
 
-    //単語確認用id保管リスト
-    ArrayList<Integer> idList;
+    //単語確認用の保管リスト
+    ArrayList<String> idList;
 
     //神
     Realm realm;
@@ -50,7 +50,7 @@ public class MatomeActivity extends AppCompatActivity {
 
         //関連付け
         listView = (ListView) findViewById(R.id.list_matome);
-
+        //保管用listの初期化
         idList=new ArrayList<>();
 
         //ツールバー表示
@@ -59,12 +59,11 @@ public class MatomeActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
 
-        //intentのときに「まとめのid」をもらってくるものとする
-        int id = 0;
-        //フォルダ名ももらってくるものとする
+        //Todo フォルダ名ももらってくるものとする
         String folderName="数学";
 
         /***ダミーデータ用意 ***/
+        /*
         //トランザクション開始
         realm.beginTransaction();
         MatomeWord mWord= realm.createObject(MatomeWord.class);
@@ -121,6 +120,7 @@ public class MatomeActivity extends AppCompatActivity {
         //トランザクション終了 (データを書き込む)
         realm.commitTransaction();
 
+*/
         /***************************/
 
 
@@ -166,11 +166,11 @@ public class MatomeActivity extends AppCompatActivity {
                 for (int j=0;j<memoResults.size();j++){
                     //それぞれのメモに設定された単語の数だけ回す
                     for(int k=0;k<memoResults.get(j).getWords().size();k++){
-                        String matomeWord=matomeResults.get(0).getWords().get(i).getWord();
-                        String memoWord=memoResults.get(j).getWords().get(k).getWord();
+                        String matomeTag=matomeResults.get(0).getWords().get(i).getTagName();
+                        String memoTag=memoResults.get(j).getWords().get(k).getTagName();
                         //同じ単語があれば保持
-                        if(matomeWord.equals(memoWord)){
-                            idList.add(memoResults.get(j).getId());
+                        if(matomeTag.equals(memoTag)){
+                       //     idList.add(memoResults.get(j).get());
                             break;//一個抜ける
                         }
                     }
