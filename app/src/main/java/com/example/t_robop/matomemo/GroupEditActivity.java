@@ -1,6 +1,7 @@
 package com.example.t_robop.matomemo;
 
 
+import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
@@ -42,19 +43,20 @@ public class GroupEditActivity extends AppCompatActivity {
     ArrayList<String> arrayList;
     ListView listView;
     //ダイアログ用のEditText
-    EditText editView;
+    //////////
+    EditText dialogGroupNameEditView;
 
-    String groupName = " ";
+    String groupName;
+    //////////
     //listViewの要素の個数
     int itemNum = 0;
+    //////////
     //重複していないときtrue※
     boolean original = true;
     //ArrayAdapterのString型でarrayAdapterを作成
     ArrayAdapter<String> arrayAdapter;
     //TextViewで「textView」を作成
     TextView textView;
-    //
-    int listPosition;
     //listViewをタップしたときpositionの文字列
     String listPositionText;
 
@@ -73,33 +75,25 @@ public class GroupEditActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_group_edit);
+
         listView = (ListView) findViewById(R.id.list);
         textView = (TextView) findViewById(R.id.textView);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
 
         arrayList = new ArrayList<>();
-        arrayList.add("領域確保");
-
-        //"arrayAdapter"を
-        arrayAdapter = new ArrayAdapter<String>(
-                this, android.R.layout.simple_list_item_1);
-
-        /***これ必須だからみんな書いて***/
-        Realm.init(this);
-        realm = Realm.getDefaultInstance();
-        /*******************/
-
-
-        ////Toolbarの処理////
-
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setHomeButtonEnabled(true);
+        arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1);
         dialog = new AlertDialog.Builder(this);
 
+        arrayList.add("領域確保");
 
-        //textView.setText(" ");
+        ////データベース用
+        Realm.init(this);
+        realm = Realm.getDefaultInstance();
+
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeButtonEnabled(true);
+
         //dateBaseからデータを取得し、listViewに入れる
         dateBaseReference();
 
@@ -108,8 +102,14 @@ public class GroupEditActivity extends AppCompatActivity {
                 new AdapterView.OnItemClickListener() {
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                        listPosition = position;
+
                         dialogBuild();
+                        dialog.setTitle("編集");
+
+                        dialogGroupRemoveButtonMake(position);
+                        dialogCancelButtonMake();
+                        dialogGroupReferenceButtonMake(position);
+
                         dialog.show();
                     }
                 }
@@ -120,83 +120,9 @@ public class GroupEditActivity extends AppCompatActivity {
 
     void dialogBuild() {
 
-        editView = new EditText(getApplicationContext());
-        //タップした場所を取得
-        listPositionText = (String)listView.getItemAtPosition(listPosition);
-        editView.setText(listPositionText);
-        dialog.setView(editView);
-
-        dialog.setTitle("編集");
+        dialogGroupNameEditView = new EditText(getApplicationContext());
+        dialog.setView(dialogGroupNameEditView);
         dialog.create();
-
-        dialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int whichButton) {
-                //groupNameをeditViewのデータで初期化
-                groupName = editView.getText().toString();
-
-                ////入力データにダブってないか判定※被っているならoriginalをfalseに////
-                original = true;
-                //ListViewの要素分繰り返す
-                for (int i = 0; i < itemNum; i++) {
-                    //groupNameがarrayAdapterのi番目の要素と同じか、"未分類"なら実行
-                    if (groupName.equals(arrayAdapter.getItem(i)) || groupName.equals("未分類")) {
-                        original = false;
-                         Toast.makeText(getApplicationContext(), "同名のファイルがすでに存在します", Toast.LENGTH_SHORT).show();
-                        break;
-                    }
-                }
-
-                //入力データが空白でなく、ダブってないなら実行
-                if (groupName.equals("") == false && original) {
-
-                    if(itemNum == 0){
-                        arrayList.set(0,groupName);
-                    }else {
-                        arrayList.add(groupName);
-                    }
-                    //arrayListのデータをadapterに反映
-                    adapterUpdate();
-                    listView.setAdapter(arrayAdapter);
-                    ////データベースにデータを追加(String groupNameを追加)
-                    dateBaseAdd();
-                }
-                if (itemNum != 0) {
-                    textView.setText("");
-                }
-
-            }
-
-        });
-        dialog.setNeutralButton("削除", new DialogInterface.OnClickListener() {
-            @Override
-            //ダイアログのcancelが押されたら実行
-            public void onClick(DialogInterface dialog, int whichButton) {
-
-                ////リストから削除////
-                arrayList.remove(listPosition);
-                //arrayListのデータをadapterに反映
-                adapterUpdate();
-
-
-
-                listView.setAdapter(arrayAdapter);
-
-                dateBaseUpdate();
-
-                //元に戻す
-                editView.setText("");
-            }
-        });
-        dialog.setNegativeButton("cancel", new DialogInterface.OnClickListener() {
-            @Override
-            //ダイアログのcancelが押されたら実行
-            public void onClick(DialogInterface dialog, int whichButton) {
-
-            }
-        });
-        //元に戻す
-        editView.setText("");
     }
 
     //adapterをarrayListで更新
@@ -297,14 +223,135 @@ public class GroupEditActivity extends AppCompatActivity {
             realm.commitTransaction();
         }
     }
+    //グループを新規作成するボタンをダイアログに追加
+    void dialogGroupAddButtonMake(){
+
+        dialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int whichButton) {
+                //groupNameをeditViewのデータで初期化
+                groupName = dialogGroupNameEditView.getText().toString();
+
+                ////入力データにダブってないか判定※被っているならoriginalをfalseに////
+                original = true;
+                //ListViewの要素分繰り返す
+                for (int i = 0; i < itemNum; i++) {
+                    //groupNameがarrayAdapterのi番目の要素と同じか、"未分類"なら実行
+                    if (groupName.equals(arrayAdapter.getItem(i)) || groupName.equals("未分類")) {
+                        original = false;
+                        Toast.makeText(getApplicationContext(), "同名のファイルがすでに存在します", Toast.LENGTH_SHORT).show();
+                        break;
+                    }
+                }
+
+                //入力データが空白でなく、ダブってないなら実行
+                if (!groupName.equals("") && original) {
+
+                    if(itemNum == 0){
+                        arrayList.set(0,groupName);
+                    }else {
+                        arrayList.add(groupName);
+                    }
+
+                    ///////引数を書く
+
+                    //arrayListのデータをadapterに反映
+                    adapterUpdate();
+                    listView.setAdapter(arrayAdapter);
+                    ////データベースにデータを追加(String groupNameを追加)
+
+                    dateBaseAdd();
+                }
+            }
+        });
+    }
+    //グループを削除するボタンをダイアログに追加
+    void dialogGroupRemoveButtonMake(final int listPosition){
+
+        dialog.setNeutralButton("削除", new DialogInterface.OnClickListener() {
+            @Override
+            //ダイアログのcancelが押されたら実行
+            public void onClick(DialogInterface dialog, int whichButton) {
+
+                ////リストから削除////
+                arrayList.remove(listPosition);
+                //arrayListのデータをadapterに反映
+                adapterUpdate();
 
 
+
+                listView.setAdapter(arrayAdapter);
+
+                dateBaseUpdate();
+
+                //元に戻す
+                dialogGroupNameEditView.setText("");
+            }
+        });
+    }
+    //
+    void dialogCancelButtonMake(){
+        dialog.setNegativeButton("cancel", new DialogInterface.OnClickListener() {
+            @Override
+            //ダイアログのcancelが押されたら実行
+            public void onClick(DialogInterface dialog, int whichButton) {
+
+            }
+        });
+    }
+    //
+    void dialogGroupReferenceButtonMake(final int listPosition){
+
+        dialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int whichButton) {
+                //groupNameをeditViewのデータで初期化
+                groupName = dialogGroupNameEditView.getText().toString();
+
+                ////入力データにダブってないか判定※被っているならoriginalをfalseに////
+                original = true;
+                //ListViewの要素分繰り返す
+                for (int i = 0; i < itemNum; i++) {
+                    //groupNameがarrayAdapterのi番目の要素と同じか、"未分類"なら実行
+                    if (groupName.equals(arrayAdapter.getItem(i)) || groupName.equals("未分類")) {
+                        original = false;
+                        Toast.makeText(getApplicationContext(), "同名のファイルがすでに存在します", Toast.LENGTH_SHORT).show();
+                        break;
+                    }
+                }
+
+                //入力データが空白でなく、ダブってないなら実行
+                if (!groupName.equals("") && original) {
+
+                    arrayList.set(listPosition,groupName);
+
+                    //引数の記入
+
+                    //arrayListのデータをadapterに反映
+                    adapterUpdate();
+                    listView.setAdapter(arrayAdapter);
+
+                    //データベースを更新
+                    dateBaseUpdate();
+                }
+                if (itemNum != 0) {
+                    textView.setText("");
+                }
+
+            }
+
+        });
+    }
     //フローティングアクションボタンがタップされた際に実行
     public void plus(View v) {
-        //getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
-        //checkが1つもついていないとき実行
-        listPosition = -1;
+
         dialogBuild();
+
+        dialog.setTitle("新規作成");
+
+        dialogGroupAddButtonMake();
+        dialogCancelButtonMake();
+
         dialog.show();
     }
 
