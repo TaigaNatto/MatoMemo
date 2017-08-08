@@ -12,6 +12,7 @@ import android.support.v7.widget.ButtonBarLayout;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.util.SparseBooleanArray;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -148,12 +149,12 @@ public class FolderCreateActivity extends AppCompatActivity implements OnDateSet
                 Log.d("date",String.valueOf(monthOfYear));
                 Log.d("date",String.valueOf(dayOfMonth));
                 frontYear = year;
-                frontMonth = monthOfYear+1;
+                frontMonth = monthOfYear;
                 frontDay = dayOfMonth;
-                frontDate = frontYear*10000 + frontMonth*100 + frontDay;
+                frontDate = frontYear*10000 + (frontMonth+1)*100 + frontDay;
 
                 if(frontDate<rearDate){
-                    textViewfront.setText(String.valueOf(frontYear) + "/ " + String.valueOf(frontMonth) + "/ " + String.valueOf(frontDay));
+                    textViewfront.setText(String.valueOf(frontYear) + "/ " + String.valueOf(frontMonth+1) + "/ " + String.valueOf(frontDay));
                 }else{
                     Toast.makeText(this, "誤った日付が設定されています。", Toast.LENGTH_LONG).show();
                 }
@@ -164,12 +165,12 @@ public class FolderCreateActivity extends AppCompatActivity implements OnDateSet
                 Log.d("date",String.valueOf(monthOfYear));
                 Log.d("date",String.valueOf(dayOfMonth));
                 rearYear = year;
-                rearMonth = monthOfYear+1;
+                rearMonth = monthOfYear;
                 rearDay = dayOfMonth;
-                rearDate = rearYear*10000 + rearMonth*100 + rearDay;
+                rearDate = rearYear*10000 + (rearMonth+1)*100 + rearDay;
 
                 if(frontDate<rearDate){
-                    textViewrear.setText(String.valueOf(rearYear) + "/ " + String.valueOf(rearMonth) + "/ " + String.valueOf(rearDay));
+                    textViewrear.setText(String.valueOf(rearYear) + "/ " + String.valueOf(rearMonth+1) + "/ " + String.valueOf(rearDay));
                 }else{
                     Toast.makeText(this, "誤った日付が設定されています。", Toast.LENGTH_LONG).show();
                 }
@@ -187,7 +188,19 @@ public class FolderCreateActivity extends AppCompatActivity implements OnDateSet
         //まとめをデータベースに保存
         saveMatome();
 
+
         finish();
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if(keyCode== KeyEvent.KEYCODE_BACK){
+
+            saveMemoCheckedDialog();
+
+            return true;
+        }
+        return false;
     }
 
     //DatabaseからTagの一覧を取得
@@ -240,39 +253,10 @@ public class FolderCreateActivity extends AppCompatActivity implements OnDateSet
 
         //トランザクション終了
         realm.commitTransaction();
+
+        Toast.makeText(this, "まとめを作成しました", Toast.LENGTH_LONG).show();
     }
 
-    //まとめタイトルをDatabaseに保存
-    public void saveMatomeTitle(){
-
-        realm.beginTransaction();
-        RealmMatomeEntity model = realm.createObject(RealmMatomeEntity.class);
-
-        if(edittext.length() !=0) {
-            model.setMatomeName(edittext.getText().toString());
-
-        }else{
-            model.setMatomeName("タイトル未設定");
-        }
-
-        realm.commitTransaction();
-    }
-
-    //まとめ期間開始日をDatabaseに保存
-    public void saveMatomeTime(){
-
-        realm.beginTransaction();
-
-        //まとめ期間開始日をDatabaseに保存
-        RealmMatomeEntity frontModel = realm.createObject(RealmMatomeEntity.class);
-        frontModel.setStartDate(frontDate);
-
-        //まとめ期間終了日をDatabaseに保存
-        RealmMatomeEntity rearModel = realm.createObject(RealmMatomeEntity.class);
-        rearModel.setEndDate(rearDate);
-
-        realm.commitTransaction();
-    }
 
     private void saveMemoCheckedDialog(){
 
@@ -293,6 +277,7 @@ public class FolderCreateActivity extends AppCompatActivity implements OnDateSet
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         // 保存する ボタンクリック処理
+                        saveMatome();
                         finish();
                     }
                 });
