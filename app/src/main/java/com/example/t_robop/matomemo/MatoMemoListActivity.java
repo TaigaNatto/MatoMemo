@@ -241,17 +241,19 @@ public class MatoMemoListActivity extends AppCompatActivity implements AdapterVi
     public void MatoMemoClick(View v){      //ToDo メソッド名リファクター
         String buttonText = (String) matoMemoButton.getText();  //ButtonのTextを取得    //ToDo 変数名リファクター
         Intent intent = null;
-        int requestCode = 123;
+        String modeKEY = "MODE";
+        String subjectKEY = "SUBJECT NAME";
 
         switch (buttonText){
             case "メモを書く":
                 intent = new Intent(this,WritingActivity.class);    //WritingActivityにIntent
-                intent.putExtra("MODE",0);      //数値受け渡し　1: メモ確認　0: 新規作成   //ここでは1を送る
-                intent.putExtra("SUBJECT NAME",nowSubjectName);     //教科名受け渡し
+                intent.putExtra(modeKEY,0);      //数値受け渡し　1: メモ確認　0: 新規作成   //ここでは1を送る
+                intent.putExtra(subjectKEY,nowSubjectName);     //教科名受け渡し
                 break;
 
             case "まとめを作る":
                 intent = new Intent(this,FolderCreateActivity.class);    //FolderCreateActivityにIntent
+                intent.putExtra(subjectKEY,nowSubjectName);
                 break;
         }
 

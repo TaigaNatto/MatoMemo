@@ -14,6 +14,9 @@ import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+
 import io.realm.Realm;
 import io.realm.RealmQuery;
 import io.realm.RealmResults;
@@ -76,9 +79,34 @@ public class MatomeFragment extends Fragment implements OnItemClickListener, OnI
 
         adapterMatome.clear();
 
+        //Debug用全データ確認
+        String allMatomeData;
+        String[] allWordsData = new String[100];   //マーカーが引かれている箇所の単語
+
+        if(matomeResults.size() != 0){
+            //データ取得
+            for(int w=0; w<matomeResults.get(w).getWords().size(); w++){
+                allWordsData[w] = matomeResults.get(w).getWords().get(w).getWord();
+            }
+
+            //ToDo まとめ機関未設定のときに、初期値の999999999が代入されている、マーカーが動かないので下一つが未検証、idはなんのために存在？　
+            for(int i=0; i<matomeResults.size(); i++){
+                allMatomeData = "id: " + matomeResults.get(i).getId() + "\n" +
+                        "まとめ名前: " + matomeResults.get(i).getMatomeName() + "\n" +
+                        "まとめ期間開始日: " + matomeResults.get(i).getStartDate() + "\n" +
+                        "まとめ期間終了日: " + matomeResults.get(i).getEndDate() + "\n" +
+                        "教科名: " + matomeResults.get(i).getFolder() + "\n" +
+                        "マーカー単語: " + allWordsData[i];
+
+                adapterMatome.add(allMatomeData);
+            }
+        }
+
+        /*
         for (int i = 0; i < matomeResults.size(); i++) {
             adapterMatome.add(matomeResults.get(i).getMatomeName());
         }
+        */
     }
 
     //Drawerクリック時のまとめリスト更新
