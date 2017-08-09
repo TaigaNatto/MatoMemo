@@ -1,6 +1,7 @@
 package com.example.t_robop.matomemo;
 
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -33,8 +34,8 @@ public class MatomeActivity extends AppCompatActivity {
     //表示する要素のリスト
     ArrayList<MatomeObject> matomeObjects;
 
-    //単語確認用の保管リスト
-    ArrayList<String> idList;
+    //単語確認用のid保管リスト
+    ArrayList<Integer> idList;
 
     //神
     Realm realm;
@@ -170,7 +171,7 @@ public class MatomeActivity extends AppCompatActivity {
                         String memoTag=memoResults.get(j).getWords().get(k).getTagName();
                         //同じ単語があれば保持
                         if(matomeTag.equals(memoTag)){
-                       //     idList.add(memoResults.get(j).get());
+                            idList.add(memoResults.get(j).getId());
                             break;//一個抜ける
                         }
                     }

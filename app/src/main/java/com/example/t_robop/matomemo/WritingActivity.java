@@ -288,6 +288,14 @@ public class WritingActivity extends ActionBarActivity implements TextWatcher {
                                     //トランザクション終了 (データを書き込む)
                                     realm.commitTransaction();
 
+                                    //検索用のクエリ作成
+                                    RealmQuery<RealmMemoEntity> memoQuery = realm.where(RealmMemoEntity.class);
+                                    //インスタンス生成し、その中にすべてのデータを入れる 今回なら全てのデータ
+                                    RealmResults<RealmMemoEntity> memoResults = memoQuery.findAll();
+                                    for(int i=0;i<memoResults.size();i++) {
+                                        Log.d("SSSSS", String.valueOf(memoResults.get(i).getId()));
+                                    }
+
                                     finish();
                                 }
                             });
@@ -413,6 +421,24 @@ public class WritingActivity extends ActionBarActivity implements TextWatcher {
         String text=memo.replaceAll(word,"<span style=background-color:"+color+">"+word+"</span>");
         //変更後の文字列を返す
         return text;
+    }
+
+    //既存のidの最大値+1した数値を返してくれるメソッド
+    public int getNewId(){
+        //検索用のクエリ作成
+        RealmQuery<RealmMemoEntity> memoQuery = realm.where(RealmMemoEntity.class);
+        //インスタンス生成し、その中にすべてのデータを入れる 今回なら全てのデータ
+        RealmResults<RealmMemoEntity> memoResults = memoQuery.findAll();
+        int maxId=0;
+        if(memoResults.size()>0) {
+            for (int i = 0; i < memoResults.size(); i++) {
+                int nowId=memoResults.get(i).getId();
+                if(nowId>maxId){
+                    maxId=nowId;
+                }
+            }
+        }
+        return maxId+1;
     }
 
 
