@@ -1,5 +1,6 @@
 package com.example.t_robop.matomemo;
 
+import android.content.ClipData;
 import android.content.Intent;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -200,6 +201,7 @@ public class MatoMemoListActivity extends AppCompatActivity implements AdapterVi
     }
 
     //ToDo intentして戻ってきたときに変更されたデータが適用されていない
+    //ToDo intentして戻ってきた時にDrawerのクリックと、ViewPagerのスワイプがバグる
     //Activityが表示されるときに呼ばれるメソッド
     @Override
     protected void onResume(){
@@ -227,6 +229,8 @@ public class MatoMemoListActivity extends AppCompatActivity implements AdapterVi
         //AdapterをListViewにセット
         drawerListView.setAdapter(drawerArrayAdapter);
 
+        drawerListView.setOnItemClickListener(this);
+
         //Fragment操作準備
         matomemoFragmentPagerAdapter = new CustomFragmentPagerAdapter(getSupportFragmentManager(),tabNames);
 
@@ -235,8 +239,6 @@ public class MatoMemoListActivity extends AppCompatActivity implements AdapterVi
         matomemoFragmentPagerAdapter.addFragment(MatomeFragment.newInstance());
 
         viewPager.setAdapter(matomemoFragmentPagerAdapter);
-
-        drawerListView.setOnItemClickListener(this);
 
         viewPager.addOnPageChangeListener(this);
 
@@ -292,7 +294,7 @@ public class MatoMemoListActivity extends AppCompatActivity implements AdapterVi
         //教科クリックしたらToolBar.setTitleで教科名をセット
         toolbar.setTitle(item);
 
-        //Drawer内でタップされた教科名のメモを表示   //ToDo 連続タップすると落ちる
+        //Drawer内でタップされた教科名のメモを表示   //ToDo 非同期処理で実装
         showMemoDataTest(item);
     }
 
@@ -319,32 +321,15 @@ public class MatoMemoListActivity extends AppCompatActivity implements AdapterVi
 
     }
 
-    //ToDo 別画面で作成されてデータベースに保存されているメモのリストを呼び出す
-    //intent元でタップされた教科名のメモを表示
+    //ToDo 非同期処理で対応させる
+    //ToDO Intentで戻ったときも呼ばれる?
+    //メモリストのリロード
     public void showMemoDataTest(String subject){
-        //Fragment操作準備
-        matomemoFragmentPagerAdapter = new CustomFragmentPagerAdapter(getSupportFragmentManager(),tabNames);
-
-        //AdapterにFragment追加
-        matomemoFragmentPagerAdapter.addFragment(MemoFragment.newInstance(subject));
-        matomemoFragmentPagerAdapter.addFragment(MatomeFragment.newInstance());
-
-        tabLayout = (TabLayout)findViewById(R.id.tabs);
-        viewPager = (ViewPager)findViewById(R.id.pager);
-
-        viewPager.setAdapter(matomemoFragmentPagerAdapter);
-
-        tabLayout.setupWithViewPager(viewPager);
-
-        //ToDo 二重タップで必ず落ちる　
-
-        /*
         Fragment fragment = matomemoFragmentPagerAdapter.getItem(0);    //CustomFragmentPagerAdapterのgetItemからfragment情報を取ってくる
         if(fragment != null && fragment instanceof MemoFragment){
-            //((MemoFragment)fragment).setMemoDataTest(subject);  //Debug用　タップした教科名のメモをデータベースに設定      //ToDo 新規で教科フォルダを作った際に、まだメモが一個も作成されていないのでNull処理を追加必要
-            ((MemoFragment)fragment).getMemoDataList(subject);  //タップされた教科名のメモをデータベースから取ってくる    //ToDo ここはFragmentの更新メソッドでは？
+            ((MemoFragment)fragment).reloadMemoData(subject);
         }
-        */
+
     }
 
     //データベースから教科取得

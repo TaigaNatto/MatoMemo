@@ -1,8 +1,10 @@
 package com.example.t_robop.matomemo;
 
 import android.app.Activity;
+import android.app.LauncherActivity;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.ListFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,10 +20,12 @@ import io.realm.RealmResults;
  * Created by user on 2017/06/20.
  */
 
-public class MemoFragment extends Fragment implements AdapterView.OnItemClickListener, AdapterView.OnItemLongClickListener {
+public class MemoFragment extends ListFragment implements AdapterView.OnItemClickListener, AdapterView.OnItemLongClickListener {
 
     //ListView memoListView = null;   //メモのListView
     ArrayAdapter<String> adapterMemo = null;    //ListViewのAdapter
+
+    String subject;
 
     private MatoMemoListActivity matoMemoListActivity;
 
@@ -52,7 +56,7 @@ public class MemoFragment extends Fragment implements AdapterView.OnItemClickLis
         adapterMemo = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1);
 
         Bundle args = getArguments();
-        String subject = args.getString("SUBJECT"); //初期表示の教科名を保存
+        subject = args.getString("SUBJECT"); //初期表示の教科名を保存
         //ToDo 別画面で作成されてデータベースに保存されているメモのリストを呼び出す
         setMemoDataTest(subject);   //Debug用データベース設定    StartListActivityでタップした教科名のメモ一覧をデータベースにセット
         getMemoDataList(subject);   //StartListActivityでタップした教科名のメモ一覧をデータベースから取ってきて表示
@@ -68,12 +72,12 @@ public class MemoFragment extends Fragment implements AdapterView.OnItemClickLis
         return memoListView;
     }
 
-    //MatoMemoListActivityとの連携  横線あるけど気にしないで
+    /*MatoMemoListActivityとの連携  横線あるけど気にしないで
     @Override
     public void onAttach(Activity activity){
         matoMemoListActivity = (MatoMemoListActivity)activity;
         super.onAttach(matoMemoListActivity);
-    }
+    }*/
 
     //Debug用データベース設定    教科別メモセット
     //ToDo
@@ -106,6 +110,12 @@ public class MemoFragment extends Fragment implements AdapterView.OnItemClickLis
         for(int i=0; i<memoResults.size(); i++){
             adapterMemo.add(memoResults.get(i).getMemo());    //メモをListViewのAdapterに入れる
         }
+    }
+
+    public void reloadMemoData(String subject){
+        adapterMemo.clear();
+        getMemoDataList(subject);
+        adapterMemo.notifyDataSetChanged();
     }
 
     //選択されたItemをデータベースから削除
