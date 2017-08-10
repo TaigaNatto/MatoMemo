@@ -28,6 +28,8 @@ public class MatomeFragment extends Fragment implements OnItemClickListener, OnI
     //ListView matomeListView = null;
     ArrayAdapter<String> adapterMatome = null;
 
+    ArrayList<Integer> idList;
+
     private String nowSubjectName;
 
     Realm realm;
@@ -51,6 +53,8 @@ public class MatomeFragment extends Fragment implements OnItemClickListener, OnI
         realm = Realm.getDefaultInstance();
 
         adapterMatome = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1);
+
+        idList=new ArrayList<>();
 
         //値の受け渡し
         Bundle args = getArguments();
@@ -104,6 +108,7 @@ public class MatomeFragment extends Fragment implements OnItemClickListener, OnI
             */
             for (int i=0;i<matomeResults.size();i++){
                 adapterMatome.add(matomeResults.get(i).getMatomeName());
+                idList.add(matomeResults.get(i).getId());
             }
         }
 
@@ -119,6 +124,7 @@ public class MatomeFragment extends Fragment implements OnItemClickListener, OnI
         nowSubjectName = subject;
 
         adapterMatome.clear();
+        idList.clear();
         getMatomeDataList(subject);
         adapterMatome.notifyDataSetChanged();
     }
@@ -146,13 +152,7 @@ public class MatomeFragment extends Fragment implements OnItemClickListener, OnI
     public void onItemClick(AdapterView<?> adapterView, View view, int pos, long l) {
         Intent intent = new Intent(getActivity(), MatomeActivity.class);     //MatomeActivityへIntent
         //idの指定
-        //検索用のクエリ作成
-        RealmQuery<RealmMatomeEntity> matomeQuery = realm.where(RealmMatomeEntity.class);
-        matomeQuery.equalTo("folder",nowSubjectName);
-        matomeQuery.equalTo("matomeName",adapterMatome.getItem(pos));
-        //インスタンス生成し、その中にすべてのデータを入れる 今回なら全てのデータ
-        RealmResults<RealmMatomeEntity> matomeResults = matomeQuery.findAll();
-        intent.putExtra("ID",matomeResults.get(0).getId());
+        intent.putExtra("ID",idList.get(pos));
         startActivity(intent);
     }
 
