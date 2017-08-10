@@ -53,7 +53,7 @@ public class FolderCreateActivity extends AppCompatActivity implements OnDateSet
     int frontYear = c.get(Calendar.YEAR);
     int frontMonth = c.get(Calendar.MONTH);
     int frontDay = c.get(Calendar.DAY_OF_MONTH);
-    int frontDate = 99999999;
+    int frontDate = 0;
 
     int rearYear = c.get(Calendar.YEAR);
     int rearMonth = c.get(Calendar.MONTH);
@@ -203,7 +203,7 @@ public class FolderCreateActivity extends AppCompatActivity implements OnDateSet
         if(keyCode== KeyEvent.KEYCODE_BACK){
 
             checkarray = listView.getCheckedItemPositions();
-            if(checkarray.size()==0 && frontDate==99999999 && rearDate==99999999 && edittext.length()==0){
+            if(checkarray.size()==0 && frontDate==0 && rearDate==99999999 && edittext.length()==0){
                 finish();
             }else {
                 saveMemoCheckedDialog();
@@ -330,7 +330,7 @@ public class FolderCreateActivity extends AppCompatActivity implements OnDateSet
 
                 //ListViewチェックボックスで選択されているものを配列に代入
                 checkarray = listView.getCheckedItemPositions();
-                if(checkarray.size()==0 && frontDate==99999999 && rearDate==99999999 && edittext.length()==0){
+                if(checkarray.size()==0 && frontDate==0 && rearDate==99999999 && edittext.length()==0){
                     finish();
                 }else {
                     saveMemoCheckedDialog();

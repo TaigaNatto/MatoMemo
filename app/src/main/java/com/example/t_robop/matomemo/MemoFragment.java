@@ -128,6 +128,7 @@ public class MemoFragment extends Fragment implements OnItemClickListener, OnIte
         nowSubjectName = subject;   //Drawerでクリックされた教科名をフィールド変数に代入
 
         adapterMemo.clear();
+        idList.clear();
         getMemoDataList(subject);    //データベースから教科別メモ取得
         adapterMemo.notifyDataSetChanged();
     }
