@@ -6,12 +6,14 @@ import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.AlertDialog;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.Html;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.ActionMode;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -19,9 +21,13 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -33,7 +39,7 @@ import io.realm.RealmResults;
 
 import static com.example.t_robop.matomemo.R.id.txtmemo;
 
-public class WritingActivity extends ActionBarActivity implements TextWatcher {
+public class WritingActivity extends AppCompatActivity implements TextWatcher {
 
     int id;
     //メモを新規作成する場合は０、編集するときは１としています。
@@ -43,6 +49,9 @@ public class WritingActivity extends ActionBarActivity implements TextWatcher {
 
     TextView textView;
     EditText editText;
+    ArrayAdapter<String> spinnerAdapter;
+
+    MatoMemoListActivity matoMemoListActivity;
 
     Realm realm;
 
@@ -85,6 +94,7 @@ public class WritingActivity extends ActionBarActivity implements TextWatcher {
         layout.setListener(listner);
 
         mWordList = new ArrayList<>();
+        matoMemoListActivity = new MatoMemoListActivity();
 
         editText.addTextChangedListener(this);
 
@@ -185,6 +195,36 @@ public class WritingActivity extends ActionBarActivity implements TextWatcher {
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
+
+        spinnerAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item);
+        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        // アイテムを追加します
+        spinnerAdapter.add("未分類");
+        matoMemoListActivity.getFolderDataList(realm, spinnerAdapter);
+        Spinner spinner = (Spinner) findViewById(R.id.Spinner);
+        // アダプターを設定します
+        spinner.setAdapter(spinnerAdapter);
+        // スピナーのアイテムが選択された時に呼び出されるコールバックリスナーを登録します
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view,
+                                       int position, long id) {
+                Spinner spinner = (Spinner) parent;
+                // 選択されたアイテムを取得します
+                folder = (String) spinner.getSelectedItem();
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> arg0) {
+            }
+        });
+    }
+
+    @Override
+    public void onRestart() {
+        super.onRestart();
+        matoMemoListActivity.reloadDrawerList(realm, spinnerAdapter);
     }
 
     @Override
@@ -226,9 +266,21 @@ public class WritingActivity extends ActionBarActivity implements TextWatcher {
         return false;
     }
 
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+
+            saveMemoDialog();
+
+            return true;
+        }
+        return false;
+    }
+
+
     //ToDo Intent先の作成とIntent処理の追加
-    //メニューが選択されたときの処理
-    //戻るボタンを押したときの処理
+//メニューが選択されたときの処理
+//戻るボタンを押したときの処理
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         final int id = item.getItemId();
@@ -247,113 +299,7 @@ public class WritingActivity extends ActionBarActivity implements TextWatcher {
             case android.R.id.home:
 
                 if (change == 1) {
-                    // 確認ダイアログの生成
-                    AlertDialog.Builder alertDlg = new AlertDialog.Builder(this);
-                    alertDlg.setTitle("");
-                    alertDlg.setMessage("メモの内容を保存しますか？");
-                    alertDlg.setPositiveButton(
-                            "キャンセル",
-                            new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int which) {
-                                    // キャンセル ボタンクリック処理
-
-                                }
-                            });
-                    alertDlg.setNeutralButton(
-                            "保存する",
-                            new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int which) {
-                                    // 保存する ボタンクリック処理
-
-                                    //トランザクション開始
-                                    realm.beginTransaction();
-
-                                    //新規作成時
-                                    if (WritingActivity.this.id == -1) {
-                                        //インスタンスを生成
-                                        RealmMemoEntity model = realm.createObject(RealmMemoEntity.class);
-                                        //新規の場合は今日の日付を取得
-                                        final Calendar c = Calendar.getInstance();
-                                        int newYear = c.get(Calendar.YEAR);
-                                        int newMonth = c.get(Calendar.MONTH) + 1;
-                                        int newDay = c.get(Calendar.DAY_OF_MONTH);
-
-                                        int Today = newYear * 10000 + newMonth * 100 + newDay;
-
-                                        //書き込みたいデータをインスタンスに入れる
-                                        model.setDate(Today);
-
-                                        //タグが１つでもセットされてれば
-                                        if (mWordList.size() > 0) {
-                                            for (int i = 0; i < mWordList.size(); i++) {
-                                                MatomeWord mWord = realm.createObject(MatomeWord.class);
-                                                mWord.setWord(mWordList.get(i).getWord());
-                                                mWord.setTagName(mWordList.get(i).getTagName());
-                                                model.words.add(mWord);
-                                            }
-                                        }
-
-                                        //書き込みたいデータをインスタンスに入れる
-                                        model.setMemo(editText.getText().toString());
-
-                                        //フォルダ名をセット
-                                        model.setFolder(folder);
-
-                                        //新規idをセット
-                                        model.setId(getNewId());
-                                    }
-                                    //更新時
-                                    else {
-                                        //検索用のクエリ作成
-                                        RealmQuery<RealmMemoEntity> query = realm.where(RealmMemoEntity.class);
-                                        //持ってきたidで検索
-                                        query.equalTo("id", WritingActivity.this.id);
-                                        //インスタンス生成し、その中にすべてのデータを入れる
-                                        RealmResults<RealmMemoEntity> results = query.findAll();
-                                        //１つしかないはずなのでposition0で指定
-                                        RealmMemoEntity editModel = results.get(0);
-                                        //書き込みたいデータをインスタンスに入れる
-                                        editModel.setMemo(editText.getText().toString());
-                                        //タグが１つでもセットされてれば
-                                        if (mWordList.size() > 0) {
-                                            //一度中身を初期化
-                                            editModel.words.clear();
-                                            //タグを追加
-                                            for (int i = 0; i < mWordList.size(); i++) {
-                                                MatomeWord mWord = realm.createObject(MatomeWord.class);
-                                                mWord.setWord(mWordList.get(i).getWord());
-                                                mWord.setTagName(mWordList.get(i).getTagName());
-                                                editModel.words.add(mWord);
-                                            }
-                                        }
-                                    }
-
-                                    //トランザクション終了 (データを書き込む)
-                                    realm.commitTransaction();
-
-                                    //検索用のクエリ作成
-                                    RealmQuery<RealmMemoEntity> memoQuery = realm.where(RealmMemoEntity.class);
-                                    //インスタンス生成し、その中にすべてのデータを入れる 今回なら全てのデータ
-                                    RealmResults<RealmMemoEntity> memoResults = memoQuery.findAll();
-                                    for (int i = 0; i < memoResults.size(); i++) {
-                                        Log.d("SSSSS", String.valueOf(memoResults.get(i).getId()));
-                                    }
-
-                                    finish();
-                                }
-                            });
-                    alertDlg.setNegativeButton(
-                            "保存しないで戻る",
-                            new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int which) {
-                                    // 保存しないで戻る ボタンクリック処理
-                                    finish();
-                                }
-                            });
-
-                    // 表示
-                    alertDlg.create().show();
-
+                    saveMemoDialog();
                 } else {
                     finish();
                 }
@@ -383,6 +329,120 @@ public class WritingActivity extends ActionBarActivity implements TextWatcher {
         return result;
     }
 
+    public void saveMemoDialog() {
+        // 確認ダイアログの生成
+        AlertDialog.Builder alertDlg = new AlertDialog.Builder(this);
+        alertDlg.setTitle("");
+        alertDlg.setMessage("メモの内容を保存しますか？");
+        alertDlg.setPositiveButton(
+                "キャンセル",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        // キャンセル ボタンクリック処理
+
+                    }
+                });
+        alertDlg.setNeutralButton(
+                "保存する",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        // 保存する ボタンクリック処理
+
+                        //トランザクション開始
+                        realm.beginTransaction();
+
+                        //新規作成時
+                        if (WritingActivity.this.id == -1) {
+                            //インスタンスを生成
+                            RealmMemoEntity model = realm.createObject(RealmMemoEntity.class);//新規の場合は今日の日付を取得
+                            final Calendar c = Calendar.getInstance();
+                            int newYear = c.get(Calendar.YEAR);
+                            int newMonth = c.get(Calendar.MONTH) + 1;
+                            int newDay = c.get(Calendar.DAY_OF_MONTH);
+                            int newHour = c.get(Calendar.HOUR_OF_DAY);
+                            int newMinute = c.get(Calendar.MINUTE);
+                            int newSecond = c.get(Calendar.SECOND);
+
+                            int Today = newYear * 10000 + newMonth * 100 + newDay;
+                            int nowTime = newHour * 10000 + newMinute * 100 + newSecond;
+
+                            //書き込みたいデータをインスタンスに入れる
+                            model.setDate(Today);
+                            model.setTime(nowTime);
+
+                            //タグが１つでもセットされてれば
+                            if (mWordList.size() > 0) {
+                                for (int i = 0; i < mWordList.size(); i++) {
+                                    MatomeWord mWord = realm.createObject(MatomeWord.class);
+                                    mWord.setWord(mWordList.get(i).getWord());
+                                    mWord.setTagName(mWordList.get(i).getTagName());
+                                    model.words.add(mWord);
+                                }
+                            }
+
+                            //書き込みたいデータをインスタンスに入れる
+                            model.setMemo(editText.getText().toString());
+
+                            //フォルダ名をセット
+                            model.setFolder(folder);
+
+                            //新規idをセット
+                            model.setId(getNewId());
+                        }
+                        //更新時
+                        else {
+                            //検索用のクエリ作成
+                            RealmQuery<RealmMemoEntity> query = realm.where(RealmMemoEntity.class);
+                            //持ってきたidで検索
+                            query.equalTo("id", WritingActivity.this.id);
+                            //インスタンス生成し、その中にすべてのデータを入れる
+                            RealmResults<RealmMemoEntity> results = query.findAll();
+                            //１つしかないはずなのでposition0で指定
+                            RealmMemoEntity editModel = results.get(0);
+                            //書き込みたいデータをインスタンスに入れる
+                            editModel.setMemo(editText.getText().toString());
+                            //タグが１つでもセットされてれば
+                            if (mWordList.size() > 0) {
+                                //一度中身を初期化
+                                editModel.words.clear();
+                                //タグを追加
+                                for (int i = 0; i < mWordList.size(); i++) {
+                                    MatomeWord mWord = realm.createObject(MatomeWord.class);
+                                    mWord.setWord(mWordList.get(i).getWord());
+                                    mWord.setTagName(mWordList.get(i).getTagName());
+                                    editModel.words.add(mWord);
+                                }
+                            }
+                        }
+
+                        //トランザクション終了 (データを書き込む)
+                        realm.commitTransaction();
+
+                        //検索用のクエリ作成
+                        RealmQuery<RealmMemoEntity> memoQuery = realm.where(RealmMemoEntity.class);
+                        //インスタンス生成し、その中にすべてのデータを入れる 今回なら全てのデータ
+                        RealmResults<RealmMemoEntity> memoResults = memoQuery.findAll();
+                        for (int i = 0; i < memoResults.size(); i++) {
+                            Log.d("SSSSS", String.valueOf(memoResults.get(i).getId()));
+                        }
+
+                        finish();
+                    }
+                });
+        alertDlg.setNegativeButton(
+                "保存しないで戻る",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        // 保存しないで戻る ボタンクリック処理
+                        finish();
+                    }
+                });
+
+        // 表示
+        alertDlg.create().show();
+
+    }
+
     //メニューバーの作成
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -407,7 +467,7 @@ public class WritingActivity extends ActionBarActivity implements TextWatcher {
     };
 
     //色選択のためのDialogを表示
-    public void marker_mode(View v){
+    public void marker_mode(View v) {
         int defaultItem = 0; // デフォルトでチェックされているアイテム
         final List<Integer> checkedItems = new ArrayList<>();
         checkedItems.add(defaultItem);
