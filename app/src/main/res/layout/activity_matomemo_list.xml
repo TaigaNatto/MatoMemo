@@ -92,7 +92,7 @@
             android:background="#808080"
             android:backgroundTint="#FFFFFF"
             android:layout_weight="6"
-            android:onClick="editFolder"
+            android:onClick="intentEditFolder"
             android:text="フォルダ編集"/>
 
     </LinearLayout>
