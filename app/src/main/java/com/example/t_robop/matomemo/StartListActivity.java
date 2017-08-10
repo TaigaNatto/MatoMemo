@@ -141,39 +141,6 @@ public class StartListActivity extends AppCompatActivity {
         Intent intents = new Intent(this, WritingActivity.class);
         startActivity(intents);
     }
-    //バックキーの処理
-    /*
-    @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if(keyCode== KeyEvent.KEYCODE_BACK){
-            // なんらかの処理
-            //Class activityName = getCallingActivity().getClass();
-
-            //Intent intent=new Intent(getApplicationContext(),GroupEditActivity.class);
-            //startActivity(intent);
-
-
-            int activityNum = 0;
-            Intent intent = getIntent();
-            activityNum = intent.getIntExtra("Date",0);
-
-            if(activityNum == 1) {
-                //finish();
-                Intent intents = new Intent(this, MatoMemoListActivity.class);
-                intents.putExtra("Date",0);
-                startActivity(intents);
-            }else {
-                //finish();
-                Intent intents = new Intent(this, GroupEditActivity.class);
-                intents.putExtra("Date",0);
-                startActivity(intents);
-            }
-
-
-            return true;
-        }
-        return false;
-    }*/
     //メニューバーの作成
     @Override
     public boolean onCreateOptionsMenu(Menu menu){
