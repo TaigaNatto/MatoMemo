@@ -35,7 +35,7 @@ import static com.example.t_robop.matomemo.R.id.txtmemo;
 
 public class WritingActivity extends ActionBarActivity implements TextWatcher {
 
-    int mode;
+    int id;
     //メモを新規作成する場合は０、編集するときは１としています。
     String folder;
 
@@ -52,9 +52,9 @@ public class WritingActivity extends ActionBarActivity implements TextWatcher {
     Button markBtn;
 
     //markする色を保持する(デフォルトは白)
-    String tempColor="#ffffff";
+    String tempColor = "#ffffff";
     //markするタグを保持する
-    String tempTagName=null;
+    String tempTagName = null;
 
     //タグ一覧を保持する
     String tags[];
@@ -70,30 +70,44 @@ public class WritingActivity extends ActionBarActivity implements TextWatcher {
         Realm.init(this);
         realm = Realm.getDefaultInstance();
 
-        Intent intent=new Intent();
-        mode = intent.getIntExtra("MODE",0);
+        Intent intent = new Intent();
+        //todo idで管理します！(新規は-1,編集はidを飛ばしてください！！)
+        id = intent.getIntExtra("MODE", -1);
         //todo intentでフォルダ名ほしい！
-        folder=intent.getStringExtra("SUBJECT NAME");
+        folder = intent.getStringExtra("SUBJECT NAME");
 
         //関連付け
         textView = (TextView) findViewById(R.id.txt);
         editText = (EditText) findViewById(R.id.txtmemo);
-        layout=(DetectableSoftKeyLayout)findViewById(R.id.liner_layout);
-        markBtn=(Button) findViewById(R.id.mark_button);
+        layout = (DetectableSoftKeyLayout) findViewById(R.id.liner_layout);
+        markBtn = (Button) findViewById(R.id.mark_button);
         //キーボード検知用のリスナーをセット
         layout.setListener(listner);
 
-        mWordList=new ArrayList<>();
+        mWordList = new ArrayList<>();
 
         editText.addTextChangedListener(this);
 
-        if (mode == 0) {
+        if (id == -1) {
 
             textView.setVisibility(View.GONE);
 
             //キーボードを出現させる
             getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
         } else {
+
+            //idからメモの取得
+            //検索用のクエリ作成
+            RealmQuery<RealmMemoEntity> query = realm.where(RealmMemoEntity.class);
+            query.equalTo("id", id);
+            //インスタンス生成し、その中にすべてのデータを入れる 今回なら全てのデータ
+            RealmResults<RealmMemoEntity> results = query.findAll();
+            //１つしか入ってないはずなので0
+            String memo = results.get(0).getMemo();
+
+            //Viewに持ってきたメモのセット
+            textView.setText(memo);
+            editText.setText(memo);
 
             editText.setVisibility(View.GONE);
 
@@ -120,10 +134,10 @@ public class WritingActivity extends ActionBarActivity implements TextWatcher {
         //インスタンス生成し、その中にすべてのデータを入れる 今回なら全てのデータ
         RealmResults<RealmWordEntity> wordResults = wordQuery.findAll();
         //タグ一覧保持の容量をセット
-        tags=new String[wordResults.size()];
+        tags = new String[wordResults.size()];
         //タグ一覧に同期
-        for (int i=0;i<wordResults.size();i++){
-            tags[i]=wordResults.get(i).getTagName();
+        for (int i = 0; i < wordResults.size(); i++) {
+            tags[i] = wordResults.get(i).getTagName();
         }
 
         editText.setCustomSelectionActionModeCallback(new ActionMode.Callback() {
@@ -147,10 +161,10 @@ public class WritingActivity extends ActionBarActivity implements TextWatcher {
             @Override
             public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
                 int id = item.getItemId();
-                switch(id) {
+                switch (id) {
                     case R.id.mark:
                         // 独自の処理
-                        if(tempTagName!=null) {
+                        if (tempTagName != null) {
                             //マーカー付け
                             wordMark();
                             Log.d("SSSS", "マークされたよ！");
@@ -217,7 +231,7 @@ public class WritingActivity extends ActionBarActivity implements TextWatcher {
     //戻るボタンを押したときの処理
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
+        final int id = item.getItemId();
 
         Intent intent = null;
 
@@ -253,10 +267,11 @@ public class WritingActivity extends ActionBarActivity implements TextWatcher {
 
                                     //トランザクション開始
                                     realm.beginTransaction();
-                                    //インスタンスを生成
-                                    RealmMemoEntity model = realm.createObject(RealmMemoEntity.class);
 
-                                    if (mode == 0) {
+                                    //新規作成時
+                                    if (WritingActivity.this.id == -1) {
+                                        //インスタンスを生成
+                                        RealmMemoEntity model = realm.createObject(RealmMemoEntity.class);
                                         //新規の場合は今日の日付を取得
                                         final Calendar c = Calendar.getInstance();
                                         int newYear = c.get(Calendar.YEAR);
@@ -269,21 +284,49 @@ public class WritingActivity extends ActionBarActivity implements TextWatcher {
                                         model.setDate(Today);
 
                                         //タグが１つでもセットされてれば
-                                        if(mWordList.size()>0){
-                                            for (int i = 0; i< mWordList.size(); i++){
-                                                MatomeWord mWord= realm.createObject(MatomeWord.class);
+                                        if (mWordList.size() > 0) {
+                                            for (int i = 0; i < mWordList.size(); i++) {
+                                                MatomeWord mWord = realm.createObject(MatomeWord.class);
                                                 mWord.setWord(mWordList.get(i).getWord());
                                                 mWord.setTagName(mWordList.get(i).getTagName());
                                                 model.words.add(mWord);
                                             }
                                         }
+
+                                        //書き込みたいデータをインスタンスに入れる
+                                        model.setMemo(editText.getText().toString());
+
+                                        //フォルダ名をセット
+                                        model.setFolder(folder);
+
+                                        //新規idをセット
+                                        model.setId(getNewId());
                                     }
-
-                                    //書き込みたいデータをインスタンスに入れる
-                                    model.setMemo(editText.getText().toString());
-
-                                    //フォルダ名をセット
-                                    model.setFolder(folder);
+                                    //更新時
+                                    else {
+                                        //検索用のクエリ作成
+                                        RealmQuery<RealmMemoEntity> query = realm.where(RealmMemoEntity.class);
+                                        //持ってきたidで検索
+                                        query.equalTo("id", WritingActivity.this.id);
+                                        //インスタンス生成し、その中にすべてのデータを入れる
+                                        RealmResults<RealmMemoEntity> results = query.findAll();
+                                        //１つしかないはずなのでposition0で指定
+                                        RealmMemoEntity editModel = results.get(0);
+                                        //書き込みたいデータをインスタンスに入れる
+                                        editModel.setMemo(editText.getText().toString());
+                                        //タグが１つでもセットされてれば
+                                        if (mWordList.size() > 0) {
+                                            //一度中身を初期化
+                                            editModel.words.clear();
+                                            //タグを追加
+                                            for (int i = 0; i < mWordList.size(); i++) {
+                                                MatomeWord mWord = realm.createObject(MatomeWord.class);
+                                                mWord.setWord(mWordList.get(i).getWord());
+                                                mWord.setTagName(mWordList.get(i).getTagName());
+                                                editModel.words.add(mWord);
+                                            }
+                                        }
+                                    }
 
                                     //トランザクション終了 (データを書き込む)
                                     realm.commitTransaction();
@@ -292,7 +335,7 @@ public class WritingActivity extends ActionBarActivity implements TextWatcher {
                                     RealmQuery<RealmMemoEntity> memoQuery = realm.where(RealmMemoEntity.class);
                                     //インスタンス生成し、その中にすべてのデータを入れる 今回なら全てのデータ
                                     RealmResults<RealmMemoEntity> memoResults = memoQuery.findAll();
-                                    for(int i=0;i<memoResults.size();i++) {
+                                    for (int i = 0; i < memoResults.size(); i++) {
                                         Log.d("SSSSS", String.valueOf(memoResults.get(i).getId()));
                                     }
 
@@ -364,7 +407,7 @@ public class WritingActivity extends ActionBarActivity implements TextWatcher {
     };
 
     //色選択のためのDialogを表示
-    public void marker_mode(View v){
+    public void marker_mode(View v) {
         int defaultItem = 0; // デフォルトでチェックされているアイテム
         final List<Integer> checkedItems = new ArrayList<>();
         checkedItems.add(defaultItem);
@@ -384,13 +427,13 @@ public class WritingActivity extends ActionBarActivity implements TextWatcher {
                             //検索用のクエリ作成
                             RealmQuery<RealmWordEntity> wordQuery = realm.where(RealmWordEntity.class);
                             //選択されたタグのもののみ取得
-                            wordQuery.equalTo("tagName",tags[checkedItems.get(0)]);
+                            wordQuery.equalTo("tagName", tags[checkedItems.get(0)]);
                             //インスタンス生成し、その中にすべてのデータを入れる 今回なら全てのデータ
                             RealmResults<RealmWordEntity> wordResults = wordQuery.findAll();
                             //設定する色を変更
-                            tempColor=wordResults.get(0).getColor();
+                            tempColor = wordResults.get(0).getColor();
                             //設定するタグを変更
-                            tempTagName=wordResults.get(0).getTagName();
+                            tempTagName = wordResults.get(0).getTagName();
                         }
                     }
                 })
@@ -399,15 +442,15 @@ public class WritingActivity extends ActionBarActivity implements TextWatcher {
     }
 
     //選択した文字列にmakerを付けてくれるうえに保存までしてくれるメソッド
-    public void wordMark(){
+    public void wordMark() {
         //選択の始めの位置を取得
-        int start=editText.getSelectionStart();
+        int start = editText.getSelectionStart();
         //選択の終わりの位置を取得
-        int end=editText.getSelectionEnd();
+        int end = editText.getSelectionEnd();
         //選択部分の文字列の取得
-        String text=editText.getText().toString().substring(start,end);
+        String text = editText.getText().toString().substring(start, end);
         //色を変えてEditTextにセット
-        editText.setText(Html.fromHtml(giveMark(editText.getText().toString(),text,tempColor)));
+        editText.setText(Html.fromHtml(giveMark(editText.getText().toString(), text, tempColor)));
         //一時保存
         MatomeWord mWord = new MatomeWord();
         mWord.setTagName(tempTagName);
@@ -416,29 +459,29 @@ public class WritingActivity extends ActionBarActivity implements TextWatcher {
     }
 
     //単語にマーカー付けてくれる最高のメソッド
-    public String giveMark(String memo,String word,String color){
+    public String giveMark(String memo, String word, String color) {
         //htmlで背景色変え
-        String text=memo.replaceAll(word,"<span style=background-color:"+color+">"+word+"</span>");
+        String text = memo.replaceAll(word, "<span style=background-color:" + color + ">" + word + "</span>");
         //変更後の文字列を返す
         return text;
     }
 
     //既存のidの最大値+1した数値を返してくれるメソッド
-    public int getNewId(){
+    public int getNewId() {
         //検索用のクエリ作成
         RealmQuery<RealmMemoEntity> memoQuery = realm.where(RealmMemoEntity.class);
         //インスタンス生成し、その中にすべてのデータを入れる 今回なら全てのデータ
         RealmResults<RealmMemoEntity> memoResults = memoQuery.findAll();
-        int maxId=0;
-        if(memoResults.size()>0) {
+        int maxId = 0;
+        if (memoResults.size() > 0) {
             for (int i = 0; i < memoResults.size(); i++) {
-                int nowId=memoResults.get(i).getId();
-                if(nowId>maxId){
-                    maxId=nowId;
+                int nowId = memoResults.get(i).getId();
+                if (nowId > maxId) {
+                    maxId = nowId;
                 }
             }
         }
-        return maxId+1;
+        return maxId + 1;
     }
 
 

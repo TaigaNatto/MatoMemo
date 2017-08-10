@@ -15,6 +15,8 @@ public class RealmMatomeEntity extends RealmObject {
     private int id;
     //まとめの名前
     private String matomeName;
+    //まとめの教科
+    private String folder;
     //まとめる日付　無ければ-1とかで
     private int startDate=-1;
     private int endDate=-1;
@@ -34,6 +36,13 @@ public class RealmMatomeEntity extends RealmObject {
     }
     public void setMatomeName(String matomeName){
         this.matomeName=matomeName;
+    }
+
+    public String getFolder(){
+        return this.folder;
+    }
+    public void setFolder(String folder){
+        this.folder=folder;
     }
 
     public int getStartDate(){

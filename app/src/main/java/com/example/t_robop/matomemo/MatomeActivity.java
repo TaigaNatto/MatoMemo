@@ -52,7 +52,7 @@ public class MatomeActivity extends AppCompatActivity {
         //関連付け
         listView = (ListView) findViewById(R.id.list_matome);
         //保管用listの初期化
-        idList=new ArrayList<>();
+        idList = new ArrayList<>();
 
         //ツールバー表示
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -60,8 +60,9 @@ public class MatomeActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
 
-        //Todo フォルダ名ももらってくるものとする
-        String folderName="数学";
+        Intent intent = getIntent();
+        //todo idほしいです！！！
+        int id = intent.getIntExtra("ID", 1);
 
         /***ダミーデータ用意 ***/
         /*
@@ -127,9 +128,9 @@ public class MatomeActivity extends AppCompatActivity {
 
         //検索用のクエリ作成
         RealmQuery<RealmMatomeEntity> mwQuery = realm.where(RealmMatomeEntity.class);
-        //インスタンス生成し、その中にすべてのデータを入れる 今回なら全てのデータ
+        //インスタンス生成
         RealmResults<RealmMatomeEntity> mwResults = mwQuery.findAll();
-        for(int j=0;j<mwResults.size();j++) {
+        for (int j = 0; j < mwResults.size(); j++) {
             for (int i = 0; i < mwResults.get(j).getWords().size(); i++) {
                 Log.d("SSS", String.valueOf(mwResults.get(j).getWords().get(i).getWord()));
             }
@@ -140,49 +141,49 @@ public class MatomeActivity extends AppCompatActivity {
         //検索用のまとめクエリ作成
         RealmQuery<RealmMatomeEntity> matomeQuery = realm.where(RealmMatomeEntity.class);
         //もらってきたidで検索
-        //matomeQuery.equalTo("id", id);
+        matomeQuery.equalTo("id", id);
         //インスタンス生成し、その中にすべてのデータを入れる(今回は一つだけのはず)
         RealmResults<RealmMatomeEntity> matomeResults = matomeQuery.findAll();
+        RealmMatomeEntity matomeEntity = matomeResults.get(0);
+        String folderName = matomeEntity.getFolder();
+        int startDate = matomeEntity.getStartDate();
+        int endDate = matomeEntity.getEndDate();
 
         //検索用のメモクエリ作成
         RealmQuery<RealmMemoEntity> memoQuery = realm.where(RealmMemoEntity.class);
         //フォルダ名取得
-        memoQuery.equalTo("folder",folderName);
+        memoQuery.equalTo("folder", folderName);
+        memoQuery.between("date", startDate, endDate);
         //インスタンス生成し、検索されたメモを取得する
         RealmResults<RealmMemoEntity> memoResults = memoQuery.findAll();
 
-        //同じidのまとめが複数存在することはありえない設計なので常に一つ目のみ取得する
-        //まとめの開始時間と終了時間のどちらかが-1(未設定)でないなら
-//        if (matomeResults.get(0).getStartDate() != -1 || matomeResults.get(0).getEndDate() != -1) {
-//
-//            //ここで時間で検索する処理
-//
-//        }
-        //単語が指定されてる場合
-        //if(matomeResults.get(0).getWords()!=null){
-            //その単語を保持してるメモをlistに保管
-            //まとめに設定された単語の数だけ回す
-            for(int i=0;i<matomeResults.get(0).getWords().size();i++){
-                //メモの数だけ回す
-                for (int j=0;j<memoResults.size();j++){
-                    //それぞれのメモに設定された単語の数だけ回す
-                    for(int k=0;k<memoResults.get(j).getWords().size();k++){
-                        String matomeTag=matomeResults.get(0).getWords().get(i).getTagName();
-                        String memoTag=memoResults.get(j).getWords().get(k).getTagName();
-                        //同じ単語があれば保持
-                        if(matomeTag.equals(memoTag)){
-                            idList.add(memoResults.get(j).getId());
-                            break;//一個抜ける
+        //その単語を保持してるメモをlistに保管
+        //まとめに設定された単語の数だけ回す
+        for (int i = 0; i < matomeResults.get(0).getWords().size(); i++) {
+            //メモの数だけ回す
+            for (int j = 0; j < memoResults.size(); j++) {
+                //それぞれのメモに設定された単語の数だけ回す
+                for (int k = 0; k < memoResults.get(j).getWords().size(); k++) {
+                    String matomeTag = matomeResults.get(0).getWords().get(i).getTagName();
+                    String memoTag = memoResults.get(j).getWords().get(k).getTagName();
+                    //同じ単語があれば保持
+                    if (matomeTag.equals(memoTag)) {
+                        int memoId = memoResults.get(j).getId();
+                        //既にメモを保持してないか確認
+                        for (int l = 0; l < idList.size(); l++) {
+                            if (idList.get(l) == memoId) {
+                                break;
+                            } else {
+                                if (l == idList.size() - 1) {
+                                    idList.add(memoId);
+                                    memoQuery.equalTo("id", memoId);
+                                }
+                            }
                         }
+                        break;//一個抜ける
                     }
                 }
             }
-        //}
-
-        //最終的なメモ検索結果のクエリ作成
-        for (int i=0;i<idList.size();i++) {
-            //idが同じものを総取り
-            memoQuery.equalTo("id", idList.get(i));
         }
         //インスタンス生成し、検索されたメモを取得する
         RealmResults<RealmMemoEntity> MResults = memoQuery.findAll();
@@ -194,13 +195,16 @@ public class MatomeActivity extends AppCompatActivity {
         //最終検索結果の数だけ回す
         for (int i = 0; i < MResults.size(); i++) {
             //list表示用のオブジェクトを初期化
-            MatomeObject matomeObj=new MatomeObject();
+            MatomeObject matomeObj = new MatomeObject();
             //メモセット
             matomeObj.setMemo(MResults.get(i).getMemo());
             //単語帳セット
-            ArrayList<String> wordList=new ArrayList<>();
-            for(int j=0;j<MResults.get(i).getWords().size();j++) {
-                wordList.add(MResults.get(i).getWords().get(j).getWord());
+            ArrayList<MatomeWord> wordList = new ArrayList<>();
+            for (int j = 0; j < MResults.get(i).getWords().size(); j++) {
+                MatomeWord mWord=new MatomeWord();
+                mWord.setTagName(MResults.get(i).getWords().get(j).getTagName());
+                mWord.setWord(MResults.get(i).getWords().get(j).getWord());
+                wordList.add(mWord);
             }
             matomeObj.setMarckWords(wordList);
             //listに追加

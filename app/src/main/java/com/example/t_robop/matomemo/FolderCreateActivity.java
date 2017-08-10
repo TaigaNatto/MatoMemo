@@ -53,7 +53,7 @@ public class FolderCreateActivity extends AppCompatActivity implements OnDateSet
     int frontYear = c.get(Calendar.YEAR);
     int frontMonth = c.get(Calendar.MONTH);
     int frontDay = c.get(Calendar.DAY_OF_MONTH);
-    int frontDate = 99999999;
+    int frontDate = 0;
 
     int rearYear = c.get(Calendar.YEAR);
     int rearMonth = c.get(Calendar.MONTH);
