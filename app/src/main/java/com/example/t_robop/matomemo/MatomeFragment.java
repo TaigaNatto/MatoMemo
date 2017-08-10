@@ -85,6 +85,7 @@ public class MatomeFragment extends Fragment implements OnItemClickListener, OnI
 
         if(matomeResults.size() != 0){
             //データ取得
+            /*
             for(int w=0; w<matomeResults.get(w).getWords().size(); w++){
                 allWordsData[w] = matomeResults.get(w).getWords().get(w).getWord();
             }
@@ -99,6 +100,10 @@ public class MatomeFragment extends Fragment implements OnItemClickListener, OnI
                         "マーカー単語: " + allWordsData[i];
 
                 adapterMatome.add(allMatomeData);
+            }
+            */
+            for (int i=0;i<matomeResults.size();i++){
+                adapterMatome.add(matomeResults.get(i).getMatomeName());
             }
         }
 
@@ -138,9 +143,16 @@ public class MatomeFragment extends Fragment implements OnItemClickListener, OnI
 
     //まとめ内容へIntent
     @Override
-    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+    public void onItemClick(AdapterView<?> adapterView, View view, int pos, long l) {
         Intent intent = new Intent(getActivity(), MatomeActivity.class);     //MatomeActivityへIntent
-        intent.putExtra("SUBJECT NAME", nowSubjectName);
+        //idの指定
+        //検索用のクエリ作成
+        RealmQuery<RealmMatomeEntity> matomeQuery = realm.where(RealmMatomeEntity.class);
+        matomeQuery.equalTo("folder",nowSubjectName);
+        matomeQuery.equalTo("matomeName",adapterMatome.getItem(pos));
+        //インスタンス生成し、その中にすべてのデータを入れる 今回なら全てのデータ
+        RealmResults<RealmMatomeEntity> matomeResults = matomeQuery.findAll();
+        intent.putExtra("ID",matomeResults.get(0).getId());
         startActivity(intent);
     }
 

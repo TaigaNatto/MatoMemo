@@ -247,7 +247,7 @@ public class MatoMemoListActivity extends AppCompatActivity implements AdapterVi
         switch (buttonText){
             case "メモを書く":
                 intent = new Intent(this,WritingActivity.class);    //WritingActivityにIntent
-                intent.putExtra(modeKEY,0);      //数値受け渡し　1: メモ確認　0: 新規作成   //ここでは1を送る
+                intent.putExtra(modeKEY,-1);      //数値受け渡し　id: メモ確認　-1: 新規作成   //ここでは-1を送る
                 intent.putExtra(subjectKEY,nowSubjectName);     //教科名受け渡し
                 break;
 

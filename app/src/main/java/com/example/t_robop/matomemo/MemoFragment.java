@@ -27,6 +27,9 @@ public class MemoFragment extends Fragment implements OnItemClickListener, OnIte
     //ListView memoListView = null;   //メモのListView
     ArrayAdapter<String> adapterMemo = null;    //ListViewのAdapter
 
+    //id保持用のリスト
+    ArrayList<Integer> idList;
+
     private String nowSubjectName;  //現在表示しているメモの教科名
 
     Realm realm;
@@ -52,6 +55,8 @@ public class MemoFragment extends Fragment implements OnItemClickListener, OnIte
         realm = Realm.getDefaultInstance();
 
         adapterMemo = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1);
+
+        idList=new ArrayList<>();
 
         //MatomemoListActivityとの値の受け渡し
         Bundle args = getArguments();
@@ -86,7 +91,7 @@ public class MemoFragment extends Fragment implements OnItemClickListener, OnIte
 
         //データ取得
         if(memoResults.size() != 0){
-            for(int w=0; w<memoResults.get(w).getWords().size(); w++){
+           /* for(int w=0; w<memoResults.get(w).getWords().size(); w++){
                 allWordsData[w] = memoResults.get(w).getWords().get(w).getWord();
                 allTagData[w] = memoResults.get(w).getWords().get(w).getTagName();
             }
@@ -101,6 +106,12 @@ public class MemoFragment extends Fragment implements OnItemClickListener, OnIte
                         "tag名前: " + allTagData[j];
 
                 adapterMemo.add(allMemoData);
+            } */
+
+           //todo 書き換えました
+            for(int i=0;i<memoResults.size();i++){
+                adapterMemo.add(memoResults.get(i).getMemo());
+                idList.add(memoResults.get(i).getId());
             }
         }
 
@@ -142,9 +153,9 @@ public class MemoFragment extends Fragment implements OnItemClickListener, OnIte
 
     //メモリストのクリック処理
     @Override
-    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+    public void onItemClick(AdapterView<?> adapterView, View view, int pos, long l) {
         Intent intent = new Intent(getActivity(),WritingActivity.class);
-        intent.putExtra("MODE",1);    //数値受け渡し　1: メモ確認　0: 新規作成   //ここでは1を送る
+        intent.putExtra("MODE",idList.get(pos));    //数値受け渡し　id: メモ確認　-1: 新規作成   //ここでは1を送る
         intent.putExtra("SUBJECT NAME",nowSubjectName);     //教科名受け渡し
         startActivity(intent);
     }
