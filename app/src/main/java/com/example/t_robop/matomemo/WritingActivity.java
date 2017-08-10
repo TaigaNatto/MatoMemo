@@ -204,6 +204,16 @@ public class WritingActivity extends AppCompatActivity implements TextWatcher {
         Spinner spinner = (Spinner) findViewById(R.id.Spinner);
         // アダプターを設定します
         spinner.setAdapter(spinnerAdapter);
+
+        int index = 0;
+        for (int i = 0; i < spinnerAdapter.getCount(); i++) {
+            if (spinnerAdapter.getItem(i).equals(folder)) {
+                index = i;
+                break;
+            }
+        }
+        spinner.setSelection(index);
+
         // スピナーのアイテムが選択された時に呼び出されるコールバックリスナーを登録します
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
