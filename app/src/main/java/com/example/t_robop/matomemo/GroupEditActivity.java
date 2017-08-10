@@ -50,6 +50,7 @@ public class GroupEditActivity extends AppCompatActivity {
     EditText dialogClassPlaceEditText;
 
 
+
     String groupName;
     //////////
     //listViewの要素の個数
@@ -75,6 +76,7 @@ public class GroupEditActivity extends AppCompatActivity {
     boolean shinki = true;
     boolean henko = true;
     AlertDialog dialogNewMakeGroup;
+    AlertDialog dialogReferenceGroup;
 
 
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,12 +96,10 @@ public class GroupEditActivity extends AppCompatActivity {
         textView = (TextView) findViewById(R.id.textView);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
 
-        final AlertDialog.Builder dialogReferenceGroup;
 
         subjectArrayList = new ArrayList<>();
         classPlaceArrayList = new ArrayList<>();
         groupNameArrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1);
-        dialogReferenceGroup = new AlertDialog.Builder(this);
 
         subjectArrayList.add("領域確保");
 
@@ -115,23 +115,15 @@ public class GroupEditActivity extends AppCompatActivity {
         dateBaseReference();
         listView.setAdapter(groupNameArrayAdapter);
 
+
+
+
         ////ListViewがタップされたとき////
         listView.setOnItemClickListener(
                 new AdapterView.OnItemClickListener() {
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
-                        if (shinki) {
-
-                            //dialogBuild(dialogReferenceGroup);
-                            dialogReferenceGroup.setTitle("編集");
-
-                            dialogGroupRemoveButtonMake(position, dialogReferenceGroup);
-                            dialogCancelButtonMake(dialogReferenceGroup);
-                            dialogGroupReferenceButtonMake(position, dialogReferenceGroup);
-                            shinki = false;
-                        }
-                        dialogReferenceGroup.show();
+                        setDialogReferenceGroup(position);
                     }
                 }
         );
@@ -150,11 +142,11 @@ public class GroupEditActivity extends AppCompatActivity {
 
     //adapterをarrayListで更新
     void adapterUpdate() {
+
         groupNameArrayAdapter.clear();
+
         for (int i = 0; i < subjectArrayList.size(); i++) {
             groupNameArrayAdapter.add(subjectArrayList.get(i));
-            //listViewの要素数を追加
-            itemNum = i + 1;
         }
     }
 
@@ -235,7 +227,7 @@ public class GroupEditActivity extends AppCompatActivity {
         dateBaseRemove();
 
         //データベースにlistViewの要素をすべて追加
-        for (int i = 0; i < itemNum; i++) {
+        for (int i = 0; i < subjectArrayList.size(); i++) {
 
             String temp = (String) listView.getItemAtPosition(i);
 
@@ -398,7 +390,6 @@ public class GroupEditActivity extends AppCompatActivity {
                                         listView.setAdapter(groupNameArrayAdapter);
                                         ////データベースにデータを追加(String groupNameを追加)
                                         dateBaseAdd();
-
                                     }
 
                                 }
@@ -410,17 +401,9 @@ public class GroupEditActivity extends AppCompatActivity {
                                 public void onClick(DialogInterface dialog, int which) {
                                 }
                             }
-                    ).create();
+                    )
+                .create();
         }
-
-        // dialogBuild(dialogNewMakeGroup);
-
-        // dialogNewMakeGroup.setTitle("新規作成");
-
-        // dialogGroupAddButtonMake(dialogNewMakeGroup);
-        // dialogCancelButtonMake(dialogNewMakeGroup);
-        // henko = false;
-
         dialogNewMakeGroup.show();
     }
 
@@ -451,6 +434,61 @@ public class GroupEditActivity extends AppCompatActivity {
 //        return nai;
 
 //}
+
+    void setDialogReferenceGroup(final int position) {
+
+        if (dialogReferenceGroup == null) {
+            dialogReferenceGroup = new AlertDialog.Builder(this)
+                    .setView(inputView)
+                    .setPositiveButton(
+                            "Ok",
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+
+                                    groupName = dialogGroupNameEditText.getText().toString();
+                                    if (!groupName.equals("") && kuraberuKUN(groupName, subjectArrayList)) {
+
+                                        subjectArrayList.set(position,groupName);
+                                        adapterUpdate();
+
+                                        ////データベースにデータを追加(String groupNameを追加)
+                                        dateBaseReference();
+
+                                        listView.setAdapter(groupNameArrayAdapter);
+                                    }
+
+                                }
+                            }
+                    )
+                    .setNegativeButton(
+                            "Cancel",
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                }
+                            }
+                    )
+                    .setNeutralButton("削除", new DialogInterface.OnClickListener() {
+                                @Override
+                                //ダイアログのcancelが押されたら実行
+                                public void onClick(DialogInterface dialog, int whichButton) {
+
+                                    ////リストから削除////
+                                    subjectArrayList.remove(position);
+                                    //arrayListのデータをadapterに反映
+                                    adapterUpdate();
+                                    listView.setAdapter(groupNameArrayAdapter);
+
+                                    dateBaseUpdate();
+
+                                    //元に戻す
+                                    dialogGroupNameEditText.setText("");
+                                }
+                            }
+                    )
+                    .create();
+        }
+        dialogReferenceGroup.show();
+    }
 
     //メニューバーの作成
     @Override
