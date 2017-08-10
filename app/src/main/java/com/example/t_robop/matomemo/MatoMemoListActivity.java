@@ -44,7 +44,7 @@ public class MatoMemoListActivity extends AppCompatActivity implements AdapterVi
     ListView drawerListView;
     ArrayAdapter<String> drawerArrayAdapter;
 
-    private String nowSubjectName;  //現在表示されている画面の教科名
+    private String nowSubjectName = "未分類";  //現在表示されている画面の教科名
 
     //画面下のButton
     Button matoMemoButton;
@@ -78,11 +78,12 @@ public class MatoMemoListActivity extends AppCompatActivity implements AdapterVi
         tabLayout = (TabLayout)findViewById(R.id.tabs);
         viewPager = (ViewPager)findViewById(R.id.pager);
 
+        /*
         //ToDo intent処理なので別メソッド化
         //StartListActivityからのIntent受取
         Intent intent = getIntent();
         nowSubjectName = intent.getStringExtra("folder");   //ToDo 教科名空欄の場合の例外処理
-
+        */
 
         //Toolbar表示
         toolbar.setTitle(nowSubjectName);  //intent元でタップされた教科名を設定
