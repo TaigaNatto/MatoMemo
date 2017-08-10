@@ -53,7 +53,7 @@ public class FolderCreateActivity extends AppCompatActivity implements OnDateSet
     int frontYear = c.get(Calendar.YEAR);
     int frontMonth = c.get(Calendar.MONTH);
     int frontDay = c.get(Calendar.DAY_OF_MONTH);
-    int frontDate = 99999999;
+    int frontDate = 0;
 
     int rearYear = c.get(Calendar.YEAR);
     int rearMonth = c.get(Calendar.MONTH);
@@ -69,6 +69,9 @@ public class FolderCreateActivity extends AppCompatActivity implements OnDateSet
 
     //ArrayAdapterのString型でarrayAdapterを作成
     ArrayAdapter<String> arrayAdapter;
+
+    //チェックが入っているTagをDatabaseに保存するための配列
+    SparseBooleanArray checkarray;
 
     //まとめの教科名
     String folder;
@@ -156,7 +159,7 @@ public class FolderCreateActivity extends AppCompatActivity implements OnDateSet
                 frontDay = dayOfMonth;
                 frontDate = frontYear*10000 + (frontMonth+1)*100 + frontDay;
 
-                if(frontDate<rearDate){
+                if(frontDate<=rearDate){
                     textViewfront.setText(String.valueOf(frontYear) + "/ " + String.valueOf(frontMonth+1) + "/ " + String.valueOf(frontDay));
                 }else{
                     Toast.makeText(this, "誤った日付が設定されています。", Toast.LENGTH_LONG).show();
@@ -172,7 +175,7 @@ public class FolderCreateActivity extends AppCompatActivity implements OnDateSet
                 rearDay = dayOfMonth;
                 rearDate = rearYear*10000 + (rearMonth+1)*100 + rearDay;
 
-                if(frontDate<rearDate){
+                if(frontDate<=rearDate){
                     textViewrear.setText(String.valueOf(rearYear) + "/ " + String.valueOf(rearMonth+1) + "/ " + String.valueOf(rearDay));
                 }else{
                     Toast.makeText(this, "誤った日付が設定されています。", Toast.LENGTH_LONG).show();
@@ -199,8 +202,12 @@ public class FolderCreateActivity extends AppCompatActivity implements OnDateSet
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if(keyCode== KeyEvent.KEYCODE_BACK){
 
-            saveMemoCheckedDialog();
-
+            checkarray = listView.getCheckedItemPositions();
+            if(checkarray.size()==0 && frontDate==0 && rearDate==99999999 && edittext.length()==0){
+                finish();
+            }else {
+                saveMemoCheckedDialog();
+            }
             return true;
         }
         return false;
@@ -241,10 +248,10 @@ public class FolderCreateActivity extends AppCompatActivity implements OnDateSet
         model.setEndDate(rearDate);
 
         //ListViewチェックボックスで選択されているものを配列に代入
-        SparseBooleanArray array = listView.getCheckedItemPositions();
-        for(int i = 0; i<array.size(); i++){
-            int at = array.keyAt(i);
-            if (array.get(at)) {
+        checkarray = listView.getCheckedItemPositions();
+        for(int i = 0; i<checkarray.size(); i++){
+            int at = checkarray.keyAt(i);
+            if (checkarray.get(at)) {
                 Log.d("example", "選択されている項目:" + listView.getItemAtPosition(at).toString()); //選択されているListの文字列を取得
                 Log.d("example", "そのキー" + at);  //選択されているListの要素数を取得
                 MatomeWord mWord= realm.createObject(MatomeWord.class);
@@ -255,6 +262,8 @@ public class FolderCreateActivity extends AppCompatActivity implements OnDateSet
         }
 
         model.setFolder(folder);
+
+        model.setId(getNewId());
 
         //トランザクション終了
         realm.commitTransaction();
@@ -319,7 +328,13 @@ public class FolderCreateActivity extends AppCompatActivity implements OnDateSet
             //戻るボタンを押したときの処理
             case android.R.id.home:
 
-                saveMemoCheckedDialog();
+                //ListViewチェックボックスで選択されているものを配列に代入
+                checkarray = listView.getCheckedItemPositions();
+                if(checkarray.size()==0 && frontDate==0 && rearDate==99999999 && edittext.length()==0){
+                    finish();
+                }else {
+                    saveMemoCheckedDialog();
+                }
                 break;
 
             //メニューが選択されたときの処理
@@ -345,6 +360,24 @@ public class FolderCreateActivity extends AppCompatActivity implements OnDateSet
         }
 
         return result;
+    }
+
+    //既存のidの最大値+1した数値を返してくれるメソッド
+    public int getNewId() {
+        //検索用のクエリ作成
+        RealmQuery<RealmMatomeEntity> matomeQuery = realm.where(RealmMatomeEntity.class);
+        //インスタンス生成し、その中にすべてのデータを入れる 今回なら全てのデータ
+        RealmResults<RealmMatomeEntity> matomeResults = matomeQuery.findAll();
+        int maxId = 0;
+        if (matomeResults.size() > 0) {
+            for (int i = 0; i < matomeResults.size(); i++) {
+                int nowId = matomeResults.get(i).getId();
+                if (nowId > maxId) {
+                    maxId = nowId;
+                }
+            }
+        }
+        return maxId + 1;
     }
 
 }

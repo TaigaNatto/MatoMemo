@@ -40,6 +40,13 @@ public class RealmMatomeEntity extends RealmObject {
         this.matomeName=matomeName;
     }
 
+    public String getFolder(){
+        return this.folder;
+    }
+    public void setFolder(String folder){
+        this.folder=folder;
+    }
+
     public int getStartDate(){
         return this.startDate;
     }
@@ -52,13 +59,6 @@ public class RealmMatomeEntity extends RealmObject {
     }
     public void setEndDate(int endDate){
         this.endDate=endDate;
-    }
-
-    public String getFolder(){
-        return this.folder;
-    }
-    public void setFolder(String folder){
-        this.folder=folder;
     }
 
     public RealmList<MatomeWord> getWords(){

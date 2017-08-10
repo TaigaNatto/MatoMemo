@@ -17,6 +17,7 @@ import io.realm.annotations.PrimaryKey;
 public class RealmMemoEntity extends RealmObject {
 
     private int id;
+
     private String memo;
     private int date;//20170627(こんな感じで保存)
     private int time;//1816(18:16のときはこんなふうに)

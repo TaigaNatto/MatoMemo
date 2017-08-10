@@ -103,7 +103,7 @@ public class MatoMemoListActivity extends AppCompatActivity implements AdapterVi
         viewPager.addOnPageChangeListener(this);
 
 
-        getFolderDataList();    //Databaseから教科(Folder)取得してdrawerArrayAdapterにセット    //ToDo データのgetとsetを分けてメソッド化する →　reloadいらなくなる
+        getFolderDataList(drawerArrayAdapter);    //Databaseから教科(Folder)取得してdrawerArrayAdapterにセット    //ToDo データのgetとsetを分けてメソッド化する →　reloadいらなくなる
 
 
         drawerListView.setAdapter(drawerArrayAdapter);
@@ -203,14 +203,14 @@ public class MatoMemoListActivity extends AppCompatActivity implements AdapterVi
     }
 
     //データベースから教科取得
-    public void getFolderDataList(){
+    public void getFolderDataList(ArrayAdapter<String> arrayAdapter){
         //検索用のクエリ作成
         RealmQuery<RealmFolderEntity> folderQuery = realm.where(RealmFolderEntity.class);
         //インスタンス生成し、その中にすべてのデータを入れる 今回なら全てのデータ
         RealmResults<RealmFolderEntity> folderResults = folderQuery.findAll();
 
         for(int i=0; i<folderResults.size(); i++){
-            drawerArrayAdapter.add(folderResults.get(i).getFolderName());    //全教科名をDrawerのAdapterに追加
+            arrayAdapter.add(folderResults.get(i).getFolderName());    //全教科名をDrawerのAdapterに追加
         }
         //ToDo arrayListに入れて返す
     }
@@ -219,7 +219,7 @@ public class MatoMemoListActivity extends AppCompatActivity implements AdapterVi
     private void reloadDrawerList(){
         drawerArrayAdapter.clear();
         drawerArrayAdapter.add("未分類");
-        getFolderDataList();
+        getFolderDataList(drawerArrayAdapter);
         drawerArrayAdapter.notifyDataSetChanged();
     }
 
@@ -247,7 +247,7 @@ public class MatoMemoListActivity extends AppCompatActivity implements AdapterVi
         switch (buttonText){
             case "メモを書く":
                 intent = new Intent(this,WritingActivity.class);    //WritingActivityにIntent
-                intent.putExtra(modeKEY,0);      //数値受け渡し　1: メモ確認　0: 新規作成   //ここでは1を送る
+                intent.putExtra(modeKEY,-1);      //数値受け渡し　id: メモ確認　-1: 新規作成   //ここでは-1を送る
                 intent.putExtra(subjectKEY,nowSubjectName);     //教科名受け渡し
                 break;
 
