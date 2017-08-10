@@ -190,6 +190,8 @@ public class TagEditActivity extends AppCompatActivity {
                                             wordObj.setColor(tempColor);
                                             //上書き
                                             wordList.set(checkList, wordObj);
+                                            //listViewに反映
+                                            setListItem(getApplicationContext());
 
                                             //Realm更新
                                             //検索用のクエリ作成
