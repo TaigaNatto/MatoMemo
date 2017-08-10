@@ -15,6 +15,8 @@ import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import java.util.ArrayList;
+
 import io.realm.Realm;
 import io.realm.RealmQuery;
 import io.realm.RealmResults;
@@ -43,7 +45,7 @@ public class MemoFragment extends Fragment implements OnItemClickListener, OnIte
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle saveInstanceState){
 
-        //ToDo メモが無い場合はTextViewで「メモなし」を表示 (優先度低)
+        //ToDo メモが無い場合はTextViewで「メモなし」を表示
         ListView memoListView = (ListView)inflater.inflate(R.layout.activity_memo_tab,container,false);
 
         Realm.init(getActivity());
@@ -55,7 +57,6 @@ public class MemoFragment extends Fragment implements OnItemClickListener, OnIte
         Bundle args = getArguments();
         nowSubjectName = args.getString("SUBJECT"); //初期表示の教科名を保存
 
-        //ToDo 別画面で作成されてデータベースに保存されているメモのリストを呼び出す
         getMemoDataList(nowSubjectName);   //StartListActivityでタップした教科名のメモ一覧をデータベースから取ってきて表示
 
         memoListView.setOnItemClickListener(this);
@@ -67,22 +68,6 @@ public class MemoFragment extends Fragment implements OnItemClickListener, OnIte
         return memoListView;
     }
 
-    //Debug用データベース設定    教科別メモセット
-    //ToDo
-    public void setMemoDataTest(String subjectName){
-
-        realm.beginTransaction();
-
-        RealmMemoEntity testMemo = realm.createObject(RealmMemoEntity.class);
-
-        //Debug用　Drawer内でタップした教科のメモをDebug用に作成したセット
-        testMemo.setFolder(subjectName);
-        testMemo.setMemo(subjectName+"メモ");
-
-        realm.commitTransaction();
-
-    }
-
     //データベースから教科別メモ取得
     public void getMemoDataList(String subjectName){    //引数：　Drawer内でクリックした教科名
         //検索用のクエリ作成
@@ -90,13 +75,41 @@ public class MemoFragment extends Fragment implements OnItemClickListener, OnIte
 
         memoQuery = memoQuery.equalTo("folder",subjectName);  //引数で受け取った教科名のメモを取得
 
-        RealmResults<RealmMemoEntity> memoResults = memoQuery.findAll();    //インスタンス生成し、その中に取得したすべてのデータを入れる
+        RealmResults<RealmMemoEntity> memoResults = memoQuery.findAll();
 
-        adapterMemo.clear();    //一旦Listを全部削除
+        //adapterMemo.clear();    //一旦Listを全部削除
 
+        //Debeg用　全データ確認
+        String allMemoData;     //Listに入れるメモのパラメータ
+        String[] allWordsData = new String[100];    //マーカーが引かれている箇所の単語
+        String[] allTagData = new String[100];      //tagの名前
+
+        //データ取得
+        if(memoResults.size() != 0){
+            for(int w=0; w<memoResults.get(w).getWords().size(); w++){
+                allWordsData[w] = memoResults.get(w).getWords().get(w).getWord();
+                allTagData[w] = memoResults.get(w).getWords().get(w).getTagName();
+            }
+
+            //ToDo 保存時間取れてない、マーカーが機種依存で動かないので下２つが検証できない
+            for(int j=0; j<memoResults.size(); j++){
+                allMemoData = "教科: " + memoResults.get(j).getFolder() + "\n" +
+                        "メモ内容: " + memoResults.get(j).getMemo() + "\n" +
+                        "保存日付: " + memoResults.get(j).getDate() + "\n" +
+                        "保存時間: " + memoResults.get(j).getTime() + "\n" +
+                        "マーカー単語: " + allWordsData[j] + "\n" +
+                        "tag名前: " + allTagData[j];
+
+                adapterMemo.add(allMemoData);
+            }
+        }
+
+        /*
         for(int i=0; i<memoResults.size(); i++){
             adapterMemo.add(memoResults.get(i).getMemo());    //メモをListViewのAdapterに入れる
         }
+        */
+        //ToDo adapterに代入するデータをarrayListで返す　→　後でadapterに代入
     }
 
     //Drawerクリック時のメモリスト更新
@@ -130,7 +143,6 @@ public class MemoFragment extends Fragment implements OnItemClickListener, OnIte
     //メモリストのクリック処理
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-        //ToDo メモリストのItemをタップしたときに、教科名　のデータを持ってWritingActivityにIntent
         Intent intent = new Intent(getActivity(),WritingActivity.class);
         intent.putExtra("MODE",1);    //数値受け渡し　1: メモ確認　0: 新規作成   //ここでは1を送る
         intent.putExtra("SUBJECT NAME",nowSubjectName);     //教科名受け渡し

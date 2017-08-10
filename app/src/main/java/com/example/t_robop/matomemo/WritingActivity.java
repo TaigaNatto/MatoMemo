@@ -407,7 +407,7 @@ public class WritingActivity extends ActionBarActivity implements TextWatcher {
     };
 
     //色選択のためのDialogを表示
-    public void marker_mode(View v) {
+    public void marker_mode(View v){
         int defaultItem = 0; // デフォルトでチェックされているアイテム
         final List<Integer> checkedItems = new ArrayList<>();
         checkedItems.add(defaultItem);

@@ -70,6 +70,9 @@ public class FolderCreateActivity extends AppCompatActivity implements OnDateSet
     //ArrayAdapterのString型でarrayAdapterを作成
     ArrayAdapter<String> arrayAdapter;
 
+    //まとめの教科名
+    String folder;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,18 +99,18 @@ public class FolderCreateActivity extends AppCompatActivity implements OnDateSet
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
 
-
-       // ((FolderCreateActivity)getActivity()).getSupportActionBar().
-
-
         Realm.init(this);
         realm = Realm.getDefaultInstance();
 
 
+        //教科名取得
+        Intent intent=getIntent();
+        folder=intent.getStringExtra("SUBJECT NAME");
+
+
         wordlist=new ArrayList<>();
 
-
-        arrayAdapter = new ArrayAdapter<String>(
+        arrayAdapter = new ArrayAdapter<>(
                 this, android.R.layout.simple_list_item_multiple_choice);
 
         listView.setItemsCanFocus(false);
@@ -250,6 +253,8 @@ public class FolderCreateActivity extends AppCompatActivity implements OnDateSet
                 model.words.add(mWord);
             }
         }
+
+        model.setFolder(folder);
 
         //トランザクション終了
         realm.commitTransaction();
