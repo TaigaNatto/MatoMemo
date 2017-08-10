@@ -1,5 +1,7 @@
 package com.example.t_robop.matomemo;
 
+import android.os.storage.StorageManager;
+
 import java.util.ArrayList;
 
 import io.realm.RealmList;
@@ -18,6 +20,8 @@ public class RealmMatomeEntity extends RealmObject {
     //まとめる日付　無ければ-1とかで
     private int startDate=-1;
     private int endDate=-1;
+    //教科名
+    private String folder;
     //まとめ設定で指定された単語リスト(単語一覧参照先のid)
     public RealmList<MatomeWord> words;
     //まとめ設定でしていされた
@@ -48,6 +52,13 @@ public class RealmMatomeEntity extends RealmObject {
     }
     public void setEndDate(int endDate){
         this.endDate=endDate;
+    }
+
+    public String getFolder(){
+        return this.folder;
+    }
+    public void setFolder(String folder){
+        this.folder=folder;
     }
 
     public RealmList<MatomeWord> getWords(){

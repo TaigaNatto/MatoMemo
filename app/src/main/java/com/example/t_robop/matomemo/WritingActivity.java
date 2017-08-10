@@ -35,9 +35,9 @@ import static com.example.t_robop.matomemo.R.id.txtmemo;
 
 public class WritingActivity extends ActionBarActivity implements TextWatcher {
 
-    Intent intent=new Intent();
-    int mode = intent.getIntExtra("MODE",0);
+    int mode;
     //メモを新規作成する場合は０、編集するときは１としています。
+    String folder;
 
     int change = 0;
 
@@ -69,6 +69,11 @@ public class WritingActivity extends ActionBarActivity implements TextWatcher {
 
         Realm.init(this);
         realm = Realm.getDefaultInstance();
+
+        Intent intent=getIntent();
+        mode = intent.getIntExtra("MODE",0);
+        //todo intentでフォルダ名ほしい！
+        folder=intent.getStringExtra("SUBJECT NAME");
 
         //関連付け
         textView = (TextView) findViewById(R.id.txt);
@@ -276,6 +281,10 @@ public class WritingActivity extends ActionBarActivity implements TextWatcher {
 
                                     //書き込みたいデータをインスタンスに入れる
                                     model.setMemo(editText.getText().toString());
+
+                                    //フォルダ名をセット
+                                    model.setFolder(folder);
+
                                     //トランザクション終了 (データを書き込む)
                                     realm.commitTransaction();
 
