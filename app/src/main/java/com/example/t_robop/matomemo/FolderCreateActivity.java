@@ -53,7 +53,7 @@ public class FolderCreateActivity extends AppCompatActivity implements OnDateSet
     int frontYear = c.get(Calendar.YEAR);
     int frontMonth = c.get(Calendar.MONTH);
     int frontDay = c.get(Calendar.DAY_OF_MONTH);
-    int frontDate = 0;
+    int frontDate = 99999999;
 
     int rearYear = c.get(Calendar.YEAR);
     int rearMonth = c.get(Calendar.MONTH);
@@ -263,6 +263,8 @@ public class FolderCreateActivity extends AppCompatActivity implements OnDateSet
 
         model.setFolder(folder);
 
+        model.setId(getNewId());
+
         //トランザクション終了
         realm.commitTransaction();
 
@@ -358,6 +360,24 @@ public class FolderCreateActivity extends AppCompatActivity implements OnDateSet
         }
 
         return result;
+    }
+
+    //既存のidの最大値+1した数値を返してくれるメソッド
+    public int getNewId() {
+        //検索用のクエリ作成
+        RealmQuery<RealmMatomeEntity> matomeQuery = realm.where(RealmMatomeEntity.class);
+        //インスタンス生成し、その中にすべてのデータを入れる 今回なら全てのデータ
+        RealmResults<RealmMatomeEntity> matomeResults = matomeQuery.findAll();
+        int maxId = 0;
+        if (matomeResults.size() > 0) {
+            for (int i = 0; i < matomeResults.size(); i++) {
+                int nowId = matomeResults.get(i).getId();
+                if (nowId > maxId) {
+                    maxId = nowId;
+                }
+            }
+        }
+        return maxId + 1;
     }
 
 }

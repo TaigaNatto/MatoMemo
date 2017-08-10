@@ -70,7 +70,7 @@ public class WritingActivity extends ActionBarActivity implements TextWatcher {
         Realm.init(this);
         realm = Realm.getDefaultInstance();
 
-        Intent intent = new Intent();
+        Intent intent = getIntent();
         //todo idで管理します！(新規は-1,編集はidを飛ばしてください！！)
         id = intent.getIntExtra("MODE", -1);
         //todo intentでフォルダ名ほしい！
