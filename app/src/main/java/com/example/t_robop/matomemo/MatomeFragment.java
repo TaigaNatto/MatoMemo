@@ -28,6 +28,8 @@ public class MatomeFragment extends Fragment implements OnItemClickListener, OnI
     //ListView matomeListView = null;
     ArrayAdapter<String> adapterMatome = null;
 
+    ArrayList<Integer> idList;
+
     private String nowSubjectName;
 
     Realm realm;
@@ -51,6 +53,8 @@ public class MatomeFragment extends Fragment implements OnItemClickListener, OnI
         realm = Realm.getDefaultInstance();
 
         adapterMatome = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1);
+
+        idList=new ArrayList<>();
 
         //値の受け渡し
         Bundle args = getArguments();
@@ -85,20 +89,26 @@ public class MatomeFragment extends Fragment implements OnItemClickListener, OnI
 
         if(matomeResults.size() != 0){
             //データ取得
+            /*
             for(int w=0; w<matomeResults.get(w).getWords().size(); w++){
                 allWordsData[w] = matomeResults.get(w).getWords().get(w).getWord();
             }
 
-            //ToDo まとめ機関未設定のときに、初期値の999999999が代入されている、マーカーが動かないので下一つが未検証、idはなんのために存在？　
+            //ToDo まとめ機関未設定のときに、開始日が0または終了日が999999999のときは「未設定」を表示、マーカーが動かないので下一つが未検証、idはなんのために存在？　
             for(int i=0; i<matomeResults.size(); i++){
                 allMatomeData = "id: " + matomeResults.get(i).getId() + "\n" +
                         "まとめ名前: " + matomeResults.get(i).getMatomeName() + "\n" +
-                        "まとめ期間開始日: " + matomeResults.get(i).getStartDate() + "\n" +
-                        "まとめ期間終了日: " + matomeResults.get(i).getEndDate() + "\n" +
+                        "まとめ期間開始日: " + matomeResults.get(i).getStartDate() + "\n" +     //ToDo 0のとき、String型で「未設定」を表示
+                        "まとめ期間終了日: " + matomeResults.get(i).getEndDate() + "\n" +       //ToDo 999999999のとき、String型で「未設定」を表示
                         "教科名: " + matomeResults.get(i).getFolder() + "\n" +
                         "マーカー単語: " + allWordsData[i];
 
                 adapterMatome.add(allMatomeData);
+            }
+            */
+            for (int i=0;i<matomeResults.size();i++){
+                adapterMatome.add(matomeResults.get(i).getMatomeName());
+                idList.add(matomeResults.get(i).getId());
             }
         }
 
@@ -114,6 +124,7 @@ public class MatomeFragment extends Fragment implements OnItemClickListener, OnI
         nowSubjectName = subject;
 
         adapterMatome.clear();
+        idList.clear();
         getMatomeDataList(subject);
         adapterMatome.notifyDataSetChanged();
     }
@@ -138,9 +149,10 @@ public class MatomeFragment extends Fragment implements OnItemClickListener, OnI
 
     //まとめ内容へIntent
     @Override
-    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+    public void onItemClick(AdapterView<?> adapterView, View view, int pos, long l) {
         Intent intent = new Intent(getActivity(), MatomeActivity.class);     //MatomeActivityへIntent
-        intent.putExtra("SUBJECT NAME", nowSubjectName);
+        //idの指定
+        intent.putExtra("ID",idList.get(pos));
         startActivity(intent);
     }
 

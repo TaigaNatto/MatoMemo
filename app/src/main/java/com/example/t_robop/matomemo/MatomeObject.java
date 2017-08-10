@@ -10,7 +10,7 @@ import java.util.ArrayList;
 public class MatomeObject {
 
     String memo;
-    ArrayList<String> marckWords;
+    ArrayList<MatomeWord> marckWords;
 
     public String getMemo(){
         return this.memo;
@@ -19,10 +19,10 @@ public class MatomeObject {
         this.memo=memo;
     }
 
-    public ArrayList<String> getMarckWords(){
+    public ArrayList<MatomeWord> getMarckWords(){
         return this.marckWords;
     }
-    public void setMarckWords(ArrayList<String> marckWords){
+    public void setMarckWords(ArrayList<MatomeWord> marckWords){
         this.marckWords=marckWords;
     }
 
