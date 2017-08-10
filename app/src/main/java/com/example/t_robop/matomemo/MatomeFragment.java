@@ -89,12 +89,12 @@ public class MatomeFragment extends Fragment implements OnItemClickListener, OnI
                 allWordsData[w] = matomeResults.get(w).getWords().get(w).getWord();
             }
 
-            //ToDo まとめ機関未設定のときに、初期値の999999999が代入されている、マーカーが動かないので下一つが未検証、idはなんのために存在？　
+            //ToDo まとめ機関未設定のときに、開始日が0または終了日が999999999のときは「未設定」を表示、マーカーが動かないので下一つが未検証、idはなんのために存在？　
             for(int i=0; i<matomeResults.size(); i++){
                 allMatomeData = "id: " + matomeResults.get(i).getId() + "\n" +
                         "まとめ名前: " + matomeResults.get(i).getMatomeName() + "\n" +
-                        "まとめ期間開始日: " + matomeResults.get(i).getStartDate() + "\n" +
-                        "まとめ期間終了日: " + matomeResults.get(i).getEndDate() + "\n" +
+                        "まとめ期間開始日: " + matomeResults.get(i).getStartDate() + "\n" +     //ToDo 0のとき、String型で「未設定」を表示
+                        "まとめ期間終了日: " + matomeResults.get(i).getEndDate() + "\n" +       //ToDo 999999999のとき、String型で「未設定」を表示
                         "教科名: " + matomeResults.get(i).getFolder() + "\n" +
                         "マーカー単語: " + allWordsData[i];
 
