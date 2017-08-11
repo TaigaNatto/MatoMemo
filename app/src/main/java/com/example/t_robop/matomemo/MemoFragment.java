@@ -3,6 +3,7 @@ package com.example.t_robop.matomemo;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Debug;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
@@ -14,6 +15,7 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 
@@ -24,21 +26,18 @@ import io.realm.RealmResults;
 
 public class MemoFragment extends Fragment implements OnItemClickListener, OnItemLongClickListener {
 
-    //ListView memoListView = null;   //メモのListView
-    ArrayAdapter<String> adapterMemo = null;    //ListViewのAdapter
+    private ArrayAdapter<String> adapterMemo = null;    //ListViewのAdapter
 
-    //id保持用のリスト
-    ArrayList<Integer> idList;
+    private ArrayList<Integer> idList;  //id保持用のリスト
 
     private String nowSubjectName;  //現在表示しているメモの教科名
 
-    Realm realm;
+    private Realm realm;
 
     //MemoFragmentのインスタンス化メソッド
     public static MemoFragment newInstance(String subjectName){
-        // Bundleとかここに書く
         Bundle args = new Bundle();
-        args.putString("SUBJECT",subjectName);  //StartListActivityでクリックされた教科名を受け取って保存  @KEY SUBJECT
+        args.putString("SUBJECT",subjectName);  //選択されている教科名を受け取って保存  @KEY SUBJECT
         MemoFragment fragment = new MemoFragment();
         fragment.setArguments(args);
         return fragment;
@@ -48,47 +47,48 @@ public class MemoFragment extends Fragment implements OnItemClickListener, OnIte
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle saveInstanceState){
 
-        //ToDo メモが無い場合はTextViewで「メモなし」を表示
-        ListView memoListView = (ListView)inflater.inflate(R.layout.activity_memo_tab,container,false);
+        View view = inflater.inflate(R.layout.activity_memo_tab,container,false);
 
         Realm.init(getActivity());
         realm = Realm.getDefaultInstance();
 
-        adapterMemo = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1);
+        //MatoMemoListActivityとの値の受け渡し
+        Bundle args = getArguments();
+        nowSubjectName = args.getString("SUBJECT");
+
+        ListView memoListView = (ListView)view.findViewById(R.id.memo_list);
+        TextView emptyTextView = (TextView)view.findViewById(R.id.emptyMemoView);
+        memoListView.setEmptyView(emptyTextView);
 
         idList=new ArrayList<>();
 
-        //MatomemoListActivityとの値の受け渡し
-        Bundle args = getArguments();
-        nowSubjectName = args.getString("SUBJECT"); //初期表示の教科名を保存
-
-        getMemoDataList(nowSubjectName);   //StartListActivityでタップした教科名のメモ一覧をデータベースから取ってきて表示
+        adapterMemo = new ArrayAdapter<>(getContext(),android.R.layout.simple_list_item_1);
+        getMemoDataList(nowSubjectName);   //選択されている教科名のメモ一覧をデータベースから取ってきて表示
 
         memoListView.setOnItemClickListener(this);
-
         memoListView.setOnItemLongClickListener(this);
 
         memoListView.setAdapter(adapterMemo);
 
-        return memoListView;
+        return view;
+        //return memoListView;
     }
 
     //データベースから教科別メモ取得
     public void getMemoDataList(String subjectName){    //引数：　Drawer内でクリックした教科名
-        //検索用のクエリ作成
+
         RealmQuery<RealmMemoEntity> memoQuery = realm.where(RealmMemoEntity.class);
 
         memoQuery = memoQuery.equalTo("folder",subjectName);  //引数で受け取った教科名のメモを取得
 
         RealmResults<RealmMemoEntity> memoResults = memoQuery.findAll();
 
-        //adapterMemo.clear();    //一旦Listを全部削除
-
         //Debeg用　全データ確認
         String allMemoData;     //Listに入れるメモのパラメータ
         String[] allWordsData = new String[100];    //マーカーが引かれている箇所の単語
         String[] allTagData = new String[100];      //tagの名前
 
+        //ToDo メモリストに何を表示するのか定めて、該当データ取得とadapterへの代入を行う
         //データ取得
         if(memoResults.size() != 0){
            /* for(int w=0; w<memoResults.get(w).getWords().size(); w++){
@@ -110,17 +110,15 @@ public class MemoFragment extends Fragment implements OnItemClickListener, OnIte
 
            //todo 書き換えました
             for(int i=0;i<memoResults.size();i++){
-                adapterMemo.add(memoResults.get(i).getMemo());
+                adapterMemo.add((memoResults.get(i).getMemo()));
                 idList.add(memoResults.get(i).getId());
             }
         }
-
         /*
         for(int i=0; i<memoResults.size(); i++){
             adapterMemo.add(memoResults.get(i).getMemo());    //メモをListViewのAdapterに入れる
         }
         */
-        //ToDo adapterに代入するデータをarrayListで返す　→　後でadapterに代入
     }
 
     //Drawerクリック時のメモリスト更新
@@ -164,8 +162,7 @@ public class MemoFragment extends Fragment implements OnItemClickListener, OnIte
     //メモリストのロングクリック処理
     @Override
     public boolean onItemLongClick(AdapterView<?> adapterView, View view, int position, long l) {
-        Log.d("test","onLongItemClick");
-        final String item = (String)adapterView.getItemAtPosition(position);   //クリックしたpositionからItemを取得
+        final String clickedMemoListItem = (String)adapterView.getItemAtPosition(position);   //クリックしたpositionからItemを取得
 
         //消去確認のダイアログ
         AlertDialog.Builder alertDig = new AlertDialog.Builder(getActivity());
@@ -183,9 +180,9 @@ public class MemoFragment extends Fragment implements OnItemClickListener, OnIte
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 //YES処理
-                adapterMemo.remove(item);   //リストから削除
+                adapterMemo.remove(clickedMemoListItem);   //リストから削除
 
-                removeMemoData(item);   //データベースから削除
+                removeMemoData(clickedMemoListItem);   //データベースから削除
             }
         });
 

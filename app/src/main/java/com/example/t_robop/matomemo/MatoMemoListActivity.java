@@ -91,6 +91,7 @@ public class MatoMemoListActivity extends AppCompatActivity implements AdapterVi
         tabLayout.setupWithViewPager(viewPager);
     }
 
+    //ToDo GroupEditActivityで教科削除して戻ったときに、消された教科の情報が残っている
     //Activityが再度開始された時
     @Override
     public void onRestart(){
@@ -187,9 +188,6 @@ public class MatoMemoListActivity extends AppCompatActivity implements AdapterVi
                 arrayAdapter.add(folderResults.get(i).getFolderName());    //全教科名をDrawerのAdapterに追加
             }
         }
-
-
-        //ToDo arrayListに入れて返す
     }
 
     //教科リストの更新
