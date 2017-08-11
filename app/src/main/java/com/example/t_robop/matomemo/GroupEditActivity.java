@@ -65,7 +65,6 @@ public class GroupEditActivity extends AppCompatActivity {
     //TextViewで「textView」を作成
     TextView textView;
     //listViewをタップしたときpositionの文字列
-    String listPositionText;
 
     /*** 神 ***/
     Realm realm;
@@ -101,8 +100,6 @@ public class GroupEditActivity extends AppCompatActivity {
         dialogGroupNameMakeText = (EditText) dialogViewGroupMake.findViewById(R.id.groupNameMake);
         dialogClassPlaceMakeText = (EditText) dialogViewGroupMake.findViewById(R.id.classPlaceMake);
 
-        dialogClassPlaceEditText.setSelection(dialogClassPlaceEditText.getText().length());
-
         listView = (ListView) findViewById(R.id.list);
         textView = (TextView) findViewById(R.id.textView);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -112,7 +109,7 @@ public class GroupEditActivity extends AppCompatActivity {
         classPlaceArrayList = new ArrayList<>();
         groupNameArrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1);
 
-        groupNameArrayList.add("領域確保");
+        //groupNameArrayList.add("領域確保");
 
         ////データベース用
         Realm.init(this);
@@ -126,7 +123,7 @@ public class GroupEditActivity extends AppCompatActivity {
         dateBaseReference();
         listView.setAdapter(groupNameArrayAdapter);
 
-
+        setTextViewDisply();
 
 
         ////ListViewがタップされたとき////
@@ -157,7 +154,7 @@ public class GroupEditActivity extends AppCompatActivity {
         RealmResults<RealmFolderEntity> folderResults = folderQuery.findAll();
         /***使い方は↑のメモと同じ***/
 
-        if (folderResults.size() != 0) {
+        /*if (folderResults.size() != 0) {
             text = folderResults.get(0).getFolderName();
             groupNameArrayList.set(0, text);
             for (int i = 1; i < folderResults.size(); i++) {
@@ -166,7 +163,13 @@ public class GroupEditActivity extends AppCompatActivity {
             }
             //adapterの中身を更新
             adapterUpdate();
+        }*/
+        for (int i = 0; i < folderResults.size(); i++) {
+            text = folderResults.get(i).getFolderName();
+            groupNameArrayList.add(text);
         }
+        //adapterの中身を更新
+        adapterUpdate();
     }
 
     ////データベースのデータを削除
@@ -284,12 +287,14 @@ public class GroupEditActivity extends AppCompatActivity {
                                     dateBaseUpdate();
 
                                     dialogGroupNameEditText.setText("");
+                                    setTextViewDisply();
                                 }
                             }
                     )
                     .create();
         }
         dialogBuilderGroupEdit.show();
+
     }
 
 
@@ -310,17 +315,13 @@ public class GroupEditActivity extends AppCompatActivity {
 
                                     if (!groupName.equals("") && GroupNameInTheList()) {
 
-                                        if (groupNameArrayList.size() == 0) {
-                                            groupNameArrayList.set(0, groupName);
-                                        } else {
-                                            groupNameArrayList.add(groupName);
-                                        }
-
+                                        groupNameArrayList.add(groupName);
                                         //arrayListのデータをadapterに反映
                                         adapterUpdate();
                                         listView.setAdapter(groupNameArrayAdapter);
                                         ////データベースにデータを追加(String groupNameを追加)
                                         dateBaseAdd();
+                                        setTextViewDisply();
                                     }
 
                                 }
@@ -336,6 +337,7 @@ public class GroupEditActivity extends AppCompatActivity {
                     .create();
         }
         dialogBuilderGroupMake.show();
+        setTextViewDisply();
     }
 
     void dateBaseAdd() {
@@ -348,6 +350,14 @@ public class GroupEditActivity extends AppCompatActivity {
         model.setFolderName(groupName);
         //トランザクション終了 (データを書き込む)
         realm.commitTransaction();
+    }
+
+    void setTextViewDisply(){
+        if(groupNameArrayList.size() == 0){
+            textView.setVisibility(View.VISIBLE);
+        }else {
+            textView.setVisibility(View.INVISIBLE);
+        }
     }
 
     void dialogGroupReferenceButtonMake(final int listPosition, AlertDialog.Builder dialog) {
@@ -382,6 +392,15 @@ public class GroupEditActivity extends AppCompatActivity {
 
         });
     }
+    //adapterをarrayListで更新
+    void adapterUpdate() {
+
+        groupNameArrayAdapter.clear();
+
+        for (int i = 0; i < groupNameArrayList.size(); i++) {
+            groupNameArrayAdapter.add(groupNameArrayList.get(i));
+        }
+    }
 
     //アラートダイアログを使用可能に
     void alertDialogBuild(AlertDialog.Builder alertDialog){
@@ -415,16 +434,6 @@ public class GroupEditActivity extends AppCompatActivity {
         });
     }
 
-    //adapterをarrayListで更新
-    void adapterUpdate() {
-
-        groupNameArrayAdapter.clear();
-
-        for (int i = 0; i < groupNameArrayList.size(); i++) {
-            groupNameArrayAdapter.add(groupNameArrayList.get(i));
-            itemNum = i + 1;
-        }
-    }
     //グループを新規作成するボタンをダイアログに追加
     void dialogGroupAddButtonMake(AlertDialog.Builder dialog) {
 
