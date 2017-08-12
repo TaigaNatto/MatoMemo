@@ -44,7 +44,16 @@ public class GroupEditActivity extends AppCompatActivity {
     //listViewに入れる配列
     ArrayList<String> groupNameArrayList;
     ArrayList<String> classPlaceArrayList;
-    ListView listView;
+    ListView simpleListView;
+    ListView multiChoiceListView;
+
+    ///////
+
+    //multinihennko
+    //まずはもう一つのlistViewを消す
+
+    //////
+
     //ダイアログ用のEditText
     //////////
     EditText dialogGroupNameEditText;
@@ -58,10 +67,13 @@ public class GroupEditActivity extends AppCompatActivity {
     //listViewの要素の個数
     int itemNum = 0;
     //////////
-    //重複していないときtrue※
-    boolean original = true;
+
+    boolean groupEditMode;
+
     //ArrayAdapterのString型でarrayAdapterを作成
     ArrayAdapter<String> groupNameArrayAdapter;
+
+    ArrayAdapter<String> groupNameArrayAdapterChoice;
     //TextViewで「textView」を作成
     TextView textView;
     //listViewをタップしたときpositionの文字列
@@ -100,7 +112,8 @@ public class GroupEditActivity extends AppCompatActivity {
         dialogGroupNameMakeText = (EditText) dialogViewGroupMake.findViewById(R.id.groupNameMake);
         dialogClassPlaceMakeText = (EditText) dialogViewGroupMake.findViewById(R.id.classPlaceMake);
 
-        listView = (ListView) findViewById(R.id.list);
+        simpleListView = (ListView) findViewById(R.id.list);
+        multiChoiceListView = (ListView) findViewById(R.id.list_item);
         textView = (TextView) findViewById(R.id.textView);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
 
@@ -108,8 +121,12 @@ public class GroupEditActivity extends AppCompatActivity {
         groupNameArrayList = new ArrayList<>();
         classPlaceArrayList = new ArrayList<>();
         groupNameArrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1);
+        groupNameArrayAdapterChoice = new ArrayAdapter<String>(
+                this, android.R.layout.simple_list_item_multiple_choice);
 
         //groupNameArrayList.add("領域確保");
+        multiChoiceListView.setVisibility(View.GONE);
+        groupEditMode = true;
 
         ////データベース用
         Realm.init(this);
@@ -121,13 +138,12 @@ public class GroupEditActivity extends AppCompatActivity {
 
         //dateBaseからデータを取得
         dateBaseReference();
-        listView.setAdapter(groupNameArrayAdapter);
+        simpleListView.setAdapter(groupNameArrayAdapter);
 
         setTextViewDisply();
 
-
         ////ListViewがタップされたとき////
-        listView.setOnItemClickListener(
+        simpleListView.setOnItemClickListener(
                 new AdapterView.OnItemClickListener() {
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -136,6 +152,45 @@ public class GroupEditActivity extends AppCompatActivity {
                         dialogGroupNameEditText.setText(groupNameArrayList.get(position));
                         dialogGroupNameEditText.setSelection(dialogGroupNameEditText.getText().length());
                         setDialogBuilderGroupEdit();
+                    }
+                }
+        );
+
+        simpleListView.setOnItemLongClickListener(
+                new AdapterView.OnItemLongClickListener(){
+                    @Override
+                    public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                        simpleListView.setVisibility(View.GONE);
+                        multiChoiceListView.setVisibility(View.VISIBLE);
+
+                        groupEditMode = false;
+
+                        adapterUpdate();
+                        multiChoiceListView.setAdapter(groupNameArrayAdapterChoice);
+
+                        ((android.support.design.widget.FloatingActionButton) findViewById(R.id.fab)).setImageResource(R.drawable.gomi);
+
+                        return true;
+                    }
+                }
+        );
+
+        multiChoiceListView.setOnItemLongClickListener(
+                new AdapterView.OnItemLongClickListener(){
+                    @Override
+                    public boolean onItemLongClick(AdapterView<?> parent,View view, int position, long id){
+
+                        simpleListView.setVisibility(View.VISIBLE);
+                        multiChoiceListView.setVisibility(View.GONE);
+
+                        groupEditMode = true;
+
+                        adapterUpdate();
+                        simpleListView.setAdapter(groupNameArrayAdapter);
+
+                        ((android.support.design.widget.FloatingActionButton) findViewById(R.id.fab)).setImageResource(R.drawable.plusmark);
+
+                        return true;
                     }
                 }
         );
@@ -230,7 +285,6 @@ public class GroupEditActivity extends AppCompatActivity {
         for (int i = 0; i < groupNameArrayList.size(); i++) {
             //groupNameがarrayAdapterのi番目の要素と同じか、"未分類"なら実行
             if (groupName.equals(groupNameArrayList.get(i)) || groupName.equals("未分類")) {
-                original = false;
                 Toast.makeText(getApplicationContext(), "同名のファイルがすでに存在します", Toast.LENGTH_SHORT).show();
                 return false;
             }
@@ -259,7 +313,7 @@ public class GroupEditActivity extends AppCompatActivity {
 
                                         dateBaseUpdate();
 
-                                        listView.setAdapter(groupNameArrayAdapter);
+                                        simpleListView.setAdapter(groupNameArrayAdapter);
 
                                     }
                                 }
@@ -282,7 +336,7 @@ public class GroupEditActivity extends AppCompatActivity {
                                     groupNameArrayList.remove(listPosition);
 
                                     adapterUpdate();
-                                    listView.setAdapter(groupNameArrayAdapter);
+                                    simpleListView.setAdapter(groupNameArrayAdapter);
 
                                     dateBaseUpdate();
 
@@ -300,44 +354,72 @@ public class GroupEditActivity extends AppCompatActivity {
 
     public void plus(View v) {
 
-        dialogGroupNameMakeText.setText("");
+        if(groupEditMode) {
 
-        if (dialogBuilderGroupMake == null) {
-            dialogBuilderGroupMake = new AlertDialog.Builder(this)
-                    .setView(dialogViewGroupMake)
-                    .setTitle("新規作成")
-                    .setPositiveButton(
-                            "Ok",
-                            new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int which) {
+            dialogGroupNameMakeText.setText("");
 
-                                    groupName = dialogGroupNameMakeText.getText().toString();
+            if (dialogBuilderGroupMake == null) {
+                dialogBuilderGroupMake = new AlertDialog.Builder(this)
+                        .setView(dialogViewGroupMake)
+                        .setTitle("新規作成")
+                        .setPositiveButton(
+                                "Ok",
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int which) {
 
-                                    if (!groupName.equals("") && GroupNameInTheList()) {
+                                        groupName = dialogGroupNameMakeText.getText().toString();
 
-                                        groupNameArrayList.add(groupName);
-                                        //arrayListのデータをadapterに反映
-                                        adapterUpdate();
-                                        listView.setAdapter(groupNameArrayAdapter);
-                                        ////データベースにデータを追加(String groupNameを追加)
-                                        dateBaseAdd();
-                                        setTextViewDisply();
+                                        if (!groupName.equals("") && GroupNameInTheList()) {
+
+                                            groupNameArrayList.add(groupName);
+                                            //arrayListのデータをadapterに反映
+                                            adapterUpdate();
+                                            simpleListView.setAdapter(groupNameArrayAdapter);
+                                            ////データベースにデータを追加(String groupNameを追加)
+                                            dateBaseAdd();
+                                            setTextViewDisply();
+                                        }
+
                                     }
+                                }
+                        )
+                        .setNegativeButton(
+                                "Cancel",
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int which) {
+                                    }
+                                }
+                        )
+                        .create();
+            }
+            dialogBuilderGroupMake.show();
+            setTextViewDisply();
+        }else {
 
-                                }
-                            }
-                    )
-                    .setNegativeButton(
-                            "Cancel",
-                            new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int which) {
-                                }
-                            }
-                    )
-                    .create();
+            for(int i = groupNameArrayList.size() - 1; 0 <= i; i--){
+
+                if(multiChoiceListView.isItemChecked(i)){
+                    groupNameArrayList.remove(i);
+                }
+            }
+            adapterUpdate();
+            multiChoiceListView.setAdapter(groupNameArrayAdapterChoice);
+
+            dateBaseUpdate();
+
+            if(groupNameArrayList.size() == 0){
+                simpleListView.setVisibility(View.VISIBLE);
+                multiChoiceListView.setVisibility(View.GONE);
+
+                groupEditMode = true;
+                
+                simpleListView.setAdapter(groupNameArrayAdapter);
+
+                ((android.support.design.widget.FloatingActionButton) findViewById(R.id.fab)).setImageResource(R.drawable.plusmark);
+            }
+
+            setTextViewDisply();
         }
-        dialogBuilderGroupMake.show();
-        setTextViewDisply();
     }
 
     void dateBaseAdd() {
@@ -379,7 +461,7 @@ public class GroupEditActivity extends AppCompatActivity {
 
                     //arrayListのデータをadapterに反映
                     adapterUpdate();
-                    listView.setAdapter(groupNameArrayAdapter);
+                    simpleListView.setAdapter(groupNameArrayAdapter);
 
                     //データベースを更新
                     dateBaseUpdate();
@@ -396,9 +478,12 @@ public class GroupEditActivity extends AppCompatActivity {
     void adapterUpdate() {
 
         groupNameArrayAdapter.clear();
+        groupNameArrayAdapterChoice.clear();
+
 
         for (int i = 0; i < groupNameArrayList.size(); i++) {
             groupNameArrayAdapter.add(groupNameArrayList.get(i));
+            groupNameArrayAdapterChoice.add(groupNameArrayList.get(i));
         }
     }
 
@@ -424,7 +509,7 @@ public class GroupEditActivity extends AppCompatActivity {
                 //arrayListのデータをadapterに反映
                 adapterUpdate();
 
-                listView.setAdapter(groupNameArrayAdapter);
+                simpleListView.setAdapter(groupNameArrayAdapter);
 
                 dateBaseUpdate();
 
@@ -459,7 +544,7 @@ public class GroupEditActivity extends AppCompatActivity {
 
                     //arrayListのデータをadapterに反映
                     adapterUpdate();
-                    listView.setAdapter(groupNameArrayAdapter);
+                    simpleListView.setAdapter(groupNameArrayAdapter);
                     ////データベースにデータを追加(String groupNameを追加)
 
                     //   dateBaseAdd();
