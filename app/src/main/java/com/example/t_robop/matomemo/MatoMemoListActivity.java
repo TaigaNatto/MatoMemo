@@ -60,7 +60,6 @@ public class MatoMemoListActivity extends AppCompatActivity implements AdapterVi
         toolbar.setTitle(nowSubjectName);  //intent元でタップされた教科名を設定
         setSupportActionBar(toolbar);
 
-
         //DrawerToggleの表示
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this,drawerLayout,toolbar,R.string.drawer_open,R.string.drawer_close);
         drawerLayout.addDrawerListener(toggle);
