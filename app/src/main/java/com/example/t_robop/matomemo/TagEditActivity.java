@@ -112,6 +112,9 @@ public class TagEditActivity extends AppCompatActivity {
                 dialogSeek.setProgress(100);
                 //dialogを表示
                 alertDlg.show();
+                alertDlg.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(true);
+                alertDlg.getButton(AlertDialog.BUTTON_NEUTRAL).setEnabled(true);
+                alertDlg.getButton(AlertDialog.BUTTON_NEGATIVE).setEnabled(true);
             }
         });
 
@@ -140,6 +143,9 @@ public class TagEditActivity extends AppCompatActivity {
         dialogSeek.setProgress(100);
         //dialog召喚
         alertDlg.show();
+        alertDlg.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(true);
+        alertDlg.getButton(AlertDialog.BUTTON_NEUTRAL).setEnabled(false);
+        alertDlg.getButton(AlertDialog.BUTTON_NEGATIVE).setEnabled(true);
     }
 
     //dialogセットするメソッド
