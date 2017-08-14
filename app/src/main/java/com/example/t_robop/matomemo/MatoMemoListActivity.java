@@ -138,14 +138,12 @@ public class MatoMemoListActivity extends AppCompatActivity implements AdapterVi
     public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
         //動的に追加された教科Listのクリック処理
         //drawerArrayAdapterに教科Listがある
-        String clickedSubjectName = (String)adapterView.getItemAtPosition(position);   //クリックしたpositionからItem(教科名)を取得
-
-        nowSubjectName = clickedSubjectName;
+        nowSubjectName = (String)adapterView.getItemAtPosition(position);   //クリックしたpositionからItem(教科名)を取得
 
         //教科クリックしたらToolBar.setTitleで教科名をセット
-        toolbar.setTitle(clickedSubjectName);
+        toolbar.setTitle(nowSubjectName);
 
-        reloadFragmentData(clickedSubjectName);
+        reloadFragmentData(nowSubjectName);
     }
 
     @Override
@@ -200,9 +198,24 @@ public class MatoMemoListActivity extends AppCompatActivity implements AdapterVi
 
     //Fragmentの更新
     public void reloadFragmentData(String subjectName){
+        int flag = 0;
+
         //Drawer内でタップされた教科名のメモリストを表示
         Fragment memoFragment = customFragmentPagerAdapter.getItem(0);    //CustomFragmentPagerAdapterのgetItemからfragment情報を取ってくる
         Fragment matomeFragment = customFragmentPagerAdapter.getItem(1);
+
+        //GroupEditActivityで削除した教科が指定された場合、強制的に未分類フォルダに変える
+        for(int i=0; i<drawerArrayAdapter.getCount(); i++){
+            if(subjectName.equals(drawerArrayAdapter.getItem(i))){
+                flag = 1;
+            }
+        }
+
+        if(flag == 0){
+            subjectName = "未分類";
+            toolbar.setTitle("未分類");
+        }
+
 
         if(memoFragment != null && memoFragment instanceof MemoFragment){
             ((MemoFragment)memoFragment).reloadMemoData(subjectName);       //メモリストの更新
