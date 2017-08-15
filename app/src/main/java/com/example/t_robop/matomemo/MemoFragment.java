@@ -95,22 +95,23 @@ public class MemoFragment extends Fragment implements OnItemClickListener, OnIte
                 allWordsData[w] = memoResults.get(w).getWords().get(w).getWord();
                 allTagData[w] = memoResults.get(w).getWords().get(w).getTagName();
             }
+            */
 
             //ToDo 保存時間取れてない、マーカーが機種依存で動かないので下２つが検証できない
             for(int j=0; j<memoResults.size(); j++){
                 allMemoData = "教科: " + memoResults.get(j).getFolder() + "\n" +
                         "メモ内容: " + memoResults.get(j).getMemo() + "\n" +
                         "保存日付: " + memoResults.get(j).getDate() + "\n" +
-                        "保存時間: " + memoResults.get(j).getTime() + "\n" +
-                        "マーカー単語: " + allWordsData[j] + "\n" +
-                        "tag名前: " + allTagData[j];
+                        "保存時間: " + memoResults.get(j).getTime(); //+ "\n" +
+                        //"マーカー単語: " + allWordsData[j] + "\n" +
+                        //"tag名前: " + allTagData[j];
 
                 adapterMemo.add(allMemoData);
-            } */
+            }
 
            //todo 書き換えました
             for(int i=0;i<memoResults.size();i++){
-                adapterMemo.add((memoResults.get(i).getMemo()));
+                //adapterMemo.add((memoResults.get(i).getMemo()));
                 idList.add(memoResults.get(i).getId());
             }
         }

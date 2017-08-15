@@ -53,7 +53,7 @@ public class TagEditActivity extends AppCompatActivity {
     String tempColor = "#ffffff";
 
     int dialogModeFlag = -1;    //1: 新規作成　2: 編集
-    int editTagPosition = 0;
+    int editTagPosition = 0;    //List内のItemでクリックされたpositionを入れる変数
 
     Toolbar toolbar;
 
@@ -75,11 +75,13 @@ public class TagEditActivity extends AppCompatActivity {
         //関連付け
         toolbar = (Toolbar)findViewById(R.id.toolbar);
         tagList = (ListView) findViewById(R.id.tag_list);
+        TextView emptyTagText = (TextView)findViewById(R.id.emptyTagView);
+        tagList.setEmptyView(emptyTagText);
 
         //arrayList初期化
         wordList = new ArrayList<>();
 
-        toolbar.setTitle("tag設定");
+        toolbar.setTitle("タグ設定");
         setSupportActionBar(toolbar);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -129,7 +131,6 @@ public class TagEditActivity extends AppCompatActivity {
                 //シークバーを初期化
                 dialogSeek.setProgress(100);
                 dialogModeFlag = 2;
-                setDialog();
                 //dialogを表示
                 alertDlg.show();
                 alertDlg.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(true);
@@ -194,12 +195,13 @@ public class TagEditActivity extends AppCompatActivity {
                                                 //wordListに追加
                                                 wordList.add(wordObj);
                                             }else if(dialogModeFlag == 2){
-                                                wordList.set(editTagPosition,wordObj);
+                                                wordList.set(editTagPosition,wordObj);  //List内でタップされたpositionのtag名を更新
                                             }
 
                                             //listviewにセット
                                             setListItem(getApplicationContext());
 
+                                            //ToDo tag名のみ変更したときのデータベース書き換え 
                                             //Realmに追加保存
                                             //トランザクション開始
                                             realm.beginTransaction();
@@ -208,6 +210,7 @@ public class TagEditActivity extends AppCompatActivity {
                                             //書き込みたいデータをインスタンスに入れる
                                             model.setTagName(dialogEdit.getText().toString());
                                             model.setColor(tempColor);
+
                                             //トランザクション終了 (データを書き込む)
                                             realm.commitTransaction();
                                         }

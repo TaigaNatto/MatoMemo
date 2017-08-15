@@ -56,8 +56,8 @@ public class MatomeFragment extends Fragment implements OnItemClickListener, OnI
         nowSubjectName = args.getString("SUBJECT"); //初期表示の教科名を保存
 
         ListView matomeListView = (ListView)view.findViewById(R.id.matome_list);
-        TextView emptyMatomeView = (TextView)view.findViewById(R.id.emptyMatomeView);
-        matomeListView.setEmptyView(emptyMatomeView);
+        TextView emptyMatomeText = (TextView)view.findViewById(R.id.emptyMatomeView);
+        matomeListView.setEmptyView(emptyMatomeText);
 
         idList=new ArrayList<>();
 

@@ -15,6 +15,15 @@
         android:background="?attr/colorPrimary">
     </android.support.v7.widget.Toolbar>
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/emptyTagView"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:text="@string/help_addTag"
+        android:textSize="20sp"/>
+
     <ListView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
