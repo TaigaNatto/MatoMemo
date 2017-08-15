@@ -104,6 +104,8 @@ public class WritingActivity extends AppCompatActivity {
 
             textView.setVisibility(View.GONE);
 
+            memo = "";
+
             //キーボードを出現させる
             getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
         } else {

@@ -48,15 +48,25 @@
 
     </LinearLayout>
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/txtempty"
+        android:text="タグがありません"
+        android:textSize="30sp"/>
+
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-    <ListView
+
+        <ListView
         android:layout_width="match_parent"
         android:layout_height="367dp"
         android:id="@+id/tagList">
+
 
     </ListView>
 
@@ -74,6 +84,7 @@
             android:layout_alignParentBottom="true"
             android:text="まとめ作成"
             android:onClick="matomecreateClick"/>
+
 
 
     </LinearLayout>

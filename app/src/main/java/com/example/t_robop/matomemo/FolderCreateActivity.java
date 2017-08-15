@@ -91,6 +91,8 @@ public class FolderCreateActivity extends AppCompatActivity implements OnDateSet
 
         Button btn = (Button)findViewById(R.id.createbutton);
 
+        listView.setEmptyView(findViewById(R.id.txtempty));
+
         newFragment = new DatePick(2017,1,1);
         secondFragment=new DatePick(2017,1,1);
 
@@ -128,6 +130,11 @@ public class FolderCreateActivity extends AppCompatActivity implements OnDateSet
 
     }
 
+    @Override
+    public void onRestart() {
+        super.onRestart();
+        getTagDataList();
+    }
 
     public void showDatePickerDialog(View v) {
         switch (v.getId()) {
@@ -219,6 +226,8 @@ public class FolderCreateActivity extends AppCompatActivity implements OnDateSet
 
         RealmResults<RealmWordEntity> wordResults = wordQuery.findAll();
         //取ってきたデータ全部欲しい時はこんな感じに
+        wordlist.clear();
+        arrayAdapter.clear();
         for(int i=0;i<wordResults.size();i++){
 
             wordlist.add(wordResults.get(i));
