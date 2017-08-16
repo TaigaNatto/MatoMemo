@@ -39,7 +39,7 @@ import io.realm.RealmResults;
 
 import static com.example.t_robop.matomemo.R.id.txtmemo;
 
-public class WritingActivity extends AppCompatActivity implements TextWatcher {
+public class WritingActivity extends AppCompatActivity {
 
     int id;
     //メモを新規作成する場合は０、編集するときは１としています。
@@ -71,6 +71,8 @@ public class WritingActivity extends AppCompatActivity implements TextWatcher {
     //設定されたタグデータの保持
     ArrayList<MatomeWord> mWordList;
 
+    String memo;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -96,11 +98,13 @@ public class WritingActivity extends AppCompatActivity implements TextWatcher {
         mWordList = new ArrayList<>();
         matoMemoListActivity = new MatoMemoListActivity();
 
-        editText.addTextChangedListener(this);
+       // editText.addTextChangedListener(this);
 
         if (id == -1) {
 
             textView.setVisibility(View.GONE);
+
+            memo = "";
 
             //キーボードを出現させる
             getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
@@ -113,7 +117,7 @@ public class WritingActivity extends AppCompatActivity implements TextWatcher {
             //インスタンス生成し、その中にすべてのデータを入れる 今回なら全てのデータ
             RealmResults<RealmMemoEntity> results = query.findAll();
             //１つしか入ってないはずなので0
-            String memo = results.get(0).getMemo();
+            memo = results.get(0).getMemo();
 
             //Viewに持ってきたメモのセット
             textView.setText(memo);
@@ -135,6 +139,7 @@ public class WritingActivity extends AppCompatActivity implements TextWatcher {
                     manager.toggleSoftInput(1, InputMethodManager.SHOW_IMPLICIT);
                 }
             });
+
 
         }
 
@@ -237,28 +242,8 @@ public class WritingActivity extends AppCompatActivity implements TextWatcher {
         matoMemoListActivity.reloadDrawerList(realm, spinnerAdapter);
     }
 
-    @Override
-    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-        //操作前のEditTextの状態を取得する
-    }
 
-    @Override
-    public void onTextChanged(CharSequence s, int start, int before, int count) {
-        //操作中のEditTextの状態を取得する
-    }
 
-    @Override
-    public void afterTextChanged(Editable s) {
-        //操作後のEditTextの状態を取得する
-        // テキスト変更後に変更されたテキストを取り出す
-        String inputStr = s.toString();
-
-// 文字長をカウントして
-        if (inputStr.length() != 0) {
-            change = 1;
-        }
-
-    }
 
     @Override
     public boolean onTouchEvent(MotionEvent motionEvent) {
@@ -280,8 +265,12 @@ public class WritingActivity extends AppCompatActivity implements TextWatcher {
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
 
-            saveMemoDialog();
-
+            String newmemo = editText.getText().toString();
+            if(memo.equals(newmemo)) {
+                finish();
+            }else {
+                saveMemoDialog();
+            }
             return true;
         }
         return false;
@@ -308,10 +297,12 @@ public class WritingActivity extends AppCompatActivity implements TextWatcher {
         switch (id) {
             case android.R.id.home:
 
-                if (change == 1) {
-                    saveMemoDialog();
-                } else {
+
+                String newmemo = editText.getText().toString();
+                if(memo.equals(newmemo)) {
                     finish();
+                }else {
+                    saveMemoDialog();
                 }
                 break;
 
