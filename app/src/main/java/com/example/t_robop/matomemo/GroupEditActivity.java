@@ -47,6 +47,7 @@ public class GroupEditActivity extends AppCompatActivity {
     ListView simpleListView;
     ListView multiChoiceListView;
 
+    ArrayList<String> memoDetaList;
     ///////
 
     //multinihennko
@@ -123,6 +124,8 @@ public class GroupEditActivity extends AppCompatActivity {
         groupNameArrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1);
         groupNameArrayAdapterChoice = new ArrayAdapter<String>(
                 this, android.R.layout.simple_list_item_multiple_choice);
+
+        memoDetaList = new ArrayList<>();
 
         //groupNameArrayList.add("領域確保");
         multiChoiceListView.setVisibility(View.GONE);
@@ -209,16 +212,6 @@ public class GroupEditActivity extends AppCompatActivity {
         RealmResults<RealmFolderEntity> folderResults = folderQuery.findAll();
         /***使い方は↑のメモと同じ***/
 
-        /*if (folderResults.size() != 0) {
-            text = folderResults.get(0).getFolderName();
-            groupNameArrayList.set(0, text);
-            for (int i = 1; i < folderResults.size(); i++) {
-                text = folderResults.get(i).getFolderName();
-                groupNameArrayList.add(text);
-            }
-            //adapterの中身を更新
-            adapterUpdate();
-        }*/
         for (int i = 0; i < folderResults.size(); i++) {
             text = folderResults.get(i).getFolderName();
             groupNameArrayList.add(text);
@@ -248,7 +241,7 @@ public class GroupEditActivity extends AppCompatActivity {
     }
 
     ////データベースのデータを削除
-    void dateBaseRemove() {
+    void detaBaseRemove() {
 
         ////フォルダをすべて削除////
         RealmQuery<RealmFolderEntity> query = realm.where(RealmFolderEntity.class);
@@ -265,9 +258,9 @@ public class GroupEditActivity extends AppCompatActivity {
     }
 
     ////データベースのデータを更新////
-    void dateBaseUpdate() {
+    void detaBaseUpdate() {
         //データベースのデータを削除
-        dateBaseRemove();
+        detaBaseRemove();
 
         //データベースにlistViewの要素をすべて追加
         for (int i = 0; i < groupNameArrayList.size(); i++) {
@@ -313,10 +306,14 @@ public class GroupEditActivity extends AppCompatActivity {
 
                                     if (!groupName.equals("") && GroupNameInTheList()) {
 
+                                        detaBaseReferenceMemo();
+                                        dateBaseMemoDateRemove();
+
                                         groupNameArrayList.set(listPosition, groupName);
                                         adapterUpdate();
 
-                                        dateBaseUpdate();
+                                        detaBaseUpdate();
+                                        detaBaseAddMemo();
 
                                         simpleListView.setAdapter(groupNameArrayAdapter);
 
@@ -328,7 +325,6 @@ public class GroupEditActivity extends AppCompatActivity {
                             "Cancel",
                             new DialogInterface.OnClickListener(){
                                 public void onClick(DialogInterface dialogBuilderGroupEdit,int witch){
-
                                 }
                             }
                     )
@@ -345,7 +341,7 @@ public class GroupEditActivity extends AppCompatActivity {
                                     adapterUpdate();
                                     simpleListView.setAdapter(groupNameArrayAdapter);
 
-                                    dateBaseUpdate();
+                                    detaBaseUpdate();
 
                                     dialogGroupNameEditText.setText("");
                                     setTextViewDisply();
@@ -383,7 +379,7 @@ public class GroupEditActivity extends AppCompatActivity {
                                             adapterUpdate();
                                             simpleListView.setAdapter(groupNameArrayAdapter);
                                             ////データベースにデータを追加(String groupNameを追加)
-                                            dateBaseAdd();
+                                            detaBaseAdd();
                                             setTextViewDisply();
                                         }
 
@@ -415,7 +411,7 @@ public class GroupEditActivity extends AppCompatActivity {
             adapterUpdate();
             multiChoiceListView.setAdapter(groupNameArrayAdapterChoice);
 
-            dateBaseUpdate();
+            detaBaseUpdate();
 
             if(groupNameArrayList.size() == 0){
                 simpleListView.setVisibility(View.VISIBLE);
@@ -433,7 +429,7 @@ public class GroupEditActivity extends AppCompatActivity {
         }
     }
 
-    void dateBaseAdd() {
+    void detaBaseAdd() {
 
         //トランザクション開始
         realm.beginTransaction();
@@ -453,12 +449,53 @@ public class GroupEditActivity extends AppCompatActivity {
         }
     }
 
-    void dateBaseAddMemo(){
+    void detaBaseReferenceMemo(){
 
+        realm = Realm.getDefaultInstance();
+        //検索用のクエリ作成
+        RealmQuery<RealmMemoEntity> memoQuery = realm.where(RealmMemoEntity.class);
 
+        memoQuery.equalTo("folder",groupNameArrayList.get(listPosition));
 
+        //インスタンス生成し、その中にすべてのデータを入れる 今回なら全てのデータ
+        RealmResults<RealmMemoEntity> memoResults = memoQuery.findAll();
 
+        String text;
+
+        for (int i = 0; i < memoResults.size(); i++) {
+
+            text = memoResults.get(i).getMemo();
+            memoDetaList.add(text);
+        }
     }
+
+    void detaBaseAddMemo(){
+
+        RealmQuery<RealmMemoEntity> queryMemo = realm.where(RealmMemoEntity.class);
+
+
+        //消したいデータを指定 (以下の場合はmemoデータの「memo」が「test」のものを指定)
+        queryMemo.equalTo("folder", groupNameArrayList.get(listPosition));
+
+
+
+        for (int i = 0; i < memoDetaList.size(); i++) {
+
+            realm.beginTransaction();
+            //インスタンスを生成
+            RealmMemoEntity model = realm.createObject(RealmMemoEntity.class);
+            //書き込みたいデータをインスタンスに入れる
+            model.setMemo(memoDetaList.get(i));
+            model.setFolder(groupNameArrayList.get(listPosition));
+            //トランザクション終了 (データを書き込む)
+            realm.commitTransaction();
+        }
+        for(int i = memoDetaList.size() - 1; i >= 0 ;i--) {
+            memoDetaList.remove(i);
+        }
+    }
+
+
 
     void dialogGroupReferenceButtonMake(final int listPosition, AlertDialog.Builder dialog) {
 
@@ -482,7 +519,7 @@ public class GroupEditActivity extends AppCompatActivity {
                     simpleListView.setAdapter(groupNameArrayAdapter);
 
                     //データベースを更新
-                    dateBaseUpdate();
+                    detaBaseUpdate();
                 }
                 if (itemNum != 0) {
                     textView.setText("");
@@ -529,7 +566,7 @@ public class GroupEditActivity extends AppCompatActivity {
 
                 simpleListView.setAdapter(groupNameArrayAdapter);
 
-                dateBaseUpdate();
+                detaBaseUpdate();
 
                 //元に戻す
                 dialogGroupNameEditText.setText("");
