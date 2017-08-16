@@ -15,8 +15,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.SeekBar;
@@ -24,7 +22,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import io.realm.Realm;
 import io.realm.RealmQuery;
@@ -54,6 +51,7 @@ public class TagEditActivity extends AppCompatActivity {
 
     int dialogModeFlag = -1;    //1: 新規作成　2: 編集
     int editTagPosition = 0;    //List内のItemでクリックされたpositionを入れる変数
+    String beforeEditTagName = null;
 
     Toolbar toolbar;
 
@@ -67,10 +65,9 @@ public class TagEditActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tag_edit);
 
-        /***realmの初期化***/
+        /*realmの初期化*/
         Realm.init(this);
         realm = Realm.getDefaultInstance();
-        /*******************/
 
         //関連付け
         toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -87,7 +84,7 @@ public class TagEditActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
 
-        /**ダイアログレイアウトの呼び出し**/
+        /*ダイアログレイアウトの呼び出し*/
         //ダイアログレイアウトの読み込み
         LayoutInflater factory = LayoutInflater.from(this);
         inputView = factory.inflate(R.layout.colorpicker_dialog, null);
@@ -126,6 +123,7 @@ public class TagEditActivity extends AppCompatActivity {
                 RealmWordEntity wordObj = wordList.get(position);
                 //タグ名を取得してセット
                 dialogEdit.setText(wordObj.getTagName());
+                beforeEditTagName = dialogEdit.getText().toString();
                 //色を取得してセット
                 dialogColor.setBackgroundColor(Color.parseColor(wordObj.getColor()));
                 //シークバーを初期化
@@ -139,7 +137,7 @@ public class TagEditActivity extends AppCompatActivity {
             }
         });
 
-        /***tag一覧のデータが欲しい！***/
+        /*tag一覧のデータが欲しい！*/
         //検索用のクエリ作成
         RealmQuery<RealmWordEntity> tagQuery = realm.where(RealmWordEntity.class);
         //インスタンス生成し、その中にすべてのデータを入れる
@@ -191,28 +189,42 @@ public class TagEditActivity extends AppCompatActivity {
                                             RealmWordEntity wordObj = new RealmWordEntity();
                                             wordObj.setTagName(dialogEdit.getText().toString());
                                             wordObj.setColor(tempColor);
-                                            if (dialogModeFlag == 1) {
+                                            if (dialogModeFlag == 1) {  //tag新規作成時
                                                 //wordListに追加
                                                 wordList.add(wordObj);
-                                            } else if (dialogModeFlag == 2) {
+                                            } else if (dialogModeFlag == 2) {   //tag編集時
                                                 wordList.set(editTagPosition, wordObj);  //List内でタップされたpositionのtag名を更新
                                             }
 
                                             //listviewにセット
                                             setListItem(getApplicationContext());
 
-                                            //ToDo tag名のみ変更したときのデータベース書き換え 
-                                            //Realmに追加保存
-                                            //トランザクション開始
-                                            realm.beginTransaction();
-                                            //インスタンスを生成
-                                            RealmWordEntity model = realm.createObject(RealmWordEntity.class);
-                                            //書き込みたいデータをインスタンスに入れる
-                                            model.setTagName(dialogEdit.getText().toString());
-                                            model.setColor(tempColor);
+                                            //tag新規作成時
+                                            if(dialogModeFlag == 1){
+                                                //Realmに追加保存
+                                                //トランザクション開始
+                                                realm.beginTransaction();
+                                                //インスタンスを生成
+                                                RealmWordEntity model = realm.createObject(RealmWordEntity.class);
+                                                //書き込みたいデータをインスタンスに入れる
+                                                model.setTagName(dialogEdit.getText().toString());
+                                                model.setColor(tempColor);
 
-                                            //トランザクション終了 (データを書き込む)
-                                            realm.commitTransaction();
+                                                //トランザクション終了 (データを書き込む)
+                                                realm.commitTransaction();
+                                            }
+                                            //tag名編集時
+                                            else if(dialogModeFlag == 2){
+                                                //編集前のdialogEditのテキストとデータベース上のtagNameを比較
+                                                RealmResults<RealmWordEntity> editTag = realm.where(RealmWordEntity.class).equalTo("tagName",beforeEditTagName).findAll();
+                                                realm.beginTransaction();
+                                                RealmWordEntity model = editTag.get(0);
+                                                model.setTagName(dialogEdit.getText().toString());  //データベース上の編集するtagNameを新しいテキストでセットする
+                                                realm.commitTransaction();
+                                            }
+
+
+
                                         }
                                         //存在してれば更新
                                         else {
@@ -394,9 +406,6 @@ public class TagEditActivity extends AppCompatActivity {
             case R.id.editFolder:
                 intent = new Intent(this, GroupEditActivity.class);  //GroupEditActivityへIntent
                 startActivity(intent);
-                break;
-
-            default:
                 break;
 
         }
