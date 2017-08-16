@@ -73,9 +73,9 @@ public class TagEditActivity extends AppCompatActivity {
         /*******************/
 
         //関連付け
-        toolbar = (Toolbar)findViewById(R.id.toolbar);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
         tagList = (ListView) findViewById(R.id.tag_list);
-        TextView emptyTagText = (TextView)findViewById(R.id.emptyTagView);
+        TextView emptyTagText = (TextView) findViewById(R.id.emptyTagView);
         tagList.setEmptyView(emptyTagText);
 
         //arrayList初期化
@@ -90,7 +90,7 @@ public class TagEditActivity extends AppCompatActivity {
         /**ダイアログレイアウトの呼び出し**/
         //ダイアログレイアウトの読み込み
         LayoutInflater factory = LayoutInflater.from(this);
-        inputView = factory.inflate(R.layout.colorpicker_dialog,null);
+        inputView = factory.inflate(R.layout.colorpicker_dialog, null);
         //ダイアログ内の関連付け
         dialogEdit = (EditText) inputView.findViewById(R.id.tag_edit);
         dialogColor = (TextView) inputView.findViewById(R.id.tag_color);
@@ -191,11 +191,11 @@ public class TagEditActivity extends AppCompatActivity {
                                             RealmWordEntity wordObj = new RealmWordEntity();
                                             wordObj.setTagName(dialogEdit.getText().toString());
                                             wordObj.setColor(tempColor);
-                                            if(dialogModeFlag == 1){
+                                            if (dialogModeFlag == 1) {
                                                 //wordListに追加
                                                 wordList.add(wordObj);
-                                            }else if(dialogModeFlag == 2){
-                                                wordList.set(editTagPosition,wordObj);  //List内でタップされたpositionのtag名を更新
+                                            } else if (dialogModeFlag == 2) {
+                                                wordList.set(editTagPosition, wordObj);  //List内でタップされたpositionのtag名を更新
                                             }
 
                                             //listviewにセット
@@ -374,9 +374,9 @@ public class TagEditActivity extends AppCompatActivity {
 
     //メニューバーの作成
     @Override
-    public boolean onCreateOptionsMenu(Menu menu){
+    public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.options,menu);  //res\menu\optionsのlayoutを読み込む
+        inflater.inflate(R.menu.options, menu);  //res\menu\optionsのlayoutを読み込む
         return true;
     }
 
@@ -386,7 +386,7 @@ public class TagEditActivity extends AppCompatActivity {
         Intent intent;
 
         //addしたときのIDで識別
-        switch(item.getItemId()) {
+        switch (item.getItemId()) {
             case android.R.id.home:
                 finish();
                 break;

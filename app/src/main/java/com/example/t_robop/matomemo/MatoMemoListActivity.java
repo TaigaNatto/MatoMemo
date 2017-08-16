@@ -48,29 +48,29 @@ public class MatoMemoListActivity extends AppCompatActivity implements AdapterVi
         realm = Realm.getDefaultInstance();
 
         //UI部品の取得
-        toolbar = (Toolbar)findViewById(R.id.toolbar);
-        matoMemoButton = (Button)findViewById(R.id.MatoMemoButton);
-        DrawerLayout drawerLayout = (DrawerLayout)findViewById(R.id.drawerLayout);
-        ListView drawerListView = (ListView)findViewById(R.id.left_drawer);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        matoMemoButton = (Button) findViewById(R.id.MatoMemoButton);
+        DrawerLayout drawerLayout = (DrawerLayout) findViewById(R.id.drawerLayout);
+        ListView drawerListView = (ListView) findViewById(R.id.left_drawer);
         String[] tabNames = getResources().getStringArray(R.array.tabs);
-        TabLayout tabLayout = (TabLayout)findViewById(R.id.tabs);
-        ViewPager viewPager = (ViewPager)findViewById(R.id.pager);
+        TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
+        ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
 
         //Toolbar表示
         toolbar.setTitle(nowSubjectName);  //intent元でタップされた教科名を設定
         setSupportActionBar(toolbar);
 
         //DrawerToggleの表示
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this,drawerLayout,toolbar,R.string.drawer_open,R.string.drawer_close);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.drawer_open, R.string.drawer_close);
         drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
 
         //Drawer内のList初期化
-        drawerArrayAdapter =new ArrayAdapter<>(this,R.layout.drawer_list_item);
+        drawerArrayAdapter = new ArrayAdapter<>(this, R.layout.drawer_list_item);
         drawerArrayAdapter.add("未分類");
 
 
-        getFolderDataList(realm,drawerArrayAdapter);    //Databaseから教科(Folder)取得してdrawerArrayAdapterにセット    //ToDo データのgetとsetを分けてメソッド化する →　reloadいらなくなる
+        getFolderDataList(realm, drawerArrayAdapter);    //Databaseから教科(Folder)取得してdrawerArrayAdapterにセット    //ToDo データのgetとsetを分けてメソッド化する →　reloadいらなくなる
 
 
         drawerListView.setAdapter(drawerArrayAdapter);
@@ -78,7 +78,7 @@ public class MatoMemoListActivity extends AppCompatActivity implements AdapterVi
 
 
         //Fragment操作準備
-        customFragmentPagerAdapter = new CustomFragmentPagerAdapter(getSupportFragmentManager(),tabNames);
+        customFragmentPagerAdapter = new CustomFragmentPagerAdapter(getSupportFragmentManager(), tabNames);
 
         //newInstanceメソッドでAdapterにFragment追加
         customFragmentPagerAdapter.addFragment(MemoFragment.newInstance(nowSubjectName));
@@ -93,17 +93,17 @@ public class MatoMemoListActivity extends AppCompatActivity implements AdapterVi
     //ToDo GroupEditActivityで教科削除して戻ったときに、消された教科の情報が残っている
     //Activityが再度開始された時
     @Override
-    public void onRestart(){
+    public void onRestart() {
         super.onRestart();
-        reloadFolderDataList(realm,drawerArrayAdapter);     //DrawerArrayAdapterの更新
+        reloadFolderDataList(realm, drawerArrayAdapter);     //DrawerArrayAdapterの更新
         reloadFragmentData(nowSubjectName);     //fragmentのListViewを更新
     }
 
     //メニューバーの作成
     @Override
-    public boolean onCreateOptionsMenu(Menu menu){
+    public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.options,menu);  //res\menu\optionsのlayoutを読み込む
+        inflater.inflate(R.menu.options, menu);  //res\menu\optionsのlayoutを読み込む
         return true;
     }
 
@@ -113,7 +113,7 @@ public class MatoMemoListActivity extends AppCompatActivity implements AdapterVi
         Intent intent = null;
 
         //addしたときのIDで識別
-        switch(item.getItemId()) {
+        switch (item.getItemId()) {
             case R.id.tag_settings:
                 intent = new Intent(this, TagEditActivity.class);   //TagEditActivityへIntent
                 break;
@@ -137,7 +137,7 @@ public class MatoMemoListActivity extends AppCompatActivity implements AdapterVi
     public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
         //動的に追加された教科Listのクリック処理
         //drawerArrayAdapterに教科Listがある
-        nowSubjectName = (String)adapterView.getItemAtPosition(position);   //クリックしたpositionからItem(教科名)を取得
+        nowSubjectName = (String) adapterView.getItemAtPosition(position);   //クリックしたpositionからItem(教科名)を取得
 
         //教科クリックしたらToolBar.setTitleで教科名をセット
         toolbar.setTitle(nowSubjectName);
@@ -153,7 +153,7 @@ public class MatoMemoListActivity extends AppCompatActivity implements AdapterVi
     @Override
     public void onPageSelected(int position) {
         String buttonText = null;
-        switch (position){
+        switch (position) {
             case 0:
                 buttonText = "メモを書く";
                 break;
@@ -174,29 +174,29 @@ public class MatoMemoListActivity extends AppCompatActivity implements AdapterVi
     }
 
     //データベースから教科取得
-    public void getFolderDataList(Realm realm, ArrayAdapter<String> arrayAdapter){
+    public void getFolderDataList(Realm realm, ArrayAdapter<String> arrayAdapter) {
         //検索用のクエリ作成
         RealmQuery<RealmFolderEntity> folderQuery = realm.where(RealmFolderEntity.class);
         //インスタンス生成し、その中にすべてのデータを入れる 今回なら全てのデータ
         RealmResults<RealmFolderEntity> folderResults = folderQuery.findAll();
 
-        if(folderResults.size() != 0){
-            for(int i=0; i<folderResults.size(); i++){
+        if (folderResults.size() != 0) {
+            for (int i = 0; i < folderResults.size(); i++) {
                 arrayAdapter.add(folderResults.get(i).getFolderName());    //全教科名をDrawerのAdapterに追加
             }
         }
     }
 
     //教科リストの更新
-    public void reloadFolderDataList(Realm realm, ArrayAdapter<String> arrayAdapter){
+    public void reloadFolderDataList(Realm realm, ArrayAdapter<String> arrayAdapter) {
         arrayAdapter.clear();
         arrayAdapter.add("未分類");
-        getFolderDataList(realm,arrayAdapter);
+        getFolderDataList(realm, arrayAdapter);
         arrayAdapter.notifyDataSetChanged();
     }
 
     //Fragmentの更新
-    public void reloadFragmentData(String subjectName){
+    public void reloadFragmentData(String subjectName) {
         int flag = 0;
 
         //Drawer内でタップされた教科名のメモリストを表示
@@ -204,44 +204,44 @@ public class MatoMemoListActivity extends AppCompatActivity implements AdapterVi
         Fragment matomeFragment = customFragmentPagerAdapter.getItem(1);
 
         //GroupEditActivityで削除した教科が指定された場合、強制的に未分類フォルダに変える
-        for(int i=0; i<drawerArrayAdapter.getCount(); i++){
-            if(subjectName.equals(drawerArrayAdapter.getItem(i))){
+        for (int i = 0; i < drawerArrayAdapter.getCount(); i++) {
+            if (subjectName.equals(drawerArrayAdapter.getItem(i))) {
                 flag = 1;
             }
         }
 
-        if(flag == 0){
+        if (flag == 0) {
             subjectName = "未分類";
             toolbar.setTitle("未分類");
         }
 
 
-        if(memoFragment != null && memoFragment instanceof MemoFragment){
-            ((MemoFragment)memoFragment).reloadMemoData(subjectName);       //メモリストの更新
+        if (memoFragment != null && memoFragment instanceof MemoFragment) {
+            ((MemoFragment) memoFragment).reloadMemoData(subjectName);       //メモリストの更新
         }
 
-        if(matomeFragment != null && matomeFragment instanceof MatomeFragment){
-            ((MatomeFragment)matomeFragment).reloadMatomeData(subjectName);     //まとめリストの更新
+        if (matomeFragment != null && matomeFragment instanceof MatomeFragment) {
+            ((MatomeFragment) matomeFragment).reloadMatomeData(subjectName);     //まとめリストの更新
         }
     }
 
     //画面下のButton処理
-    public void MatoMemoClick(View v){      //ToDo メソッド名リファクター
+    public void MatoMemoClick(View v) {      //ToDo メソッド名リファクター
         String buttonText = (String) matoMemoButton.getText();  //ButtonのTextを取得
         Intent intent = null;
         String modeKEY = "MODE";
         String subjectKEY = "SUBJECT NAME";
 
-        switch (buttonText){
+        switch (buttonText) {
             case "メモを書く":
-                intent = new Intent(this,WritingActivity.class);    //WritingActivityにIntent
-                intent.putExtra(modeKEY,-1);      //数値受け渡し　id: メモ確認　-1: 新規作成   //ここでは-1を送る
-                intent.putExtra(subjectKEY,nowSubjectName);     //教科名受け渡し
+                intent = new Intent(this, WritingActivity.class);    //WritingActivityにIntent
+                intent.putExtra(modeKEY, -1);      //-1 : メモ新規作成
+                intent.putExtra(subjectKEY, nowSubjectName);     //教科名受け渡し
                 break;
 
             case "まとめを作る":
-                intent = new Intent(this,FolderCreateActivity.class);    //FolderCreateActivityにIntent
-                intent.putExtra(subjectKEY,nowSubjectName);
+                intent = new Intent(this, FolderCreateActivity.class);    //FolderCreateActivityにIntent
+                intent.putExtra(subjectKEY, nowSubjectName);
                 break;
 
             default:
@@ -252,8 +252,8 @@ public class MatoMemoListActivity extends AppCompatActivity implements AdapterVi
     }
 
     //Drawer内のButtonクリック処理
-    public void intentEditFolder(View v){
-        Intent intent = new Intent(this,GroupEditActivity.class);   //GroupEditActivityにIntent
+    public void intentEditFolder(View v) {
+        Intent intent = new Intent(this, GroupEditActivity.class);   //GroupEditActivityにIntent
         startActivity(intent);
     }
 

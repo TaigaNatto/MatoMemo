@@ -35,9 +35,9 @@ public class MemoFragment extends Fragment implements OnItemClickListener, OnIte
     private Realm realm;
 
     //MemoFragmentのインスタンス化メソッド
-    public static MemoFragment newInstance(String subjectName){
+    public static MemoFragment newInstance(String subjectName) {
         Bundle args = new Bundle();
-        args.putString("SUBJECT",subjectName);  //選択されている教科名を受け取って保存  @KEY SUBJECT
+        args.putString("SUBJECT", subjectName);  //選択されている教科名を受け取って保存  @KEY SUBJECT
         MemoFragment fragment = new MemoFragment();
         fragment.setArguments(args);
         return fragment;
@@ -45,9 +45,9 @@ public class MemoFragment extends Fragment implements OnItemClickListener, OnIte
 
     //Fragmentで表示するViewを作成するメソッド
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle saveInstanceState){
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle saveInstanceState) {
 
-        View view = inflater.inflate(R.layout.activity_memo_tab,container,false);
+        View view = inflater.inflate(R.layout.activity_memo_tab, container, false);
 
         Realm.init(getActivity());
         realm = Realm.getDefaultInstance();
@@ -56,13 +56,13 @@ public class MemoFragment extends Fragment implements OnItemClickListener, OnIte
         Bundle args = getArguments();
         nowSubjectName = args.getString("SUBJECT");
 
-        ListView memoListView = (ListView)view.findViewById(R.id.memo_list);
-        TextView emptyTextView = (TextView)view.findViewById(R.id.emptyMemoView);
+        ListView memoListView = (ListView) view.findViewById(R.id.memo_list);
+        TextView emptyTextView = (TextView) view.findViewById(R.id.emptyMemoView);
         memoListView.setEmptyView(emptyTextView);
 
-        idList=new ArrayList<>();
+        idList = new ArrayList<>();
 
-        adapterMemo = new ArrayAdapter<>(getContext(),android.R.layout.simple_list_item_1);
+        adapterMemo = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1);
         getMemoDataList(nowSubjectName);   //選択されている教科名のメモ一覧をデータベースから取ってきて表示
 
         memoListView.setOnItemClickListener(this);
@@ -75,11 +75,11 @@ public class MemoFragment extends Fragment implements OnItemClickListener, OnIte
     }
 
     //データベースから教科別メモ取得
-    public void getMemoDataList(String subjectName){    //引数：　Drawer内でクリックした教科名
+    public void getMemoDataList(String subjectName) {    //引数：　Drawer内でクリックした教科名
 
         RealmQuery<RealmMemoEntity> memoQuery = realm.where(RealmMemoEntity.class);
 
-        memoQuery = memoQuery.equalTo("folder",subjectName);  //引数で受け取った教科名のメモを取得
+        memoQuery = memoQuery.equalTo("folder", subjectName);  //引数で受け取った教科名のメモを取得
 
         RealmResults<RealmMemoEntity> memoResults = memoQuery.findAll();
 
@@ -90,12 +90,12 @@ public class MemoFragment extends Fragment implements OnItemClickListener, OnIte
 
         //ToDo メモリストに何を表示するのか定めて、該当データ取得とadapterへの代入を行う
         //データ取得
-        if(memoResults.size() != 0){
+        if (memoResults.size() != 0) {
            /* for(int w=0; w<memoResults.get(w).getWords().size(); w++){
                 allWordsData[w] = memoResults.get(w).getWords().get(w).getWord();
                 allTagData[w] = memoResults.get(w).getWords().get(w).getTagName();
             }
-            */
+
 
             //ToDo 保存時間取れてない、マーカーが機種依存で動かないので下２つが検証できない
             for(int j=0; j<memoResults.size(); j++){
@@ -107,11 +107,11 @@ public class MemoFragment extends Fragment implements OnItemClickListener, OnIte
                         //"tag名前: " + allTagData[j];
 
                 adapterMemo.add(allMemoData);
-            }
+            }*/
 
-           //todo 書き換えました
-            for(int i=0;i<memoResults.size();i++){
-                //adapterMemo.add((memoResults.get(i).getMemo()));
+            //todo 書き換えました
+            for (int i = 0; i < memoResults.size(); i++) {
+                adapterMemo.add((memoResults.get(i).getMemo()));
                 idList.add(memoResults.get(i).getId());
             }
         }
@@ -123,7 +123,7 @@ public class MemoFragment extends Fragment implements OnItemClickListener, OnIte
     }
 
     //Drawerクリック時のメモリスト更新
-    public void reloadMemoData(String subject){
+    public void reloadMemoData(String subject) {
         nowSubjectName = subject;   //Drawerでクリックされた教科名をフィールド変数に代入
 
         adapterMemo.clear();
@@ -134,11 +134,12 @@ public class MemoFragment extends Fragment implements OnItemClickListener, OnIte
 
     //選択されたItemをデータベースから削除
     //ToDo このままだとメモタイトル同名のものが全てデータベースから消えてしまう
-    public void removeMemoData(String selectedItem){
+    public void removeMemoData(String selectedItem) {
         // クエリを発行
-        RealmQuery<RealmMemoEntity> delQuery  = realm.where(RealmMemoEntity.class);
+        RealmQuery<RealmMemoEntity> delQuery = realm.where(RealmMemoEntity.class);
         //消したいデータを指定
-        delQuery.equalTo("memo",selectedItem);
+        delQuery.equalTo("memo", selectedItem);      //メモ内容とListの文字列を比較      //ToDo List内の表示を決めないとequalToでヒットしないので、レイアウト決めよう
+
         //指定されたデータを持つデータのみに絞り込む
         final RealmResults<RealmMemoEntity> delR = delQuery.findAll();
         // 変更操作はトランザクションの中で実行する必要あり
@@ -154,16 +155,16 @@ public class MemoFragment extends Fragment implements OnItemClickListener, OnIte
     //メモリストのクリック処理
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int pos, long l) {
-        Intent intent = new Intent(getActivity(),WritingActivity.class);
-        intent.putExtra("MODE",idList.get(pos));    //数値受け渡し　id: メモ確認　-1: 新規作成   //ここでは1を送る
-        intent.putExtra("SUBJECT NAME",nowSubjectName);     //教科名受け渡し
+        Intent intent = new Intent(getActivity(), WritingActivity.class);
+        intent.putExtra("MODE", idList.get(pos));    //メモリストのposition値渡し
+        intent.putExtra("SUBJECT NAME", nowSubjectName);     //教科名受け渡し
         startActivity(intent);
     }
 
     //メモリストのロングクリック処理
     @Override
-    public boolean onItemLongClick(AdapterView<?> adapterView, View view, int position, long l) {
-        final String clickedMemoListItem = (String)adapterView.getItemAtPosition(position);   //クリックしたpositionからItemを取得
+    public boolean onItemLongClick(AdapterView<?> adapterView, View view, final int position, long l) {
+        final String clickedMemoListItem = (String) adapterView.getItemAtPosition(position);   //クリックしたpositionから文字列を取得
 
         //消去確認のダイアログ
         AlertDialog.Builder alertDig = new AlertDialog.Builder(getActivity());

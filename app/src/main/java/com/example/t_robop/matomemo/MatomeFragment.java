@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -45,7 +46,7 @@ public class MatomeFragment extends Fragment implements OnItemClickListener, OnI
     //Fragmentで表示するViewを作成するメソッド
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.activity_matome_tab,container,false);
+        View view = inflater.inflate(R.layout.activity_matome_tab, container, false);
 
         //Database初期化
         Realm.init(getActivity());
@@ -55,11 +56,11 @@ public class MatomeFragment extends Fragment implements OnItemClickListener, OnI
         Bundle args = getArguments();
         nowSubjectName = args.getString("SUBJECT"); //初期表示の教科名を保存
 
-        ListView matomeListView = (ListView)view.findViewById(R.id.matome_list);
-        TextView emptyMatomeText = (TextView)view.findViewById(R.id.emptyMatomeView);
+        ListView matomeListView = (ListView) view.findViewById(R.id.matome_list);
+        TextView emptyMatomeText = (TextView) view.findViewById(R.id.emptyMatomeView);
         matomeListView.setEmptyView(emptyMatomeText);
 
-        idList=new ArrayList<>();
+        idList = new ArrayList<>();
 
         adapterMatome = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1);
         getMatomeDataList(nowSubjectName);   //StartListActivityでタップした教科名のメモ一覧をデータベースから取ってきて表示
@@ -85,14 +86,14 @@ public class MatomeFragment extends Fragment implements OnItemClickListener, OnI
         String allMatomeData;
         String[] allWordsData = new String[100];   //マーカーが引かれている箇所の単語
 
-        if(matomeResults.size() != 0){
+        if (matomeResults.size() != 0) {
             //データ取得
             /*
             for(int w=0; w<matomeResults.get(w).getWords().size(); w++){
                 allWordsData[w] = matomeResults.get(w).getWords().get(w).getWord();
             }
 
-            //ToDo まとめ機関未設定のときに、開始日が0または終了日が999999999のときは「未設定」を表示、マーカーが動かないので下一つが未検証、idはなんのために存在？　
+            //ToDo まとめ機関未設定のときに、開始日が0または終了日が999999999のときは「未設定」を表示、マーカーが動かないので下一つが未検証　
             for(int i=0; i<matomeResults.size(); i++){
                 allMatomeData = "id: " + matomeResults.get(i).getId() + "\n" +
                         "まとめ名前: " + matomeResults.get(i).getMatomeName() + "\n" +
@@ -104,7 +105,7 @@ public class MatomeFragment extends Fragment implements OnItemClickListener, OnI
                 adapterMatome.add(allMatomeData);
             }
             */
-            for (int i=0;i<matomeResults.size();i++){
+            for (int i = 0; i < matomeResults.size(); i++) {
                 adapterMatome.add(matomeResults.get(i).getMatomeName());
                 idList.add(matomeResults.get(i).getId());
             }
@@ -130,11 +131,13 @@ public class MatomeFragment extends Fragment implements OnItemClickListener, OnI
     //選択されたItemをデータベースから削除
     public void removeMatomeData(String selectedItem) {
 
+        //realm.beginTransaction();
+
         RealmQuery<RealmMatomeEntity> delQuery = realm.where(RealmMatomeEntity.class);
         //消したいデータを指定
-        delQuery.equalTo("folder", selectedItem);
+        //delQuery.equalTo("folder", selectedItem);
 
-        final RealmResults<RealmMatomeEntity> delR = delQuery.findAll();
+        final RealmResults<RealmMatomeEntity> delR = delQuery.equalTo("matomeName", selectedItem).findAll();     //まとめフォルダの名前と一致したものを削除
 
         realm.executeTransaction(new Realm.Transaction() {
             @Override
@@ -143,6 +146,8 @@ public class MatomeFragment extends Fragment implements OnItemClickListener, OnI
                 delR.deleteAllFromRealm();
             }
         });
+
+        //realm.commitTransaction();
     }
 
     //まとめ内容へIntent
@@ -150,7 +155,7 @@ public class MatomeFragment extends Fragment implements OnItemClickListener, OnI
     public void onItemClick(AdapterView<?> adapterView, View view, int pos, long l) {
         Intent intent = new Intent(getActivity(), MatomeActivity.class);     //MatomeActivityへIntent
         //idの指定
-        intent.putExtra("ID",idList.get(pos));
+        intent.putExtra("ID", idList.get(pos));
         startActivity(intent);
     }
 
