@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +14,7 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
@@ -22,17 +24,15 @@ import io.realm.RealmQuery;
 import io.realm.RealmResults;
 
 
-//ToDo まとめListの設計確認
 public class MatomeFragment extends Fragment implements OnItemClickListener, OnItemLongClickListener {
 
-    //ListView matomeListView = null;
-    ArrayAdapter<String> adapterMatome = null;
+    private ArrayAdapter<String> adapterMatome = null;
 
-    ArrayList<Integer> idList;
+    private ArrayList<Integer> idList;
 
     private String nowSubjectName;
 
-    Realm realm;
+    private Realm realm;
 
     //MatomeFragmentのインスタンス化メソッド
     public static MatomeFragment newInstance(String subjectName) {
@@ -46,30 +46,31 @@ public class MatomeFragment extends Fragment implements OnItemClickListener, OnI
     //Fragmentで表示するViewを作成するメソッド
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        ListView matomeListView = (ListView) inflater.inflate(R.layout.activity_matome_tab, container, false);
+        View view = inflater.inflate(R.layout.activity_matome_tab, container, false);
 
         //Database初期化
         Realm.init(getActivity());
         realm = Realm.getDefaultInstance();
 
-        adapterMatome = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1);
-
-        idList=new ArrayList<>();
-
         //値の受け渡し
         Bundle args = getArguments();
         nowSubjectName = args.getString("SUBJECT"); //初期表示の教科名を保存
 
-        //ToDo 別画面で作成されてデータベースに保存されているメモのリストを呼び出す
-        getMatomeDataList(nowSubjectName);   //StartListActivityでタップした教科名のメモ一覧をデータベースから取ってきて表示   //ToDo 落ちてる
+        ListView matomeListView = (ListView) view.findViewById(R.id.matome_list);
+        TextView emptyMatomeText = (TextView) view.findViewById(R.id.emptyMatomeView);
+        matomeListView.setEmptyView(emptyMatomeText);
+
+        idList = new ArrayList<>();
+
+        adapterMatome = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1);
+        getMatomeDataList(nowSubjectName);   //StartListActivityでタップした教科名のメモ一覧をデータベースから取ってきて表示
 
         matomeListView.setOnItemClickListener(this);
-
         matomeListView.setOnItemLongClickListener(this);
 
         matomeListView.setAdapter(adapterMatome);
 
-        return matomeListView;
+        return view;
     }
 
     //データベースから教科別まとめ取得してAdapterにセット
@@ -81,20 +82,18 @@ public class MatomeFragment extends Fragment implements OnItemClickListener, OnI
 
         RealmResults<RealmMatomeEntity> matomeResults = matomeQuery.findAll();
 
-        adapterMatome.clear();
-
         //Debug用全データ確認
         String allMatomeData;
         String[] allWordsData = new String[100];   //マーカーが引かれている箇所の単語
 
-        if(matomeResults.size() != 0){
+        if (matomeResults.size() != 0) {
             //データ取得
             /*
             for(int w=0; w<matomeResults.get(w).getWords().size(); w++){
                 allWordsData[w] = matomeResults.get(w).getWords().get(w).getWord();
             }
 
-            //ToDo まとめ機関未設定のときに、開始日が0または終了日が999999999のときは「未設定」を表示、マーカーが動かないので下一つが未検証、idはなんのために存在？　
+            //ToDo まとめ機関未設定のときに、開始日が0または終了日が999999999のときは「未設定」を表示、マーカーが動かないので下一つが未検証　
             for(int i=0; i<matomeResults.size(); i++){
                 allMatomeData = "id: " + matomeResults.get(i).getId() + "\n" +
                         "まとめ名前: " + matomeResults.get(i).getMatomeName() + "\n" +
@@ -106,7 +105,7 @@ public class MatomeFragment extends Fragment implements OnItemClickListener, OnI
                 adapterMatome.add(allMatomeData);
             }
             */
-            for (int i=0;i<matomeResults.size();i++){
+            for (int i = 0; i < matomeResults.size(); i++) {
                 adapterMatome.add(matomeResults.get(i).getMatomeName());
                 idList.add(matomeResults.get(i).getId());
             }
@@ -132,11 +131,13 @@ public class MatomeFragment extends Fragment implements OnItemClickListener, OnI
     //選択されたItemをデータベースから削除
     public void removeMatomeData(String selectedItem) {
 
+        //realm.beginTransaction();
+
         RealmQuery<RealmMatomeEntity> delQuery = realm.where(RealmMatomeEntity.class);
         //消したいデータを指定
-        delQuery.equalTo("matome", selectedItem);
+        //delQuery.equalTo("folder", selectedItem);
 
-        final RealmResults<RealmMatomeEntity> delR = delQuery.findAll();
+        final RealmResults<RealmMatomeEntity> delR = delQuery.equalTo("matomeName", selectedItem).findAll();     //まとめフォルダの名前と一致したものを削除
 
         realm.executeTransaction(new Realm.Transaction() {
             @Override
@@ -145,6 +146,8 @@ public class MatomeFragment extends Fragment implements OnItemClickListener, OnI
                 delR.deleteAllFromRealm();
             }
         });
+
+        //realm.commitTransaction();
     }
 
     //まとめ内容へIntent
@@ -152,14 +155,14 @@ public class MatomeFragment extends Fragment implements OnItemClickListener, OnI
     public void onItemClick(AdapterView<?> adapterView, View view, int pos, long l) {
         Intent intent = new Intent(getActivity(), MatomeActivity.class);     //MatomeActivityへIntent
         //idの指定
-        intent.putExtra("ID",idList.get(pos));
+        intent.putExtra("ID", idList.get(pos));
         startActivity(intent);
     }
 
     //ダイアログ表示してまとめの消去
     @Override
     public boolean onItemLongClick(AdapterView<?> adapterView, View view, int position, long l) {
-        final String item = (String) adapterView.getItemAtPosition(position);   //クリックしたpositionからItemを取得
+        final String clickedMatomeItem = (String) adapterView.getItemAtPosition(position);   //クリックしたpositionからItemを取得
 
         //消去確認のダイアログ
         AlertDialog.Builder alertDig = new AlertDialog.Builder(getActivity());
@@ -177,9 +180,9 @@ public class MatomeFragment extends Fragment implements OnItemClickListener, OnI
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 //YES処理
-                adapterMatome.remove(item);   //リストから削除
+                adapterMatome.remove(clickedMatomeItem);   //リストから削除
 
-                removeMatomeData(item);   //データベースから削除
+                removeMatomeData(clickedMatomeItem);   //データベースから削除     //ToDo 削除してから画面遷移して戻ってくるとListに復活しているので、データベース上で削除できていない？
             }
         });
 

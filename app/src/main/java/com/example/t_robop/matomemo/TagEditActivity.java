@@ -2,12 +2,17 @@ package com.example.t_robop.matomemo;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Color;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -47,6 +52,11 @@ public class TagEditActivity extends AppCompatActivity {
     //一時的に色を保管するための変数。初期値は白
     String tempColor = "#ffffff";
 
+    int dialogModeFlag = -1;    //1: 新規作成　2: 編集
+    int editTagPosition = 0;    //List内のItemでクリックされたpositionを入れる変数
+
+    Toolbar toolbar;
+
     /*** 神 ***/
     Realm realm;
 
@@ -63,10 +73,19 @@ public class TagEditActivity extends AppCompatActivity {
         /*******************/
 
         //関連付け
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
         tagList = (ListView) findViewById(R.id.tag_list);
+        TextView emptyTagText = (TextView) findViewById(R.id.emptyTagView);
+        tagList.setEmptyView(emptyTagText);
 
         //arrayList初期化
         wordList = new ArrayList<>();
+
+        toolbar.setTitle("タグ設定");
+        setSupportActionBar(toolbar);
+
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeButtonEnabled(true);
 
         /**ダイアログレイアウトの呼び出し**/
         //ダイアログレイアウトの読み込み
@@ -102,6 +121,7 @@ public class TagEditActivity extends AppCompatActivity {
         tagList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                editTagPosition = position;
                 //wordオブジェクトの生成
                 RealmWordEntity wordObj = wordList.get(position);
                 //タグ名を取得してセット
@@ -110,8 +130,12 @@ public class TagEditActivity extends AppCompatActivity {
                 dialogColor.setBackgroundColor(Color.parseColor(wordObj.getColor()));
                 //シークバーを初期化
                 dialogSeek.setProgress(100);
+                dialogModeFlag = 2;
                 //dialogを表示
                 alertDlg.show();
+                alertDlg.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(true);
+                alertDlg.getButton(AlertDialog.BUTTON_NEUTRAL).setEnabled(true);
+                alertDlg.getButton(AlertDialog.BUTTON_NEGATIVE).setEnabled(true);
             }
         });
 
@@ -138,8 +162,12 @@ public class TagEditActivity extends AppCompatActivity {
         dialogColor.setBackgroundColor(Color.parseColor("#ffffff"));
         //seekbarを初期値に
         dialogSeek.setProgress(100);
+        dialogModeFlag = 1;
         //dialog召喚
         alertDlg.show();
+        alertDlg.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(true);
+        alertDlg.getButton(AlertDialog.BUTTON_NEUTRAL).setEnabled(false);
+        alertDlg.getButton(AlertDialog.BUTTON_NEGATIVE).setEnabled(true);
     }
 
     //dialogセットするメソッド
@@ -163,11 +191,17 @@ public class TagEditActivity extends AppCompatActivity {
                                             RealmWordEntity wordObj = new RealmWordEntity();
                                             wordObj.setTagName(dialogEdit.getText().toString());
                                             wordObj.setColor(tempColor);
-                                            //wordListに追加
-                                            wordList.add(wordObj);
+                                            if (dialogModeFlag == 1) {
+                                                //wordListに追加
+                                                wordList.add(wordObj);
+                                            } else if (dialogModeFlag == 2) {
+                                                wordList.set(editTagPosition, wordObj);  //List内でタップされたpositionのtag名を更新
+                                            }
+
                                             //listviewにセット
                                             setListItem(getApplicationContext());
 
+                                            //ToDo tag名のみ変更したときのデータベース書き換え 
                                             //Realmに追加保存
                                             //トランザクション開始
                                             realm.beginTransaction();
@@ -176,6 +210,7 @@ public class TagEditActivity extends AppCompatActivity {
                                             //書き込みたいデータをインスタンスに入れる
                                             model.setTagName(dialogEdit.getText().toString());
                                             model.setColor(tempColor);
+
                                             //トランザクション終了 (データを書き込む)
                                             realm.commitTransaction();
                                         }
@@ -335,5 +370,36 @@ public class TagEditActivity extends AppCompatActivity {
         }
         //見つかりませんでした！！！
         return -1;
+    }
+
+    //メニューバーの作成
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.options, menu);  //res\menu\optionsのlayoutを読み込む
+        return true;
+    }
+
+    //メニューが選択されたときの処理
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        Intent intent;
+
+        //addしたときのIDで識別
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+                break;
+
+            case R.id.editFolder:
+                intent = new Intent(this, GroupEditActivity.class);  //GroupEditActivityへIntent
+                startActivity(intent);
+                break;
+
+            default:
+                break;
+
+        }
+        return true;
     }
 }

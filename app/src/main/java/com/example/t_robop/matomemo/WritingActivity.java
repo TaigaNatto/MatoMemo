@@ -3,7 +3,6 @@ package com.example.t_robop.matomemo;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.AlertDialog;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -27,7 +26,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -201,7 +199,7 @@ public class WritingActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
 
-        spinnerAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item);
+        spinnerAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item);
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         // アイテムを追加します
         spinnerAdapter.add("未分類");
@@ -239,7 +237,7 @@ public class WritingActivity extends AppCompatActivity {
     @Override
     public void onRestart() {
         super.onRestart();
-        matoMemoListActivity.reloadDrawerList(realm, spinnerAdapter);
+        matoMemoListActivity.reloadFolderDataList(realm, spinnerAdapter);
     }
 
 
@@ -284,7 +282,7 @@ public class WritingActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         final int id = item.getItemId();
 
-        Intent intent = null;
+        Intent intent;
 
         boolean result = true;
 
