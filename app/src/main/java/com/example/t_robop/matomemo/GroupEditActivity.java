@@ -92,8 +92,10 @@ public class GroupEditActivity extends AppCompatActivity {
     boolean henko = true;
     AlertDialog dialogBuilderGroupEdit;
     AlertDialog dialogBuilderGroupMake;
+    AlertDialog dialogBuilderGroupRemove;
 
     int listPosition;
+    ArrayList checking;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -108,10 +110,8 @@ public class GroupEditActivity extends AppCompatActivity {
 
 
         dialogGroupNameEditText = (EditText) dialogViewGroupEdit.findViewById(R.id.groupNameEdit);
-        dialogClassPlaceEditText = (EditText) dialogViewGroupEdit.findViewById(R.id.classPlaceEdit);
 
         dialogGroupNameMakeText = (EditText) dialogViewGroupMake.findViewById(R.id.groupNameMake);
-        dialogClassPlaceMakeText = (EditText) dialogViewGroupMake.findViewById(R.id.classPlaceMake);
 
         simpleListView = (ListView) findViewById(R.id.list);
         multiChoiceListView = (ListView) findViewById(R.id.list_item);
@@ -399,7 +399,62 @@ public class GroupEditActivity extends AppCompatActivity {
             setTextViewDisply();
         }else {
 
-            for(int i = groupNameArrayList.size() - 1; 0 <= i; i--){
+            checking = new ArrayList<>();
+
+            for(int i = 0; i < groupNameArrayList.size(); i++){
+                checking.add("");
+                if(multiChoiceListView.isItemChecked(i)){
+                    checking.set(i,"true");
+                }
+            }
+
+            if (dialogBuilderGroupRemove == null){
+
+                dialogBuilderGroupRemove = new AlertDialog.Builder(this)
+                        .setTitle("削除しますか？")
+                        .setPositiveButton(
+                                "OK",
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialogBuilderGroupEdit, int which) {
+
+                                        for(int i = groupNameArrayList.size() - 1; 0 <= i; i--){
+
+                                            if(checking.get(i) == "true"){
+
+                                                listPosition = i;
+                                                dateBaseMemoDateRemove();
+                                                groupNameArrayList.remove(i);
+                                            }
+                                            checking.remove(i);
+                                        }
+                                        adapterUpdate();
+                                        multiChoiceListView.setAdapter(groupNameArrayAdapterChoice);
+
+                                        detaBaseUpdate();
+
+                                        simpleListView.setVisibility(View.VISIBLE);
+                                        multiChoiceListView.setVisibility(View.GONE);
+
+                                        groupEditMode = true;
+
+                                        simpleListView.setAdapter(groupNameArrayAdapter);
+
+                                        ((android.support.design.widget.FloatingActionButton) findViewById(R.id.fab)).setImageResource(R.drawable.plusmark);
+                                    }
+                                }
+                        )
+                        .setNegativeButton(
+                                "Cancel",
+                                new DialogInterface.OnClickListener(){
+                                    public void onClick(DialogInterface dialogBuilderGroupEdit,int witch){
+                                    }
+                                }
+                        )
+                        .create();
+            }
+            dialogBuilderGroupRemove.show();
+
+   /*         for(int i = groupNameArrayList.size() - 1; 0 <= i; i--){
 
                 if(multiChoiceListView.isItemChecked(i)){
 
@@ -408,11 +463,7 @@ public class GroupEditActivity extends AppCompatActivity {
                     groupNameArrayList.remove(i);
                 }
             }
-            adapterUpdate();
-            multiChoiceListView.setAdapter(groupNameArrayAdapterChoice);
-
-            detaBaseUpdate();
-
+     */
             if(groupNameArrayList.size() == 0){
                 simpleListView.setVisibility(View.VISIBLE);
                 multiChoiceListView.setVisibility(View.GONE);
