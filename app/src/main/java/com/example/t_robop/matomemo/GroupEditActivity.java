@@ -227,14 +227,13 @@ public class GroupEditActivity extends AppCompatActivity {
         adapterUpdate();
     }
 
-    ////データベースのデータを削除
-    void dateBaseRemove() {
+    void dateBaseMemoDateRemove(){
 
         ////指定したフォルダにはいっているメモデータを削除////
 
         RealmQuery<RealmMemoEntity> queryMemo = realm.where(RealmMemoEntity.class);
         //消したいデータを指定 (以下の場合はmemoデータの「memo」が「test」のものを指定)
-        queryMemo.equalTo("folder", groupName);
+        queryMemo.equalTo("folder", groupNameArrayList.get(listPosition));
         //指定されたデータを持つデータのみに絞り込む
         final RealmResults<RealmMemoEntity> resultMemos = queryMemo.findAll();
         // 変更操作はトランザクションの中で実行する必要あり
@@ -245,6 +244,12 @@ public class GroupEditActivity extends AppCompatActivity {
                 resultMemos.deleteAllFromRealm();
             }
         });
+
+    }
+
+    ////データベースのデータを削除
+    void dateBaseRemove() {
+
         ////フォルダをすべて削除////
         RealmQuery<RealmFolderEntity> query = realm.where(RealmFolderEntity.class);
         //指定されたデータを持つデータのみに絞り込む
@@ -333,6 +338,8 @@ public class GroupEditActivity extends AppCompatActivity {
                                 @Override
                                 public void onClick(DialogInterface dialogBuilderGroupEdit,int witch){
 
+                                    dateBaseMemoDateRemove();
+
                                     groupNameArrayList.remove(listPosition);
 
                                     adapterUpdate();
@@ -399,6 +406,9 @@ public class GroupEditActivity extends AppCompatActivity {
             for(int i = groupNameArrayList.size() - 1; 0 <= i; i--){
 
                 if(multiChoiceListView.isItemChecked(i)){
+
+                    listPosition = i;
+                    dateBaseMemoDateRemove();
                     groupNameArrayList.remove(i);
                 }
             }
@@ -412,7 +422,8 @@ public class GroupEditActivity extends AppCompatActivity {
                 multiChoiceListView.setVisibility(View.GONE);
 
                 groupEditMode = true;
-                
+
+                adapterUpdate();
                 simpleListView.setAdapter(groupNameArrayAdapter);
 
                 ((android.support.design.widget.FloatingActionButton) findViewById(R.id.fab)).setImageResource(R.drawable.plusmark);
@@ -440,6 +451,13 @@ public class GroupEditActivity extends AppCompatActivity {
         }else {
             textView.setVisibility(View.INVISIBLE);
         }
+    }
+
+    void dateBaseAddMemo(){
+
+
+
+
     }
 
     void dialogGroupReferenceButtonMake(final int listPosition, AlertDialog.Builder dialog) {
