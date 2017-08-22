@@ -3,13 +3,17 @@ package com.example.t_robop.matomemo;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.support.v7.app.AlertDialog;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.Html;
+import android.text.Spannable;
+import android.text.SpannableString;
 import android.text.TextWatcher;
+import android.text.style.BackgroundColorSpan;
 import android.util.Log;
 import android.view.ActionMode;
 import android.view.KeyEvent;
@@ -35,6 +39,7 @@ import io.realm.Realm;
 import io.realm.RealmQuery;
 import io.realm.RealmResults;
 
+import static com.example.t_robop.matomemo.R.id.edit;
 import static com.example.t_robop.matomemo.R.id.txtmemo;
 
 public class WritingActivity extends AppCompatActivity {
@@ -96,7 +101,7 @@ public class WritingActivity extends AppCompatActivity {
         mWordList = new ArrayList<>();
         matoMemoListActivity = new MatoMemoListActivity();
 
-       // editText.addTextChangedListener(this);
+        // editText.addTextChangedListener(this);
 
         if (id == -1) {
 
@@ -241,8 +246,6 @@ public class WritingActivity extends AppCompatActivity {
     }
 
 
-
-
     @Override
     public boolean onTouchEvent(MotionEvent motionEvent) {
 
@@ -264,9 +267,9 @@ public class WritingActivity extends AppCompatActivity {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
 
             String newmemo = editText.getText().toString();
-            if(memo.equals(newmemo)) {
+            if (memo.equals(newmemo)) {
                 finish();
-            }else {
+            } else {
                 saveMemoDialog();
             }
             return true;
@@ -297,9 +300,9 @@ public class WritingActivity extends AppCompatActivity {
 
 
                 String newmemo = editText.getText().toString();
-                if(memo.equals(newmemo)) {
+                if (memo.equals(newmemo)) {
                     finish();
-                }else {
+                } else {
                     saveMemoDialog();
                 }
                 break;
@@ -509,7 +512,15 @@ public class WritingActivity extends AppCompatActivity {
         //選択部分の文字列の取得
         String text = editText.getText().toString().substring(start, end);
         //色を変えてEditTextにセット
-        editText.setText(Html.fromHtml(giveMark(editText.getText().toString(), text, tempColor)));
+        /*
+        CharSequence str = text;
+        SpannableString spannableString = new SpannableString(str);
+        BackgroundColorSpan backgroundColorSpan = new BackgroundColorSpan(Color.parseColor(tempColor));
+        spannableString.setSpan(backgroundColorSpan,0,spannableString.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
+        String setText = editText.getText().toString().replaceAll(text,spannableString.toString());
+        editText.setText(setText);
+        */
+        editText.setText(HtmlCompat.fromHtml(giveMark(editText.getText().toString(), text, tempColor)));
         //一時保存
         MatomeWord mWord = new MatomeWord();
         mWord.setTagName(tempTagName);
@@ -520,6 +531,7 @@ public class WritingActivity extends AppCompatActivity {
     //単語にマーカー付けてくれる最高のメソッド
     public String giveMark(String memo, String word, String color) {
         //htmlで背景色変え
+        //ToDo replaceAllは文字列に対して指定したパターンに一致する部分の全てに適用されるので、issue#102が発生する
         String text = memo.replaceAll(word, "<span style=background-color:" + color + ">" + word + "</span>");
         //変更後の文字列を返す
         return text;
@@ -542,6 +554,4 @@ public class WritingActivity extends AppCompatActivity {
         }
         return maxId + 1;
     }
-
-
 }

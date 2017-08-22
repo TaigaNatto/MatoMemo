@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="130dp"
+    android:orientation="vertical"
+    android:background="@color/colorPrimary"
+    android:padding="7dp">
+
+    <ImageView
+        android:id="@+id/image_app"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_gravity="left|top"
+        android:layout_marginTop="5dp"
+        android:src="@drawable/matomemo_icon"/>
+
+    <TextView
+        android:id="@+id/main_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="MatoMemo"
+        android:textSize="14sp"
+        android:textColor="@android:color/white"
+        android:layout_marginTop="20dp"
+        android:textStyle="bold"/>
+
+    <TextView
+        android:id="@+id/sub_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="made by topicMeron"
+        android:textSize="12sp"
+        android:layout_marginTop="5dp"
+        android:textColor="@android:color/white"
+        android:textStyle="normal"/>
+
+</LinearLayout>
