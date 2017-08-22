@@ -1,6 +1,7 @@
 package com.example.t_robop.matomemo;
 
 import android.content.Intent;
+import android.os.RecoverySystem;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
@@ -26,7 +27,7 @@ import io.realm.RealmQuery;
 import io.realm.RealmResults;
 
 
-public class MatoMemoListActivity extends AppCompatActivity implements ViewPager.OnPageChangeListener, NavigationView.OnNavigationItemSelectedListener {
+public class MatoMemoListActivity extends AppCompatActivity implements ViewPager.OnPageChangeListener, NavigationView.OnNavigationItemSelectedListener{
 
     private CustomFragmentPagerAdapter customFragmentPagerAdapter;    //自作のViewPager用Adapter
 
@@ -80,7 +81,6 @@ public class MatoMemoListActivity extends AppCompatActivity implements ViewPager
 
         getFolderDataList(realm, drawerArrayAdapter);    //Databaseから教科(Folder)取得してdrawerArrayAdapterにセット    //ToDo データのgetとsetを分けてメソッド化する →　reloadいらなくなる
 
-        //ToDo subjectGroupMenuにdrawerArrayAdapterの情報をaddする
         customSubjectItemAddMenu(drawerArrayAdapter);
         navigationView.setNavigationItemSelectedListener(this);
 
@@ -97,11 +97,11 @@ public class MatoMemoListActivity extends AppCompatActivity implements ViewPager
         tabLayout.setupWithViewPager(viewPager);
     }
 
-    //ToDo GroupEditActivityで教科削除して戻ったときに、消された教科の情報が残っている
-    //Activityが再度開始された時
+    //Activityが再度開始された時に呼ばれるコールバックメソッド
     @Override
     public void onRestart() {
         super.onRestart();
+
         reloadFolderDataList(realm, drawerArrayAdapter);     //DrawerArrayAdapterの更新
         reloadFragmentData(nowSubjectName);     //fragmentのListViewを更新
     }
@@ -138,7 +138,6 @@ public class MatoMemoListActivity extends AppCompatActivity implements ViewPager
         return true;
     }
 
-    //ToDo 非同期処理　(無くても動くけど...)
     //NavigationDrawer内のItemクリック処理
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
@@ -147,6 +146,7 @@ public class MatoMemoListActivity extends AppCompatActivity implements ViewPager
             Intent intent = new Intent(this, GroupEditActivity.class);   //GroupEditActivityにIntent
             startActivity(intent);
         }else{
+
             nowSubjectName = clickedItem;
 
             toolbar.setTitle(nowSubjectName);
