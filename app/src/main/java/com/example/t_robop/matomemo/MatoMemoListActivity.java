@@ -1,6 +1,9 @@
 package com.example.t_robop.matomemo;
 
+import android.animation.ObjectAnimator;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.TransitionDrawable;
 import android.os.RecoverySystem;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
@@ -13,6 +16,7 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -21,6 +25,9 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageView;
+
+import com.airbnb.lottie.LottieAnimationView;
 
 import io.realm.Realm;
 import io.realm.RealmQuery;
@@ -45,6 +52,9 @@ public class MatoMemoListActivity extends AppCompatActivity implements ViewPager
     private SubMenu subjectGroupMenu;
     private SubMenu optionGroupMenu;
 
+    ViewPager viewPager;
+    TabLayout tabLayout;
+
     private Realm realm;    //Realm
 
     //Activityの初回起動時
@@ -64,8 +74,8 @@ public class MatoMemoListActivity extends AppCompatActivity implements ViewPager
         drawerLayout = (DrawerLayout) findViewById(R.id.drawerLayout);
         //ListView drawerListView = (ListView) findViewById(R.id.left_drawer);
         String[] tabNames = getResources().getStringArray(R.array.tabs);
-        TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
-        ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
+        tabLayout = (TabLayout) findViewById(R.id.tabs);
+        viewPager = (ViewPager) findViewById(R.id.pager);
 
         //Toolbar表示
         toolbar.setTitle(nowSubjectName);  //intent元でタップされた教科名を設定
@@ -95,6 +105,9 @@ public class MatoMemoListActivity extends AppCompatActivity implements ViewPager
         viewPager.setAdapter(customFragmentPagerAdapter);
 
         tabLayout.setupWithViewPager(viewPager);
+
+        viewPager.setBackgroundColor(Color.parseColor("#eeeeff"));
+        tabLayout.setBackgroundColor(Color.parseColor("#cccccc"));
     }
 
     //Activityが再度開始された時に呼ばれるコールバックメソッド
@@ -168,11 +181,25 @@ public class MatoMemoListActivity extends AppCompatActivity implements ViewPager
         String buttonText = null;
         switch (position) {
             case 0:
+                viewPager.setBackgroundColor(Color.parseColor("#eeeeff"));
+                tabLayout.setSelectedTabIndicatorColor(Color.parseColor("#9999ff"));
                 buttonText = "メモを書く";
+                matoMemoButton.setBackgroundColor(Color.parseColor("#7f9fff"));
+                View view1 = this.matoMemoButton; // フェードイン・アウトさせたいViewを取得
+                view1.setAlpha(0.0f);
+                ObjectAnimator animation1 = ObjectAnimator.ofFloat(view1, "alpha", 1.0f);
+                animation1.start();
                 break;
 
             case 1:
+                viewPager.setBackgroundColor(Color.parseColor("#ffeeee"));
+                tabLayout.setSelectedTabIndicatorColor(Color.parseColor("#ff9999"));
                 buttonText = "まとめを作る";
+                matoMemoButton.setBackgroundColor(Color.rgb(200,79,93));
+                View view2 = this.matoMemoButton; // フェードイン・アウトさせたいViewを取得
+                view2.setAlpha(0.0f);
+                ObjectAnimator animation2 = ObjectAnimator.ofFloat(view2, "alpha", 1.0f);
+                animation2.start();
                 break;
 
             default:
@@ -183,7 +210,7 @@ public class MatoMemoListActivity extends AppCompatActivity implements ViewPager
 
     @Override
     public void onPageScrollStateChanged(int state) {
-
+        Log.d("ASD",String.valueOf(state));
     }
 
     //データベースから教科取得
@@ -255,7 +282,7 @@ public class MatoMemoListActivity extends AppCompatActivity implements ViewPager
 
     //画面下のButton処理
     public void MatoMemoClick(View v) {      //ToDo メソッド名リファクター
-        String buttonText = (String) matoMemoButton.getText();  //ButtonのTextを取得
+        String buttonText = matoMemoButton.getText().toString();  //ButtonのTextを取得
         Intent intent = null;
         String modeKEY = "MODE";
         String subjectKEY = "SUBJECT NAME";
@@ -278,4 +305,5 @@ public class MatoMemoListActivity extends AppCompatActivity implements ViewPager
 
         startActivity(intent);  //Intent!!!
     }
+
 }
