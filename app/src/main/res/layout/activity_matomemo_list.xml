@@ -29,7 +29,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginTop="50dp"
+            android:layout_marginTop="54dp"
             android:orientation="vertical"
             app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
@@ -69,34 +69,13 @@
 
     </FrameLayout>
 
-    <!-- The navigation drawer -->
-
-    <LinearLayout
-        android:layout_width="240dp"
+    <android.support.design.widget.NavigationView
+        android:id="@+id/navigationView"
+        android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="start"
-        android:orientation="vertical">
-
-        <ListView android:id="@+id/left_drawer"
-            android:layout_width="240dp"
-            android:layout_height="match_parent"
-            android:choiceMode="singleChoice"
-            android:divider="@android:color/transparent"
-            android:dividerHeight="0dp"
-            android:background="#778899"
-            android:layout_weight="1"/>
-
-        <Button
-            android:layout_width="240dp"
-            android:layout_height="match_parent"
-            android:background="#808080"
-            android:backgroundTint="#FFFFFF"
-            android:layout_weight="6"
-            android:onClick="intentEditFolder"
-            android:text="@string/editFolder"/>
-
-    </LinearLayout>
-
+        app:headerLayout="@layout/drawer_header"/>
+        <!--app:menu="@menu/drawer"-->
 </android.support.v4.widget.DrawerLayout>
 
 

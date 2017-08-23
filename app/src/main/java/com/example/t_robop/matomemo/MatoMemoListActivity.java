@@ -1,8 +1,12 @@
 package com.example.t_robop.matomemo;
 
 import android.content.Intent;
+import android.os.RecoverySystem;
+import android.support.annotation.NonNull;
+import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -12,18 +16,18 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.SubMenu;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.ListView;
 
 import io.realm.Realm;
 import io.realm.RealmQuery;
 import io.realm.RealmResults;
 
 
-public class MatoMemoListActivity extends AppCompatActivity implements AdapterView.OnItemClickListener, ViewPager.OnPageChangeListener {
+public class MatoMemoListActivity extends AppCompatActivity implements ViewPager.OnPageChangeListener, NavigationView.OnNavigationItemSelectedListener{
 
     private CustomFragmentPagerAdapter customFragmentPagerAdapter;    //自作のViewPager用Adapter
 
@@ -34,6 +38,12 @@ public class MatoMemoListActivity extends AppCompatActivity implements AdapterVi
     private Button matoMemoButton;  //WritingActivity、FolderCreateActivityに遷移するButton
 
     private Toolbar toolbar;    //ToolBar
+
+    DrawerLayout drawerLayout;
+    private NavigationView navigationView;
+    private Menu menu;
+    private SubMenu subjectGroupMenu;
+    private SubMenu optionGroupMenu;
 
     private Realm realm;    //Realm
 
@@ -50,8 +60,9 @@ public class MatoMemoListActivity extends AppCompatActivity implements AdapterVi
         //UI部品の取得
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         matoMemoButton = (Button) findViewById(R.id.MatoMemoButton);
-        DrawerLayout drawerLayout = (DrawerLayout) findViewById(R.id.drawerLayout);
-        ListView drawerListView = (ListView) findViewById(R.id.left_drawer);
+        navigationView = (NavigationView)findViewById(R.id.navigationView);
+        drawerLayout = (DrawerLayout) findViewById(R.id.drawerLayout);
+        //ListView drawerListView = (ListView) findViewById(R.id.left_drawer);
         String[] tabNames = getResources().getStringArray(R.array.tabs);
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
@@ -67,15 +78,11 @@ public class MatoMemoListActivity extends AppCompatActivity implements AdapterVi
 
         //Drawer内のList初期化
         drawerArrayAdapter = new ArrayAdapter<>(this, R.layout.drawer_list_item);
-        drawerArrayAdapter.add("未分類");
-
 
         getFolderDataList(realm, drawerArrayAdapter);    //Databaseから教科(Folder)取得してdrawerArrayAdapterにセット    //ToDo データのgetとsetを分けてメソッド化する →　reloadいらなくなる
 
-
-        drawerListView.setAdapter(drawerArrayAdapter);
-        drawerListView.setOnItemClickListener(this);
-
+        customSubjectItemAddMenu(drawerArrayAdapter);
+        navigationView.setNavigationItemSelectedListener(this);
 
         //Fragment操作準備
         customFragmentPagerAdapter = new CustomFragmentPagerAdapter(getSupportFragmentManager(), tabNames);
@@ -90,11 +97,11 @@ public class MatoMemoListActivity extends AppCompatActivity implements AdapterVi
         tabLayout.setupWithViewPager(viewPager);
     }
 
-    //ToDo GroupEditActivityで教科削除して戻ったときに、消された教科の情報が残っている
-    //Activityが再度開始された時
+    //Activityが再度開始された時に呼ばれるコールバックメソッド
     @Override
     public void onRestart() {
         super.onRestart();
+
         reloadFolderDataList(realm, drawerArrayAdapter);     //DrawerArrayAdapterの更新
         reloadFragmentData(nowSubjectName);     //fragmentのListViewを更新
     }
@@ -131,18 +138,24 @@ public class MatoMemoListActivity extends AppCompatActivity implements AdapterVi
         return true;
     }
 
-    //ToDo 非同期処理　(無くても動くけど...)
-    //DrawerListViewのクリック処理
+    //NavigationDrawer内のItemクリック処理
     @Override
-    public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-        //動的に追加された教科Listのクリック処理
-        //drawerArrayAdapterに教科Listがある
-        nowSubjectName = (String) adapterView.getItemAtPosition(position);   //クリックしたpositionからItem(教科名)を取得
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        String clickedItem = item.toString();
+        if(clickedItem.equals("教科編集")){
+            Intent intent = new Intent(this, GroupEditActivity.class);   //GroupEditActivityにIntent
+            startActivity(intent);
+        }else{
 
-        //教科クリックしたらToolBar.setTitleで教科名をセット
-        toolbar.setTitle(nowSubjectName);
+            nowSubjectName = clickedItem;
 
-        reloadFragmentData(nowSubjectName);
+            toolbar.setTitle(nowSubjectName);
+
+            reloadFragmentData(nowSubjectName);
+        }
+
+        drawerLayout.closeDrawer(GravityCompat.START);
+        return true;
     }
 
     @Override
@@ -190,9 +203,10 @@ public class MatoMemoListActivity extends AppCompatActivity implements AdapterVi
     //教科リストの更新
     public void reloadFolderDataList(Realm realm, ArrayAdapter<String> arrayAdapter) {
         arrayAdapter.clear();
-        arrayAdapter.add("未分類");
         getFolderDataList(realm, arrayAdapter);
         arrayAdapter.notifyDataSetChanged();
+        menu.clear();
+        customSubjectItemAddMenu(arrayAdapter);
     }
 
     //Fragmentの更新
@@ -225,6 +239,20 @@ public class MatoMemoListActivity extends AppCompatActivity implements AdapterVi
         }
     }
 
+    private void customSubjectItemAddMenu(ArrayAdapter arrayAdapter){
+
+        menu = navigationView.getMenu();
+        subjectGroupMenu = menu.addSubMenu(0,0,0,"Subject");
+        subjectGroupMenu.add(0,0,0,"未分類");
+
+        optionGroupMenu = menu.addSubMenu(1,1,1,"Option");
+        optionGroupMenu.add(1,0,0,"教科編集");
+
+        for(int i=0; i<arrayAdapter.getCount(); i++){
+            subjectGroupMenu.add(i+1,i+1,i+1,arrayAdapter.getItem(i).toString());
+        }
+    }
+
     //画面下のButton処理
     public void MatoMemoClick(View v) {      //ToDo メソッド名リファクター
         String buttonText = (String) matoMemoButton.getText();  //ButtonのTextを取得
@@ -250,11 +278,4 @@ public class MatoMemoListActivity extends AppCompatActivity implements AdapterVi
 
         startActivity(intent);  //Intent!!!
     }
-
-    //Drawer内のButtonクリック処理
-    public void intentEditFolder(View v) {
-        Intent intent = new Intent(this, GroupEditActivity.class);   //GroupEditActivityにIntent
-        startActivity(intent);
-    }
-
 }

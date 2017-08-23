@@ -1,24 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <item android:title="フォルダ">
+    <group android:checkableBehavior="single"
+        android:id="@+id/subject_group">
+        <item android:title="Subject">
+            <menu>
+
+                <item
+                    android:id="@+id/subject_item_0"
+                    android:title="未分類">
+
+                </item>
+
+            </menu>
+        </item>
+    </group>
+
+    <item android:title="option">
 
         <menu>
             <item
-                android:id="@+id/createFolder"
-                android:title="フォルダ作成">
+                android:id="@+id/subject_edit"
+                android:title="教科編集">
 
-            </item>
-        </menu>
-
-    </item>
-
-    <item android:title="教科">
-
-        <menu>
-            <item
-                android:id="@+id/item_1"
-                android:title="aaa">
             </item>
         </menu>
 
