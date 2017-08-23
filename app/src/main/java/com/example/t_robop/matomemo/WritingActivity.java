@@ -532,7 +532,7 @@ public class WritingActivity extends AppCompatActivity {
     public String giveMark(String memo, String word, String color) {
         //htmlで背景色変え
         //ToDo replaceAllは文字列に対して指定したパターンに一致する部分の全てに適用されるので、issue#102が発生する
-        String text = memo.replaceAll(word, "<span style=background-color:" + color + ">" + word + "</span>");
+        String text = memo.replaceAll(word, "<font color="+color+">" + word + "</font>");
         //変更後の文字列を返す
         return text;
     }

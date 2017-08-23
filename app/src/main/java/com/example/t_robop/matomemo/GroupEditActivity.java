@@ -574,5 +574,23 @@ public class GroupEditActivity extends AppCompatActivity {
         return true;
     }
 
+    //既存のidの最大値+1した数値を返してくれるメソッド
+    public int getNewId() {
+        //検索用のクエリ作成
+        RealmQuery<RealmFolderEntity> folderQuery = realm.where(RealmFolderEntity.class);
+        //インスタンス生成し、その中にすべてのデータを入れる 今回なら全てのデータ
+        RealmResults<RealmFolderEntity> folderResults = folderQuery.findAll();
+        int maxId = 0;
+        if (folderResults.size() > 0) {
+            for (int i = 0; i < folderResults.size(); i++) {
+                int nowId = folderResults.get(i).getId();
+                if (nowId > maxId) {
+                    maxId = nowId;
+                }
+            }
+        }
+        return maxId + 1;
+    }
+
 
 }
