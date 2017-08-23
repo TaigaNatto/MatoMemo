@@ -13,7 +13,7 @@ public class HtmlCompat {
     @SuppressWarnings("deprecation")
     @SuppressLint("NewApi")
     public static Spanned fromHtml(String source){
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.N){
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1){
             return Html.fromHtml(source,Html.FROM_HTML_MODE_LEGACY);
         }else {
             return Html.fromHtml(source);

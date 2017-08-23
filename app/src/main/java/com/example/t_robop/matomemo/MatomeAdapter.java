@@ -82,7 +82,7 @@ public class MatomeAdapter extends BaseAdapter {
         }
 
         //表示するレイアウトの決定
-        ((TextView)convertView.findViewById(R.id.memo_text)).setText(Html.fromHtml(txtStr));
+        ((TextView)convertView.findViewById(R.id.memo_text)).setText(HtmlCompat.fromHtml(txtStr));
 
         return convertView;
     }

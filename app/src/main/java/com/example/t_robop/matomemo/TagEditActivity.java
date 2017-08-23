@@ -8,6 +8,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -155,7 +156,7 @@ public class TagEditActivity extends AppCompatActivity {
     //+ボタン押された時
     public void plus(View v) {
         //editText内を初期化
-        dialogEdit.setText("");
+        dialogEdit.setText(HtmlCompat.fromHtml("<span style=background-color:" + "#ff00ff" + ">" + "色かわってる？？" + "</span>"));
         //色を初期化（白に）
         dialogColor.setBackgroundColor(Color.parseColor("#ffffff"));
         //seekbarを初期値に
