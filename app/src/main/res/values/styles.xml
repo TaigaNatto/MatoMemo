@@ -19,4 +19,7 @@
         <item name="colorAccent">@color/colorAccent</item>
         <item name="android:windowBackground">@color/windowBackground</item>
     </style>
+
+    
+
 </resources>
