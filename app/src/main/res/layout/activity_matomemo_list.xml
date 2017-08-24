@@ -36,7 +36,8 @@
             <android.support.design.widget.TabLayout
                 android:layout_height="wrap_content"
                 android:layout_width="match_parent"
-                android:id="@+id/tabs">
+                android:id="@+id/tabs"
+                android:background="#e5043c78">
 
                 <android.support.design.widget.TabItem
                     android:layout_height="match_parent"
@@ -63,6 +64,8 @@
                 android:layout_height="match_parent"
                 android:layout_weight="4"
                 android:text="@string/WriteMemo"
+                android:textColor="#ffffff"
+                android:background="#e5043c78"
                 android:id="@+id/MatoMemoButton"
                 android:onClick="MatoMemoClick"/>
         </LinearLayout>
@@ -74,6 +77,7 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="start"
+        android:background="#c0c6c9"
         app:headerLayout="@layout/drawer_header"/>
         <!--app:menu="@menu/drawer"-->
 </android.support.v4.widget.DrawerLayout>
