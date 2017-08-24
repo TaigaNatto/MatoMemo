@@ -277,11 +277,12 @@ public class GroupEditActivity extends AppCompatActivity {
 
                                         groupNameArrayList.set(listPosition, groupName);
 
-                                        //adapterを更新
-                                        adapterUpdate();
                                         //データベースのデータを更新
                                         detaBaseUpdate();
                                         detaBaseUpDateMemo();
+
+                                        //adapterを更新
+                                        adapterUpdate();
 
                                         simpleListView.setAdapter(groupNameArrayAdapter);
 
@@ -437,6 +438,7 @@ public class GroupEditActivity extends AppCompatActivity {
         realm.beginTransaction();
         RealmFolderEntity model = realm.createObject(RealmFolderEntity.class);
         model.setFolderName(groupName);
+        model.setId(getNewId());
         realm.commitTransaction();
     }
 
@@ -536,12 +538,12 @@ public class GroupEditActivity extends AppCompatActivity {
     }
 
     //メニューバーの作成
-    @Override
+    /*@Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.options, menu);  //res\menu\optionsのlayoutを読み込む
         return true;
-    }
+    }*/
 
     //ToDo Intent先の作成とIntent処理の追加
     //メニューが選択されたときの処理
