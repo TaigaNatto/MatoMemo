@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">MatoMemo</string>
+    <string name="app_name">マトメモ</string>
     <string name="drawer_open">DrawerOpen</string>
     <string name="drawer_close">DrawerClose</string>
     <string name="WriteMemo">メモを書く</string>
