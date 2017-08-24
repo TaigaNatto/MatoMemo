@@ -106,8 +106,8 @@ public class MatoMemoListActivity extends AppCompatActivity implements ViewPager
 
         tabLayout.setupWithViewPager(viewPager);
 
-        viewPager.setBackgroundColor(Color.parseColor("#eeeeff"));
-        tabLayout.setBackgroundColor(Color.parseColor("#cccccc"));
+        viewPager.setBackgroundColor(Color.parseColor("#eeeeef"));
+        tabLayout.setBackgroundColor(Color.parseColor("#ffffff"));
     }
 
     //Activityが再度開始された時に呼ばれるコールバックメソッド
@@ -158,7 +158,12 @@ public class MatoMemoListActivity extends AppCompatActivity implements ViewPager
         if(clickedItem.equals("教科編集")){
             Intent intent = new Intent(this, GroupEditActivity.class);   //GroupEditActivityにIntent
             startActivity(intent);
-        }else{
+        }
+        else if(clickedItem.equals("タグ編集")){
+            Intent intent = new Intent(this, TagEditActivity.class);   //GroupEditActivityにIntent
+            startActivity(intent);
+        }
+        else{
 
             nowSubjectName = clickedItem;
 
@@ -181,7 +186,7 @@ public class MatoMemoListActivity extends AppCompatActivity implements ViewPager
         String buttonText = null;
         switch (position) {
             case 0:
-                viewPager.setBackgroundColor(Color.parseColor("#eeeeff"));
+                viewPager.setBackgroundColor(Color.parseColor("#eeeeef"));
                 tabLayout.setSelectedTabIndicatorColor(Color.parseColor("#9999ff"));
                 buttonText = "メモを書く";
                 matoMemoButton.setBackgroundColor(Color.parseColor("#7f9fff"));
@@ -192,7 +197,7 @@ public class MatoMemoListActivity extends AppCompatActivity implements ViewPager
                 break;
 
             case 1:
-                viewPager.setBackgroundColor(Color.parseColor("#ffeeee"));
+                viewPager.setBackgroundColor(Color.parseColor("#efeeee"));
                 tabLayout.setSelectedTabIndicatorColor(Color.parseColor("#ff9999"));
                 buttonText = "まとめを作る";
                 matoMemoButton.setBackgroundColor(Color.rgb(200,79,93));
@@ -274,6 +279,7 @@ public class MatoMemoListActivity extends AppCompatActivity implements ViewPager
 
         optionGroupMenu = menu.addSubMenu(1,1,1,"Option");
         optionGroupMenu.add(1,0,0,"教科編集");
+        optionGroupMenu.add(1,1,0,"タグ編集");
 
         for(int i=0; i<arrayAdapter.getCount(); i++){
             subjectGroupMenu.add(i+1,i+1,i+1,arrayAdapter.getItem(i).toString());

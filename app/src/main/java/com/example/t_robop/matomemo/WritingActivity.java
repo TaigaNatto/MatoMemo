@@ -48,6 +48,8 @@ public class WritingActivity extends AppCompatActivity {
     //メモを新規作成する場合は０、編集するときは１としています。
     String folder;
 
+    int folderId;
+
     int change = 0;
 
     TextView textView;
@@ -89,6 +91,8 @@ public class WritingActivity extends AppCompatActivity {
         id = intent.getIntExtra("MODE", -1);
         //todo intentでフォルダ名ほしい！
         folder = intent.getStringExtra("SUBJECT NAME");
+        folderId=intent.getIntExtra("SubjectId",-1);
+
 
         //関連付け
         textView = (TextView) findViewById(R.id.txt);
@@ -387,6 +391,7 @@ public class WritingActivity extends AppCompatActivity {
 
                             //フォルダ名をセット
                             model.setFolder(folder);
+                            model.setFolderId(folderId);
 
                             //新規idをセット
                             model.setId(getNewId());
