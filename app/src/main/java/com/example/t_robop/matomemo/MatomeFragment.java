@@ -76,9 +76,16 @@ public class MatomeFragment extends Fragment {
     public void getMatomeDataList(String subjectName) {
 
         RealmQuery<RealmMatomeEntity> matomeQuery = realm.where(RealmMatomeEntity.class);
+        if(subjectName.equals("未分類")){
+            matomeQuery = matomeQuery.equalTo("folder", subjectName);
+        }
+        else {
+            RealmQuery<RealmFolderEntity> folQuery = realm.where(RealmFolderEntity.class);
+            folQuery = folQuery.equalTo("folderName", subjectName);
+            RealmResults<RealmFolderEntity> folResults = folQuery.findAll();
 
-        matomeQuery = matomeQuery.equalTo("folder", subjectName);
-
+            matomeQuery = matomeQuery.equalTo("folderId", folResults.get(0).getId());
+        }
         RealmResults<RealmMatomeEntity> matomeResults = matomeQuery.findAll();
 
         //Debug用全データ確認

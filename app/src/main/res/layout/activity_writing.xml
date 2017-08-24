@@ -66,29 +66,18 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="horizontal"
-        android:layout_weight="8">
+        android:layout_weight="9">
 
         <Button
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:text="マーカー"
+            android:textStyle="bold"
+            android:textColor="#ffffff"
+            android:background="@color/colorPrimary"
             android:layout_weight="1"
             android:id="@+id/mark_button"
             android:onClick="marker_mode"/>
-
-        <Button
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:text="数式"
-            android:layout_weight="1"
-            android:visibility="invisible"/>
-
-                <Button
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:text="ゴジラ"
-                    android:visibility="invisible" />
 
     </LinearLayout>
 

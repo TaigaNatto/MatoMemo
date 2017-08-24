@@ -294,13 +294,13 @@ public class MatoMemoListActivity extends AppCompatActivity implements ViewPager
         String subjectKEY = "SUBJECT NAME";
 
         switch (buttonText) {
-            case "メモを書く":
+            case "メモる":
                 intent = new Intent(this, WritingActivity.class);    //WritingActivityにIntent
                 intent.putExtra(modeKEY, -1);      //-1 : メモ新規作成
                 intent.putExtra(subjectKEY, nowSubjectName);     //教科名受け渡し
                 break;
 
-            case "まとめを作る":
+            case "マトメる":
                 intent = new Intent(this, FolderCreateActivity.class);    //FolderCreateActivityにIntent
                 intent.putExtra(subjectKEY, nowSubjectName);
                 break;

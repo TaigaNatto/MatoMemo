@@ -82,9 +82,15 @@ public class MemoFragment extends Fragment {
     public void getMemoDataList(String subjectName) {    //引数：　Drawer内でクリックした教科名
 
         RealmQuery<RealmMemoEntity> memoQuery = realm.where(RealmMemoEntity.class);
-
-        memoQuery = memoQuery.equalTo("folder", subjectName);  //引数で受け取った教科名のメモを取得
-
+        if(subjectName.equals("未分類")){
+            memoQuery = memoQuery.equalTo("folder", subjectName);  //引数で受け取った教科名のメモを取得
+        }
+        else {
+            RealmQuery<RealmFolderEntity> folQuery = realm.where(RealmFolderEntity.class);
+            folQuery = folQuery.equalTo("folderName", subjectName);  //引数で受け取った教科名のfolderを取得
+            RealmResults<RealmFolderEntity> folResults = folQuery.findAll();
+            memoQuery = memoQuery.equalTo("folderId", folResults.get(0).getId());  //引数で受け取った教科名のメモを取得
+        }
         RealmResults<RealmMemoEntity> memoResults = memoQuery.findAll();
 
         //Debeg用　全データ確認

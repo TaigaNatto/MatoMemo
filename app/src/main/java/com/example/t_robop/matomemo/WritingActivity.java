@@ -91,8 +91,6 @@ public class WritingActivity extends AppCompatActivity {
         id = intent.getIntExtra("MODE", -1);
         //todo intentでフォルダ名ほしい！
         folder = intent.getStringExtra("SUBJECT NAME");
-        folderId=intent.getIntExtra("SubjectId",-1);
-
 
         //関連付け
         textView = (TextView) findViewById(R.id.txt);
@@ -392,7 +390,12 @@ public class WritingActivity extends AppCompatActivity {
 
                             //フォルダ名をセット
                             model.setFolder(folder);
-                            model.setFolderId(folderId);
+
+                            RealmQuery<RealmFolderEntity> folQuery = realm.where(RealmFolderEntity.class);
+                            folQuery = folQuery.equalTo("folderName", folder);
+                            RealmResults<RealmFolderEntity> folResults = folQuery.findAll();
+
+                            model.setFolderId(folResults.get(0).getId());
 
                             //新規idをセット
                             model.setId(getNewId());
@@ -425,14 +428,6 @@ public class WritingActivity extends AppCompatActivity {
 
                         //トランザクション終了 (データを書き込む)
                         realm.commitTransaction();
-
-                        //検索用のクエリ作成
-                        RealmQuery<RealmMemoEntity> memoQuery = realm.where(RealmMemoEntity.class);
-                        //インスタンス生成し、その中にすべてのデータを入れる 今回なら全てのデータ
-                        RealmResults<RealmMemoEntity> memoResults = memoQuery.findAll();
-                        for (int i = 0; i < memoResults.size(); i++) {
-                            Log.d("SSSSS", String.valueOf(memoResults.get(i).getId()));
-                        }
 
                         finish();
                     }

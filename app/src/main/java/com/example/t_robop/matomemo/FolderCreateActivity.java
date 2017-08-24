@@ -272,6 +272,12 @@ public class FolderCreateActivity extends AppCompatActivity implements OnDateSet
 
         model.setFolder(folder);
 
+        RealmQuery<RealmFolderEntity> folQuery = realm.where(RealmFolderEntity.class);
+        folQuery = folQuery.equalTo("folderName", folder);
+        RealmResults<RealmFolderEntity> folResults = folQuery.findAll();
+
+        model.setFolderId(folResults.get(0).getId());
+
         model.setId(getNewId());
 
         //トランザクション終了
