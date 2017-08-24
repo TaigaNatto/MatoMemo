@@ -39,7 +39,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:id="@+id/linearLayout">
 
 
                 <EditText
@@ -64,7 +65,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_weight="8"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:id="@+id/button_layout">
 
                 <Button
                     android:id="@+id/mark_button"
