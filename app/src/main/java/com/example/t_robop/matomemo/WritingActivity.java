@@ -465,12 +465,12 @@ public class WritingActivity extends AppCompatActivity {
         inflater.inflate(R.menu.options, menu);  //res\menu\optionsのlayoutを読み込む
         return true;
     }
-
+    /*
     public void move(View v) {
         int topMargin = 100;
         layout.layout(0, topMargin, layout.getWidth(), topMargin + layout.getHeight());
     }
-
+    */
     //キーボード検知用のリスナー
     DetectableSoftKeyLayout.OnSoftKeyShownListener listner = new DetectableSoftKeyLayout.OnSoftKeyShownListener() {
         @Override
@@ -481,7 +481,7 @@ public class WritingActivity extends AppCompatActivity {
                 // linearLayout.setScaleY (30);
                 // buttonLayout.setScaleY (5);
                //  buttonLayout.setTranslationY(10);
-                move(layout);
+                //move(layout);
             } else {
                 // ソフトキーボードが表示されてなければ、非表示にする
                 markBtn.setVisibility(View.GONE);
