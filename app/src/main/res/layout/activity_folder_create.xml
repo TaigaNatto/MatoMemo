@@ -15,34 +15,68 @@
         android:background="?attr/colorPrimary">
     </android.support.v7.widget.Toolbar>
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:text="Title"
+        android:textSize="20sp"
+        />
+
     <EditText
         android:id="@+id/txtmatome"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="まとめ名前入力"/>
+        android:layout_marginBottom="15dp"
+        android:hint="まとめ名前入力"
+        android:textSize="25sp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="期間設定"
+        android:textSize="20sp"/>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="20dp"
         android:orientation="horizontal">
 
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_gravity="center"
+            android:layout_marginLeft="10dp"
             android:id="@+id/button1"
+            android:background="#e5043c78"
             android:text="日付"
+            android:textColor="#ffffff"
+            android:textSize="20sp"
+            android:drawableLeft="@mipmap/ic_calendar"
             android:onClick="showDatePickerDialog"/>  
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="～"/>
+            android:gravity="center"
+            android:text="～"
+            android:textColor="#000000"
+            android:textSize="40sp"/>
 
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_gravity="center"
+            android:layout_marginRight="10dp"
             android:id="@+id/button2"
             android:text="日付"
+            android:textColor="#ffffff"
+            android:drawableLeft="@mipmap/ic_calendar"
+            android:textSize="20sp"
+            android:background="#e5043c78"
             android:onClick="showDatePickerDialog"/>
 
 
@@ -53,6 +87,12 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="タグ"
+            android:textSize="20sp"/>
 
         <TextView
             android:layout_width="match_parent"
@@ -75,8 +115,11 @@
             android:layout_height="60dp"
             android:id="@+id/createbutton"
             android:text="まとめ作成"
+            android:textSize="20sp"
+            android:textColor="#ffffff"
             android:layout_marginTop="20dp"
             android:layout_alignParentBottom="true"
+            android:background="#043c78"
             android:onClick="matomecreateClick"/>
 
     </LinearLayout>

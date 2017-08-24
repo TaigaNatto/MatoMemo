@@ -3,17 +3,17 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:fitsSystemWindows="true"
+    android:orientation="vertical"
     tools:context="com.example.t_robop.matomemo.WritingActivity">
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
+        android:background="?attr/colorPrimary"
         android:minHeight="?attr/actionBarSize"
-        android:background="?attr/colorPrimary">
+        android:theme="@style/ThemeOverlay.AppCompat.ActionBar">
 
         <android.support.v7.widget.AppCompatSpinner
             android:id="@+id/Spinner"
@@ -35,53 +35,53 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:layout_weight="1">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:id="@+id/linearLayout">
 
 
-    <EditText
-        android:id="@+id/txtmemo"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="top"
-        android:windowSoftInputMode="stateAlwaysVisible"
-        android:hint="文字を入力"
-        android:textSize="20sp"/>
+                <EditText
+                    android:id="@+id/txtmemo"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="top"
+                    android:hint="文字を入力"
+                    android:textSize="20sp"
+                    android:windowSoftInputMode="stateAlwaysVisible" />
 
-    <TextView
-        android:id="@+id/txt"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginLeft="5dp"
-        android:layout_marginRight="5dp"
-        android:windowSoftInputMode="stateAlwaysHidden"
-        android:textSize="20sp"/>
+                <TextView
+                    android:id="@+id/txt"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:textSize="20sp"
+                    android:windowSoftInputMode="stateAlwaysHidden" />
 
-    </LinearLayout>
+            </LinearLayout>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="horizontal"
-        android:layout_weight="8">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="8"
+                android:orientation="horizontal"
+                android:id="@+id/button_layout">
 
-        <Button
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:text="マーカー"
-            android:layout_weight="1"
-            android:id="@+id/mark_button"
-            android:onClick="marker_mode"/>
+                <Button
+                    android:id="@+id/mark_button"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:onClick="marker_mode"
+                    android:text="マーカー" />
 
-        <Button
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:text="数式"
-            android:layout_weight="1"
-            android:visibility="invisible"/>
+                <Button
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:text="数式"
+                    android:visibility="invisible" />
 
                 <Button
                     android:layout_width="match_parent"
@@ -90,7 +90,7 @@
                     android:text="ゴジラ"
                     android:visibility="invisible" />
 
-    </LinearLayout>
+            </LinearLayout>
 
         </com.example.t_robop.matomemo.DetectableSoftKeyLayout>
 

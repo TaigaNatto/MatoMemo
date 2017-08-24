@@ -197,9 +197,14 @@ public class FolderCreateActivity extends AppCompatActivity implements OnDateSet
     //ボタン処理
     @Override
     public void onClick(View view) {
+        checkarray = listView.getCheckedItemPositions();
+        if(checkarray.size()==0 && frontDate==0 && rearDate==99999999 && edittext.length()==0){
+            finish();
+        }else {
+            //まとめをデータベースに保存
+            saveMatome();
 
-        //まとめをデータベースに保存
-        saveMatome();
+        }
 
 
         finish();

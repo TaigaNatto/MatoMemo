@@ -28,6 +28,8 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -62,6 +64,9 @@ public class WritingActivity extends AppCompatActivity {
 
     //キーボード検知用のインスタンス
     DetectableSoftKeyLayout layout;
+
+    LinearLayout linearLayout;
+    LinearLayout buttonLayout;
     //
     Button markBtn;
 
@@ -98,6 +103,8 @@ public class WritingActivity extends AppCompatActivity {
         textView = (TextView) findViewById(R.id.txt);
         editText = (EditText) findViewById(R.id.txtmemo);
         layout = (DetectableSoftKeyLayout) findViewById(R.id.liner_layout);
+        linearLayout = (LinearLayout) findViewById(R.id.linearLayout);
+        buttonLayout = (LinearLayout) findViewById(R.id.button_layout);
         markBtn = (Button) findViewById(R.id.mark_button);
         //キーボード検知用のリスナーをセット
         layout.setListener(listner);
@@ -459,6 +466,11 @@ public class WritingActivity extends AppCompatActivity {
         return true;
     }
 
+    public void move(View v) {
+        int topMargin = 100;
+        layout.layout(0, topMargin, layout.getWidth(), topMargin + layout.getHeight());
+    }
+
     //キーボード検知用のリスナー
     DetectableSoftKeyLayout.OnSoftKeyShownListener listner = new DetectableSoftKeyLayout.OnSoftKeyShownListener() {
         @Override
@@ -466,7 +478,10 @@ public class WritingActivity extends AppCompatActivity {
             if (isShown) {
                 // ソフトキーボードが表示されている場合
                 // ボタンを表示する
-                markBtn.setVisibility(View.VISIBLE);
+                // linearLayout.setScaleY (30);
+                // buttonLayout.setScaleY (5);
+               //  buttonLayout.setTranslationY(10);
+                move(layout);
             } else {
                 // ソフトキーボードが表示されてなければ、非表示にする
                 markBtn.setVisibility(View.GONE);
@@ -538,7 +553,7 @@ public class WritingActivity extends AppCompatActivity {
     public String giveMark(String memo, String word, String color) {
         //htmlで背景色変え
         //ToDo replaceAllは文字列に対して指定したパターンに一致する部分の全てに適用されるので、issue#102が発生する
-        String text = memo.replaceAll(word, "<font color="+color+">" + word + "</font>");
+        String text = memo.replaceAll(word, "<font color=" + color + ">" + word + "</font>");
         //変更後の文字列を返す
         return text;
     }
