@@ -102,7 +102,7 @@ public class WritingActivity extends AppCompatActivity {
         editText = (EditText) findViewById(R.id.txtmemo);
         layout = (DetectableSoftKeyLayout) findViewById(R.id.liner_layout);
         linearLayout = (LinearLayout) findViewById(R.id.linearLayout);
-        buttonLayout = (LinearLayout) findViewById(R.id.button_layout);
+        //buttonLayout = (LinearLayout) findViewById(R.id.button_layout);
         markBtn = (Button) findViewById(R.id.mark_button);
         //キーボード検知用のリスナーをセット
         layout.setListener(listner);
