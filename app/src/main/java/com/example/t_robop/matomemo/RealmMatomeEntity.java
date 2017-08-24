@@ -22,6 +22,7 @@ public class RealmMatomeEntity extends RealmObject {
     private int endDate=-1;
     //教科名
     private String folder;
+    private int folderId=-1;
     //まとめ設定で指定された単語リスト(単語一覧参照先のid)
     public RealmList<MatomeWord> words;
     //まとめ設定でしていされた
@@ -59,6 +60,13 @@ public class RealmMatomeEntity extends RealmObject {
     }
     public void setEndDate(int endDate){
         this.endDate=endDate;
+    }
+
+    public void setFolderId(int folderId){
+        this.folderId=folderId;
+    }
+    public int getFolderId(){
+        return this.folderId;
     }
 
     public RealmList<MatomeWord> getWords(){
