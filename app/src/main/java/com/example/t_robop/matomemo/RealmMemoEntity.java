@@ -22,6 +22,7 @@ public class RealmMemoEntity extends RealmObject {
     private int date;//20170627(こんな感じで保存)
     private int time;//1816(18:16のときはこんなふうに)
     private String folder="未分類";
+    private int folderId=-1;
     public RealmList<MatomeWord> words;//設定されてる単語リスト
 
     @Ignore
@@ -60,6 +61,13 @@ public class RealmMemoEntity extends RealmObject {
     }
     public String getFolder(){
         return this.folder;
+    }
+
+    public void setFolderId(int folderId){
+        this.folderId=folderId;
+    }
+    public int getFolderId(){
+        return this.folderId;
     }
 
     public int    getSessionId() { return sessionId; }
