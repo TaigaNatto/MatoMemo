@@ -26,6 +26,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 
 import com.airbnb.lottie.LottieAnimationView;
 
@@ -51,6 +52,9 @@ public class MatoMemoListActivity extends AppCompatActivity implements ViewPager
     private Menu menu;
     private SubMenu subjectGroupMenu;
     private SubMenu optionGroupMenu;
+
+    View header;
+    LinearLayout drawerHeader;
 
     ViewPager viewPager;
     TabLayout tabLayout;
@@ -108,6 +112,9 @@ public class MatoMemoListActivity extends AppCompatActivity implements ViewPager
 
         viewPager.setBackgroundColor(Color.parseColor("#eeeeef"));
         tabLayout.setBackgroundColor(Color.parseColor("#ffffff"));
+
+        header=navigationView.getHeaderView(0);
+        drawerHeader= (LinearLayout) header.findViewById(R.id.header_color);
     }
 
     //Activityが再度開始された時に呼ばれるコールバックメソッド
@@ -154,10 +161,12 @@ public class MatoMemoListActivity extends AppCompatActivity implements ViewPager
         String buttonText = null;
         switch (position) {
             case 0:
+                drawerHeader.setBackgroundColor(Color.parseColor("#043C78"));
+                toolbar.setBackgroundColor(Color.parseColor("#043C78"));
                 viewPager.setBackgroundColor(Color.parseColor("#eeeeef"));
                 tabLayout.setSelectedTabIndicatorColor(Color.parseColor("#d902ce7f"));
                 buttonText = "メモる";
-                matoMemoButton.setBackgroundColor(Color.parseColor("#7f9fff"));
+                matoMemoButton.setBackgroundColor(Color.parseColor("#043C78"));
                 View view1 = this.matoMemoButton; // フェードイン・アウトさせたいViewを取得
                 view1.setAlpha(0.0f);
                 ObjectAnimator animation1 = ObjectAnimator.ofFloat(view1, "alpha", 1.0f);
@@ -165,10 +174,12 @@ public class MatoMemoListActivity extends AppCompatActivity implements ViewPager
                 break;
 
             case 1:
+                drawerHeader.setBackgroundColor(Color.parseColor("#c84f5d"));
+                toolbar.setBackgroundColor(Color.parseColor("#c84f5d"));
                 viewPager.setBackgroundColor(Color.parseColor("#efeeee"));
                 tabLayout.setSelectedTabIndicatorColor(Color.parseColor("#ff9999"));
                 buttonText = "マトメる";
-                matoMemoButton.setBackgroundColor(Color.rgb(200,79,93));
+                matoMemoButton.setBackgroundColor(Color.parseColor("#c84f5d"));
                 View view2 = this.matoMemoButton; // フェードイン・アウトさせたいViewを取得
                 view2.setAlpha(0.0f);
                 ObjectAnimator animation2 = ObjectAnimator.ofFloat(view2, "alpha", 1.0f);

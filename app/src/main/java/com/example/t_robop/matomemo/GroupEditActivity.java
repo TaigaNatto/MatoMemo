@@ -78,8 +78,9 @@ public class GroupEditActivity extends AppCompatActivity {
         simpleListView = (ListView) findViewById(R.id.list);
         multiChoiceListView = (ListView) findViewById(R.id.list_item);
         textView = (TextView) findViewById(R.id.textView);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
 
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar.setTitle("教科編集");
 
         groupNameArrayList = new ArrayList<>();
         groupNameArrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1);

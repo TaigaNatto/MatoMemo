@@ -32,6 +32,7 @@ import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -195,6 +196,8 @@ public class WritingActivity extends AppCompatActivity {
                             //マーカー付け
                             wordMark();
                             Log.d("SSSS", "マークされたよ！");
+                        }else {
+                            Toast.makeText(WritingActivity.this,"マーカーが選択されてません",Toast.LENGTH_SHORT);
                         }
                         return true;
                 }
@@ -402,7 +405,12 @@ public class WritingActivity extends AppCompatActivity {
                             folQuery = folQuery.equalTo("folderName", folder);
                             RealmResults<RealmFolderEntity> folResults = folQuery.findAll();
 
-                            model.setFolderId(folResults.get(0).getId());
+                            if(folResults.size()!=0) {
+                                model.setFolderId(folResults.get(0).getId());
+                            }
+                            else {
+                                model.setFolderId(-1);
+                            }
 
                             //新規idをセット
                             model.setId(getNewId());
@@ -485,7 +493,7 @@ public class WritingActivity extends AppCompatActivity {
     };
 
     //色選択のためのDialogを表示
-    public void marker_mode(View v) {
+    public void marker_button(View v) {
         int defaultItem = 0; // デフォルトでチェックされているアイテム
         final List<Integer> checkedItems = new ArrayList<>();
         checkedItems.add(defaultItem);
