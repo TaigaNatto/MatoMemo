@@ -1,22 +1,13 @@
 package com.example.t_robop.matomemo;
 
-import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.AlertDialog;
-import android.util.Log;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
-import android.widget.AdapterView.OnItemLongClickListener;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
-import android.widget.TextView;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 import io.realm.Realm;
@@ -24,13 +15,19 @@ import io.realm.RealmQuery;
 import io.realm.RealmResults;
 
 
-public class MatomeFragment extends Fragment implements OnItemClickListener, OnItemLongClickListener {
+public class MatomeFragment extends Fragment {
 
-    private ArrayAdapter<String> adapterMatome = null;
+    private String[] allMatomeTitles = null;
+    private String[] allMatomeStartDates = null;
+    private String[] allMatomeEndDates = null;
+    private String[] allMatomeTagNames = null;
 
-    private ArrayList<Integer> idList;
+    public static ArrayList<Integer> idList = null;
 
-    private String nowSubjectName;
+    public static String nowSubjectName;
+
+    EmptyRecyclerView recyclerView;
+    CustomMatomeRecyclerViewAdapter customMatomeRecyclerViewAdapter;
 
     private Realm realm;
 
@@ -48,6 +45,12 @@ public class MatomeFragment extends Fragment implements OnItemClickListener, OnI
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.activity_matome_tab, container, false);
 
+        recyclerView = (EmptyRecyclerView) view.findViewById(R.id.matome_recycler_view);
+        recyclerView.setHasFixedSize(true);
+
+        View emptyView = view.findViewById(R.id.matome_view_empty);
+        recyclerView.setEmptyView(emptyView);
+
         //Database初期化
         Realm.init(getActivity());
         realm = Realm.getDefaultInstance();
@@ -56,19 +59,15 @@ public class MatomeFragment extends Fragment implements OnItemClickListener, OnI
         Bundle args = getArguments();
         nowSubjectName = args.getString("SUBJECT"); //初期表示の教科名を保存
 
-        ListView matomeListView = (ListView) view.findViewById(R.id.matome_list);
-        TextView emptyMatomeText = (TextView) view.findViewById(R.id.emptyMatomeView);
-        matomeListView.setEmptyView(emptyMatomeText);
-
         idList = new ArrayList<>();
 
-        adapterMatome = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1);
         getMatomeDataList(nowSubjectName);   //StartListActivityでタップした教科名のメモ一覧をデータベースから取ってきて表示
 
-        matomeListView.setOnItemClickListener(this);
-        matomeListView.setOnItemLongClickListener(this);
+        customMatomeRecyclerViewAdapter = new CustomMatomeRecyclerViewAdapter(allMatomeTitles,allMatomeStartDates,allMatomeEndDates,allMatomeTagNames);
+        recyclerView.setAdapter(customMatomeRecyclerViewAdapter);
 
-        matomeListView.setAdapter(adapterMatome);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
+        recyclerView.setLayoutManager(linearLayoutManager);
 
         return view;
     }
@@ -83,8 +82,19 @@ public class MatomeFragment extends Fragment implements OnItemClickListener, OnI
         RealmResults<RealmMatomeEntity> matomeResults = matomeQuery.findAll();
 
         //Debug用全データ確認
-        String allMatomeData;
-        String[] allWordsData = new String[100];   //マーカーが引かれている箇所の単語
+        int startYear;
+        int startMonth;
+        int startDay;
+
+        int endYear;
+        int endMonth;
+        int endDay;
+
+
+        allMatomeTitles = new String[matomeResults.size()];
+        allMatomeStartDates = new String[matomeResults.size()];
+        allMatomeEndDates = new String[matomeResults.size()];
+        allMatomeTagNames = new String[matomeResults.size()];
 
         if (matomeResults.size() != 0) {
             //データ取得
@@ -106,28 +116,40 @@ public class MatomeFragment extends Fragment implements OnItemClickListener, OnI
             }
             */
             for (int i = 0; i < matomeResults.size(); i++) {
-                adapterMatome.add(matomeResults.get(i).getMatomeName());
+                startYear = matomeResults.get(i).getStartDate() / 10000;
+                startMonth = matomeResults.get(i).getStartDate() / 100 % 100;
+                startDay = matomeResults.get(i).getStartDate() % 100;
+
+                endYear = matomeResults.get(i).getEndDate() / 10000;
+                endMonth = matomeResults.get(i).getEndDate() / 100 % 100;
+                endDay = matomeResults.get(i).getEndDate() % 100;
+
+                allMatomeStartDates[i] = String.valueOf(startMonth) + "/" + String.valueOf(startDay);
+                allMatomeEndDates[i] = String.valueOf(endMonth) + "/" + String.valueOf(endDay);
+                if(matomeResults.get(i).getMatomeName() == null){
+                    allMatomeTitles[i] = "タイトル未設定";
+                }else{
+                    allMatomeTitles[i] = matomeResults.get(i).getMatomeName();
+                }
+                //allMatomeTagNames[i] = matomeResults.get(i).getWords().get(matomeResults.get(i).getWords().size()).getTagName();
                 idList.add(matomeResults.get(i).getId());
             }
         }
-
-        /*
-        for (int i = 0; i < matomeResults.size(); i++) {
-            adapterMatome.add(matomeResults.get(i).getMatomeName());
-        }
-        */
     }
 
     //Drawerクリック時のまとめリスト更新
     public void reloadMatomeData(String subject) {
         nowSubjectName = subject;
 
-        adapterMatome.clear();
         idList.clear();
         getMatomeDataList(subject);
-        adapterMatome.notifyDataSetChanged();
+
+        customMatomeRecyclerViewAdapter = new CustomMatomeRecyclerViewAdapter(allMatomeTitles,allMatomeStartDates,allMatomeEndDates,allMatomeTagNames);
+        customMatomeRecyclerViewAdapter.notifyDataSetChanged();
+        recyclerView.setAdapter(customMatomeRecyclerViewAdapter);
     }
 
+    /*
     //選択されたItemをデータベースから削除
     public void removeMatomeData(String selectedItem) {
 
@@ -182,7 +204,7 @@ public class MatomeFragment extends Fragment implements OnItemClickListener, OnI
                 //YES処理
                 adapterMatome.remove(clickedMatomeItem);   //リストから削除
 
-                removeMatomeData(clickedMatomeItem);   //データベースから削除     //ToDo 削除してから画面遷移して戻ってくるとListに復活しているので、データベース上で削除できていない？
+                removeMatomeData(clickedMatomeItem);   //データベースから削除
             }
         });
 
@@ -190,4 +212,5 @@ public class MatomeFragment extends Fragment implements OnItemClickListener, OnI
 
         return true;
     }
+    */
 }
