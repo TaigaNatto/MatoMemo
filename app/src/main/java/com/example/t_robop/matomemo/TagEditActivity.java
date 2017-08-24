@@ -156,7 +156,7 @@ public class TagEditActivity extends AppCompatActivity {
     //+ボタン押された時
     public void plus(View v) {
         //editText内を初期化
-        dialogEdit.setText(HtmlCompat.fromHtml("<span style=background-color:" + "#ff00ff" + ">" + "色かわってる？？" + "</span>"));
+        dialogEdit.setText(HtmlCompat.fromHtml("<span style=background-color:" + "#ff00ff" + ">" + "</span>"));
         //色を初期化（白に）
         dialogColor.setBackgroundColor(Color.parseColor("#ffffff"));
         //seekbarを初期値に
@@ -385,6 +385,7 @@ public class TagEditActivity extends AppCompatActivity {
         return -1;
     }
 
+    /*
     //メニューバーの作成
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -412,4 +413,5 @@ public class TagEditActivity extends AppCompatActivity {
         }
         return true;
     }
+    */
 }

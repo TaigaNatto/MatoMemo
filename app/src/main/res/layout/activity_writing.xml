@@ -35,21 +35,22 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:layout_weight="1">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:id="@+id/linearLayout">
 
 
-    <EditText
-        android:id="@+id/txtmemo"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="top"
-        android:windowSoftInputMode="stateAlwaysVisible"
-        android:hint="文字を入力"
-        android:textSize="20sp"/>
+                <EditText
+                    android:id="@+id/txtmemo"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="top"
+                    android:hint="文字を入力"
+                    android:textSize="20sp"
+                    android:windowSoftInputMode="stateAlwaysVisible" />
 
     <TextView
         android:id="@+id/txt"
@@ -60,7 +61,7 @@
         android:windowSoftInputMode="stateAlwaysHidden"
         android:textSize="20sp"/>
 
-    </LinearLayout>
+            </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"

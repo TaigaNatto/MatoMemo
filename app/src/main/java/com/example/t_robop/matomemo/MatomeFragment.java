@@ -131,8 +131,17 @@ public class MatomeFragment extends Fragment {
                 endMonth = matomeResults.get(i).getEndDate() / 100 % 100;
                 endDay = matomeResults.get(i).getEndDate() % 100;
 
-                allMatomeStartDates[i] = String.valueOf(startMonth) + "/" + String.valueOf(startDay);
-                allMatomeEndDates[i] = String.valueOf(endMonth) + "/" + String.valueOf(endDay);
+                if(startMonth == 0 && startDay == 0){
+                    allMatomeStartDates[i] = "未設定";
+                }else{
+                    allMatomeStartDates[i] = String.valueOf(startMonth) + "/" + String.valueOf(startDay);
+                }
+
+                if(endMonth == 99 && endDay == 99){
+                    allMatomeEndDates[i] = "未設定";
+                }else{
+                    allMatomeEndDates[i] = String.valueOf(endMonth) + "/" + String.valueOf(endDay);
+                }
                 if(matomeResults.get(i).getMatomeName() == null){
                     allMatomeTitles[i] = "タイトル未設定";
                 }else{
