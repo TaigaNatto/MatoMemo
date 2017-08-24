@@ -60,7 +60,7 @@ public class CustomMemoRecyclerViewAdapter extends RecyclerView.Adapter<CustomMe
     }
 
     @Override
-    public void onBindViewHolder(CustomMemoRecyclerViewHolder holder, final int position) {
+    public void onBindViewHolder(final CustomMemoRecyclerViewHolder holder, final int position) {
         holder.memoDateText.setText(mMemoDates[position]);
         holder.memoTimeText.setText(mMemoTimes[position]);
         holder.memoText.setText(mMemoTexts[position]);
@@ -75,9 +75,10 @@ public class CustomMemoRecyclerViewAdapter extends RecyclerView.Adapter<CustomMe
             }
         });
 
+        /*
         holder.memoCardView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
-            public boolean onLongClick(View view) {
+            public boolean onLongClick(final View view) {
 
                 Realm.init(view.getContext());
                 realm = Realm.getDefaultInstance();
@@ -101,8 +102,10 @@ public class CustomMemoRecyclerViewAdapter extends RecyclerView.Adapter<CustomMe
                     public void onClick(DialogInterface dialogInterface, int i) {
                         //YES処理
                         //adapterMemo.remove(clickedMemoListItem);   //カードリストから削除
+                        holder.memoCardView.removeView(view);
+                        notifyItemRemoved(position);
 
-                        //removeMemoData(clickedMemoListItem);   //データベースから削除
+                        removeMemoData(mMemoTexts[position]);   //データベースから削除
                     }
                 });
 
@@ -111,6 +114,7 @@ public class CustomMemoRecyclerViewAdapter extends RecyclerView.Adapter<CustomMe
                 return true;
             }
         });
+        */
     }
 
     @Override
