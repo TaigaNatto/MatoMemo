@@ -35,18 +35,20 @@ public class GroupEditActivity extends AppCompatActivity {
     //ダイアログ用のEditText
     EditText dialogGroupNameEditText;
     EditText dialogGroupNameMakeText;
-
+    //ダイアログ内のeditTextデータを一次保存
     String groupName;
 
+    //編集画面なら真、削除画面なら偽
     boolean groupEditMode;
+
+    //ダイアログのなかでの変数宣言がうまくいかなかったため
     boolean kesu;
 
     //ArrayAdapterのString型でarrayAdapterを作成
     ArrayAdapter<String> groupNameArrayAdapter;
-
     ArrayAdapter<String> groupNameArrayAdapterChoice;
-    //TextViewで「textView」を作成
-    TextView textView;
+
+    TextView folderNotExistText;
     //listViewをタップしたときpositionの文字列
 
     /*** 神 ***/
@@ -57,11 +59,14 @@ public class GroupEditActivity extends AppCompatActivity {
     View dialogViewGroupEdit;
     View dialogViewGroupMake;
 
+    //ダイアログ　上から編集、新規作成、削除用ダイアログ
     AlertDialog dialogBuilderGroupEdit;
     AlertDialog dialogBuilderGroupMake;
     AlertDialog dialogBuilderGroupRemove;
 
+    //タップしたポジションを一時保存
     int listPosition;
+    //削除用ListViewのチェック状態を保存
     ArrayList checking;
 
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,16 +76,16 @@ public class GroupEditActivity extends AppCompatActivity {
         LayoutInflater factoryEdit = LayoutInflater.from(this);
         LayoutInflater factoryMake = LayoutInflater.from(this);
 
+
         dialogViewGroupEdit = factoryEdit.inflate(R.layout.dialog_group_edit,null);
         dialogViewGroupMake = factoryMake.inflate(R.layout.dialog_group_make,null);
         dialogGroupNameEditText = (EditText) dialogViewGroupEdit.findViewById(R.id.groupNameEdit);
         dialogGroupNameMakeText = (EditText) dialogViewGroupMake.findViewById(R.id.groupNameMake);
         simpleListView = (ListView) findViewById(R.id.list);
         multiChoiceListView = (ListView) findViewById(R.id.list_item);
-        textView = (TextView) findViewById(R.id.textView);
-
+        folderNotExistText = (TextView) findViewById(R.id.textView);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        toolbar.setTitle("教科編集");
+
 
         groupNameArrayList = new ArrayList<>();
         groupNameArrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1);
@@ -100,6 +105,7 @@ public class GroupEditActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
+        setTitle( "フォルダの編集" );
 
         //dateBaseからデータを取得
         dateBaseReference();
@@ -168,152 +174,7 @@ public class GroupEditActivity extends AppCompatActivity {
         );
     }
 
-    ////データベースからデータを取り出しgroupNameArrayListに保存////
-    void dateBaseReference() {
-
-        String text;
-        Realm.init(this);
-        realm = Realm.getDefaultInstance();
-        //検索用のクエリ作成
-        RealmQuery<RealmFolderEntity> folderQuery = realm.where(RealmFolderEntity.class);
-        //インスタンス生成し、その中にすべてのデータを入れる 今回なら全てのデータ
-        RealmResults<RealmFolderEntity> folderResults = folderQuery.findAll();
-        /***使い方は↑のメモと同じ***/
-
-        for (int i = 0; i < folderResults.size(); i++) {
-            text = folderResults.get(i).getFolderName();
-            groupNameArrayList.add(text);
-        }
-        //adapterの中身を更新
-        adapterUpdate();
-    }
-
-    ////指定したフォルダにはいっているメモデータを削除////
-    void dateBaseMemoDateRemove(){
-
-        RealmQuery<RealmMemoEntity> queryMemo = realm.where(RealmMemoEntity.class);
-        //消したいデータを指定 (以下の場合はmemoデータの「memo」が「test」のものを指定)
-        queryMemo.equalTo("folder", groupNameArrayList.get(listPosition));
-        //指定されたデータを持つデータのみに絞り込む
-        final RealmResults<RealmMemoEntity> resultMemos = queryMemo.findAll();
-        // 変更操作はトランザクションの中で実行する必要あり
-        realm.executeTransaction(new Realm.Transaction() {
-            @Override
-            public void execute(Realm realm) {
-                // すべてのオブジェクトを削除
-                resultMemos.deleteAllFromRealm();
-            }
-        });
-    }
-
-    ////データベースのデータを削除////
-    void detaBaseRemove() {
-
-        ////フォルダをすべて削除////
-        RealmQuery<RealmFolderEntity> query = realm.where(RealmFolderEntity.class);
-        //指定されたデータを持つデータのみに絞り込む
-        final RealmResults<RealmFolderEntity> results = query.findAll();
-        // 変更操作はトランザクションの中で実行する必要あり
-        realm.executeTransaction(new Realm.Transaction() {
-            @Override
-            public void execute(Realm realm) {
-                // すべてのオブジェクトを削除
-                results.deleteAllFromRealm();
-            }
-        });
-    }
-
-    ////データベースのデータを更新////
-    void detaBaseUpdate() {
-
-        //データベースのデータを削除
-        detaBaseRemove();
-        //データベースにlistViewの要素をすべて追加
-        for (int i = 0; i < groupNameArrayList.size(); i++) {
-
-            String temp = groupNameArrayList.get(i);
-            realm.beginTransaction();
-            RealmFolderEntity model = realm.createObject(RealmFolderEntity.class);
-            model.setFolderName(temp);
-            realm.commitTransaction();
-        }
-    }
-
-    ////groupNameがgroupNameArrayListの中にあるかどうかを判定
-    boolean notExistList(){
-
-        //ListViewの要素分繰り返す
-        for (int i = 0; i < groupNameArrayList.size(); i++) {
-            //groupNameがarrayAdapterのi番目の要素と同じか、"未分類"なら実行
-            if (groupName.equals(groupNameArrayList.get(i)) || groupName.equals("未分類")) {
-                Toast.makeText(getApplicationContext(), "同名のファイルがすでに存在します", Toast.LENGTH_SHORT).show();
-                return false;
-            }
-        }
-        return true;
-    }
-
-    ////編集用のlistViewがタップされたときに出るdialogの作成
-    void setDialogBuilderGroupEdit(){
-
-        //dialogがまだ作られていなければ
-        if(dialogBuilderGroupEdit == null) {
-            dialogBuilderGroupEdit = new AlertDialog.Builder(this)
-                    .setView(dialogViewGroupEdit)
-                    .setTitle("編集")
-                    .setPositiveButton(
-                            "OK",
-                            new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialogBuilderGroupEdit, int which) {
-
-                                    groupName = dialogGroupNameEditText.getText().toString();
-
-                                    //
-                                    if (!groupName.equals("") && notExistList()) {
-
-                                        //メモデータをデータベースから取得
-                                        detaBaseReferenceMemo();
-                                        //メモデータをデータベースから削除
-                                        dateBaseMemoDateRemove();
-
-                                        groupNameArrayList.set(listPosition, groupName);
-
-                                        //データベースのデータを更新
-                                        detaBaseUpdate();
-                                        detaBaseUpDateMemo();
-
-                                        //adapterを更新
-                                        adapterUpdate();
-
-                                        simpleListView.setAdapter(groupNameArrayAdapter);
-
-                                    }
-                                }
-                            }
-                    )
-                    .setNegativeButton(
-                            "Cancel",
-                            new DialogInterface.OnClickListener(){
-                                public void onClick(DialogInterface dialogBuilderGroupEdit,int witch){
-                                }
-                            }
-                    )
-                    .setNeutralButton(
-                            "削除",
-                            new DialogInterface.OnClickListener(){
-                                @Override
-                                public void onClick(DialogInterface dialogBuilderGroupEdit,int witch){
-                                    kesukadoka();
-                                }
-                            }
-                    )
-                    .create();
-        }
-        dialogBuilderGroupEdit.show();
-
-    }
-
-
+    ////フローティングアクションボタンがタップされたときの処理////
     public void plus(View v) {
 
         if(groupEditMode) {
@@ -356,7 +217,7 @@ public class GroupEditActivity extends AppCompatActivity {
                         .create();
             }
             dialogBuilderGroupMake.show();
-            //フォルダがあるか判定して、フォルダがありませんと表示させる
+            //フォルダがあるか判定して、フォルダが1つもない場合「フォルダがありません」と表示させる
             setTextViewDisply();
         }else {
 
@@ -433,69 +294,65 @@ public class GroupEditActivity extends AppCompatActivity {
         }
     }
 
-    void detaBaseAdd() {
+    ////編集用のlistViewがタップされたときに出るdialogの作成////
+    void setDialogBuilderGroupEdit(){
 
-        //トランザクション開始
-        realm.beginTransaction();
-        RealmFolderEntity model = realm.createObject(RealmFolderEntity.class);
-        model.setFolderName(groupName);
-        model.setId(getNewId());
-        realm.commitTransaction();
+        //dialogがまだ作られていなければ
+        if(dialogBuilderGroupEdit == null) {
+            dialogBuilderGroupEdit = new AlertDialog.Builder(this)
+                    .setView(dialogViewGroupEdit)
+                    .setTitle("編集")
+                    .setPositiveButton(
+                            "OK",
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialogBuilderGroupEdit, int which) {
+
+                                    groupName = dialogGroupNameEditText.getText().toString();
+
+                                    //
+                                    if (!groupName.equals("") && notExistList()) {
+                                        detaKoshin();
+
+                                        groupNameArrayList.set(listPosition, groupName);
+
+                                        //adapterを更新
+                                        adapterUpdate();
+                                        //データベースのデータを更新
+                                        //   detaBaseUpdate();
+                                        //   detaBaseUpDateMemo();
+
+
+                                        simpleListView.setAdapter(groupNameArrayAdapter);
+                                    }
+                                }
+                            }
+                    )
+                    .setNegativeButton(
+                            "Cancel",
+                            new DialogInterface.OnClickListener(){
+                                public void onClick(DialogInterface dialogBuilderGroupEdit,int witch){
+                                }
+                            }
+                    )
+                    .setNeutralButton(
+                            "削除",
+                            new DialogInterface.OnClickListener(){
+                                @Override
+                                public void onClick(DialogInterface dialogBuilderGroupEdit,int witch){
+                                    kesukadoka();
+                                }
+                            }
+                    )
+                    .create();
+        }
+        dialogBuilderGroupEdit.show();
     }
 
-    void setTextViewDisply(){
-        if(groupNameArrayList.size() == 0){
-            textView.setVisibility(View.VISIBLE);
-        }else {
-            textView.setVisibility(View.INVISIBLE);
-        }
-    }
-
-    //メモデータをデータベースから取得
-    void detaBaseReferenceMemo(){
-
-        realm = Realm.getDefaultInstance();
-        //検索用のクエリ作成
-        RealmQuery<RealmMemoEntity> memoQuery = realm.where(RealmMemoEntity.class);
-
-        memoQuery.equalTo("folder",groupNameArrayList.get(listPosition));
-
-        //インスタンス生成し、その中にすべてのデータを入れる 今回なら全てのデータ
-        RealmResults<RealmMemoEntity> memoResults = memoQuery.findAll();
-
-        String text;
-
-        for (int i = 0; i < memoResults.size(); i++) {
-
-            text = memoResults.get(i).getMemo();
-            memoDetaList.add(text);
-        }
-    }
-
-    //メモデータを更新
-    void detaBaseUpDateMemo(){
-        RealmQuery<RealmMemoEntity> queryMemo = realm.where(RealmMemoEntity.class);
-        queryMemo.equalTo("folder", groupNameArrayList.get(listPosition));
-
-        for (int i = 0; i < memoDetaList.size(); i++) {
-
-            realm.beginTransaction();
-            RealmMemoEntity model = realm.createObject(RealmMemoEntity.class);
-            model.setMemo(memoDetaList.get(i));
-            model.setFolder(groupNameArrayList.get(listPosition));
-            realm.commitTransaction();
-        }
-        for(int i = memoDetaList.size() - 1; i >= 0 ;i--) {
-            memoDetaList.remove(i);
-        }
-    }
-
-    //adapterをarrayListで更新
+    ////adapterをarrayListで更新////
     void adapterUpdate() {
 
         groupNameArrayAdapter.clear();
         groupNameArrayAdapterChoice.clear();
-
 
         for (int i = 0; i < groupNameArrayList.size(); i++) {
             groupNameArrayAdapter.add(groupNameArrayList.get(i));
@@ -503,6 +360,144 @@ public class GroupEditActivity extends AppCompatActivity {
         }
     }
 
+    ////データベースのデータを更新する
+    void detaKoshin() {
+
+        /****フォルダのデータが欲しいとき！**/
+        //検索用のクエリ作成
+        RealmQuery<RealmFolderEntity> folderQuery = realm.where(RealmFolderEntity.class);
+
+        folderQuery.equalTo("folderName",groupNameArrayList.get(listPosition));
+        //インスタンス生成し、その中にすべてのデータを入れる 今回なら全てのデータ
+        RealmResults<RealmFolderEntity> folderResults = folderQuery.findAll();
+        //トランザクション開始
+        realm.beginTransaction();
+        //最初に作られたデータなのでposition0で指定
+        RealmFolderEntity editModel=folderResults.get(0);
+
+        //トランザクション終了 (データを書き込む)
+        realm.commitTransaction();
+
+        int ID = editModel.getId();
+
+        folderQuery.equalTo("id",ID);
+        //インスタンス生成し、その中にすべてのデータを入れる 今回なら全てのデータ
+        folderResults = folderQuery.findAll();
+        //トランザクション開始
+        realm.beginTransaction();
+        //最初に作られたデータなのでposition0で指定
+        editModel=folderResults.get(0);
+        editModel.setFolderName(groupName);
+        //トランザクション終了 (データを書き込む)
+        realm.commitTransaction();
+    }
+
+    ////データベースからデータを取り出しgroupNameArrayListに保存////
+    void dateBaseReference() {
+
+        String text;
+        Realm.init(this);
+        realm = Realm.getDefaultInstance();
+        //検索用のクエリ作成
+        RealmQuery<RealmFolderEntity> folderQuery = realm.where(RealmFolderEntity.class);
+        //インスタンス生成し、その中にすべてのデータを入れる 今回なら全てのデータ
+        RealmResults<RealmFolderEntity> folderResults = folderQuery.findAll();
+        /***使い方は↑のメモと同じ***/
+
+        for (int i = 0; i < folderResults.size(); i++) {
+            text = folderResults.get(i).getFolderName();
+            groupNameArrayList.add(text);
+        }
+        //adapterの中身を更新
+        adapterUpdate();
+    }
+
+    ////データベースにデータを追加////
+    void detaBaseAdd() {
+
+        realm.beginTransaction();
+        RealmFolderEntity model = realm.createObject(RealmFolderEntity.class);
+        model.setFolderName(groupName);
+        model.setId(getNewId());
+        realm.commitTransaction();
+    }
+
+    ////指定したフォルダにはいっているメモデータを削除////
+    void dateBaseMemoDateRemove(){
+
+        RealmQuery<RealmMemoEntity> queryMemo = realm.where(RealmMemoEntity.class);
+        //消したいデータを指定 (以下の場合はmemoデータの「memo」が「test」のものを指定)
+        queryMemo.equalTo("folder", groupNameArrayList.get(listPosition));
+        //指定されたデータを持つデータのみに絞り込む
+        final RealmResults<RealmMemoEntity> resultMemos = queryMemo.findAll();
+        // 変更操作はトランザクションの中で実行する必要あり
+        realm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                // すべてのオブジェクトを削除
+                resultMemos.deleteAllFromRealm();
+            }
+        });
+    }
+
+    ////データベースのデータを削除////
+    void detaBaseRemove() {
+
+        ////フォルダをすべて削除////
+        RealmQuery<RealmFolderEntity> query = realm.where(RealmFolderEntity.class);
+        //指定されたデータを持つデータのみに絞り込む
+        final RealmResults<RealmFolderEntity> results = query.findAll();
+        // 変更操作はトランザクションの中で実行する必要あり
+        realm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                // すべてのオブジェクトを削除
+                results.deleteAllFromRealm();
+            }
+        });
+    }
+
+    ////データベースのデータを書き直す////
+    void detaBaseUpdate() {
+
+        //データベースのデータを削除
+        detaBaseRemove();
+        //データベースにlistViewの要素をすべて追加
+        for (int i = 0; i < groupNameArrayList.size(); i++) {
+
+            String temp = groupNameArrayList.get(i);
+            realm.beginTransaction();
+            RealmFolderEntity model = realm.createObject(RealmFolderEntity.class);
+            model.setFolderName(temp);
+            model.setId(getNewId());
+            realm.commitTransaction();
+        }
+    }
+
+    ////groupNameがgroupNameArrayListの中にあるかどうかを判定
+    boolean notExistList(){
+
+        //ListViewの要素分繰り返す
+        for (int i = 0; i < groupNameArrayList.size(); i++) {
+            //groupNameがarrayAdapterのi番目の要素と同じか、"未分類"なら実行
+            if (groupName.equals(groupNameArrayList.get(i)) || groupName.equals("未分類")) {
+                Toast.makeText(getApplicationContext(), "同名のファイルがすでに存在します", Toast.LENGTH_SHORT).show();
+                return false;
+            }
+        }
+        return true;
+    }
+
+    ////フォルダがあるか判定して、フォルダが1つもない場合「フォルダがありません」と表示させる////
+    void setTextViewDisply(){
+        if(groupNameArrayList.size() == 0){
+            folderNotExistText.setVisibility(View.VISIBLE);
+        }else {
+            folderNotExistText.setVisibility(View.INVISIBLE);
+        }
+    }
+
+    ////削除するか確認数ダイアログ////
     boolean kesukadoka(){
 
         final AlertDialog.Builder kesuDialog = new AlertDialog.Builder(this);
@@ -539,12 +534,12 @@ public class GroupEditActivity extends AppCompatActivity {
     }
 
     //メニューバーの作成
-    /*@Override
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.options, menu);  //res\menu\optionsのlayoutを読み込む
         return true;
-    }*/
+    }
 
     //ToDo Intent先の作成とIntent処理の追加
     //メニューが選択されたときの処理
@@ -594,6 +589,4 @@ public class GroupEditActivity extends AppCompatActivity {
         }
         return maxId + 1;
     }
-
-
 }
