@@ -2,6 +2,7 @@ package com.example.t_robop.matomemo;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.app.DatePickerDialog.OnDateSetListener;
@@ -99,6 +100,11 @@ public class FolderCreateActivity extends AppCompatActivity implements OnDateSet
 
         //ToolBar
         Toolbar toolbar = (Toolbar) findViewById(R.id.tool_bar);
+
+        toolbar.setTitle("まとめ作成");
+
+        toolbar.setBackgroundColor(Color.parseColor("#c84f5d"));
+
         setSupportActionBar(toolbar);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -281,7 +287,12 @@ public class FolderCreateActivity extends AppCompatActivity implements OnDateSet
         folQuery = folQuery.equalTo("folderName", folder);
         RealmResults<RealmFolderEntity> folResults = folQuery.findAll();
 
-        model.setFolderId(folResults.get(0).getId());
+        if(folResults.size()!=0) {
+            model.setFolderId(folResults.get(0).getId());
+        }
+        else {
+            model.setFolderId(-1);
+        }
 
         model.setId(getNewId());
 

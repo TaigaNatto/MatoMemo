@@ -147,7 +147,10 @@ public class MatomeFragment extends Fragment {
                 }else{
                     allMatomeTitles[i] = matomeResults.get(i).getMatomeName();
                 }
-                //allMatomeTagNames[i] = matomeResults.get(i).getWords().get(matomeResults.get(i).getWords().size()).getTagName();
+                allMatomeTagNames[i]="";
+                for(int k=0;k<matomeResults.get(i).getWords().size();k++) {
+                    allMatomeTagNames[i] = allMatomeTagNames[i]+" "+ matomeResults.get(i).getWords().get(k).getTagName();
+                }
                 idList.add(matomeResults.get(i).getId());
             }
         }
