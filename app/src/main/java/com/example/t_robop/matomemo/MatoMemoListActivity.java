@@ -187,8 +187,8 @@ public class MatoMemoListActivity extends AppCompatActivity implements ViewPager
         switch (position) {
             case 0:
                 viewPager.setBackgroundColor(Color.parseColor("#eeeeef"));
-                tabLayout.setSelectedTabIndicatorColor(Color.parseColor("#9999ff"));
-                buttonText = "メモを書く";
+                tabLayout.setSelectedTabIndicatorColor(Color.parseColor("#d902ce7f"));
+                buttonText = "メモる";
                 matoMemoButton.setBackgroundColor(Color.parseColor("#7f9fff"));
                 View view1 = this.matoMemoButton; // フェードイン・アウトさせたいViewを取得
                 view1.setAlpha(0.0f);
@@ -199,7 +199,7 @@ public class MatoMemoListActivity extends AppCompatActivity implements ViewPager
             case 1:
                 viewPager.setBackgroundColor(Color.parseColor("#efeeee"));
                 tabLayout.setSelectedTabIndicatorColor(Color.parseColor("#ff9999"));
-                buttonText = "まとめを作る";
+                buttonText = "マトメる";
                 matoMemoButton.setBackgroundColor(Color.rgb(200,79,93));
                 View view2 = this.matoMemoButton; // フェードイン・アウトさせたいViewを取得
                 view2.setAlpha(0.0f);
