@@ -119,38 +119,6 @@ public class MatoMemoListActivity extends AppCompatActivity implements ViewPager
         reloadFragmentData(nowSubjectName);     //fragmentのListViewを更新
     }
 
-    //メニューバーの作成
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.options, menu);  //res\menu\optionsのlayoutを読み込む
-        return true;
-    }
-
-    //メニューが選択されたときの処理
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        Intent intent = null;
-
-        //addしたときのIDで識別
-        switch (item.getItemId()) {
-            case R.id.tag_settings:
-                intent = new Intent(this, TagEditActivity.class);   //TagEditActivityへIntent
-                break;
-
-            case R.id.editFolder:
-                intent = new Intent(this, GroupEditActivity.class);  //GroupEditActivityへIntent
-                break;
-
-            default:
-                break;
-
-        }
-        startActivity(intent);
-
-        return true;
-    }
-
     //NavigationDrawer内のItemクリック処理
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
@@ -278,8 +246,8 @@ public class MatoMemoListActivity extends AppCompatActivity implements ViewPager
         subjectGroupMenu.add(0,0,0,"未分類");
 
         optionGroupMenu = menu.addSubMenu(1,1,1,"Option");
-        optionGroupMenu.add(1,0,0,"教科編集");
-        optionGroupMenu.add(1,1,0,"タグ編集");
+        optionGroupMenu.add(1,0,0,"タグ編集");
+        optionGroupMenu.add(1,1,0,"教科編集");
 
         for(int i=0; i<arrayAdapter.getCount(); i++){
             subjectGroupMenu.add(i+1,i+1,i+1,arrayAdapter.getItem(i).toString());
@@ -287,20 +255,20 @@ public class MatoMemoListActivity extends AppCompatActivity implements ViewPager
     }
 
     //画面下のButton処理
-    public void MatoMemoClick(View v) {      //ToDo メソッド名リファクター
+    public void MatoMemoClick(View v) {
         String buttonText = matoMemoButton.getText().toString();  //ButtonのTextを取得
         Intent intent = null;
         String modeKEY = "MODE";
         String subjectKEY = "SUBJECT NAME";
 
         switch (buttonText) {
-            case "メモを書く":
+            case "メモる":
                 intent = new Intent(this, WritingActivity.class);    //WritingActivityにIntent
                 intent.putExtra(modeKEY, -1);      //-1 : メモ新規作成
                 intent.putExtra(subjectKEY, nowSubjectName);     //教科名受け渡し
                 break;
 
-            case "まとめを作る":
+            case "マトメる":
                 intent = new Intent(this, FolderCreateActivity.class);    //FolderCreateActivityにIntent
                 intent.putExtra(subjectKEY, nowSubjectName);
                 break;

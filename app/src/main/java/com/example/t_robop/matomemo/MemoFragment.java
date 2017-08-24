@@ -71,13 +71,6 @@ public class MemoFragment extends Fragment {
         return view;
     }
 
-    //データの初期化
-    private void memoDataInitialize() {
-        for (int i = 0; i < allMemoDate.length; i++) {
-            allMemoDate[i] = "";
-        }
-    }
-
     //データベースから教科別メモ取得
     public void getMemoDataList(String subjectName) {    //引数：　Drawer内でクリックした教科名
 
@@ -94,12 +87,15 @@ public class MemoFragment extends Fragment {
         int hour;
         int min;
         int sec;
+
+        String viewMemoData;
+
         allMemoDate = new String[memoResults.size()];     //各CardViewに入れるメモの保存日付
         allMemoTime = new String[memoResults.size()];     //各CardViewに入れるメモの保存時間
         allMemoData = new String[memoResults.size()];     //各CardViewに入れるメモの内容
 
 
-        //ToDo メモリストに何を表示するのか定めて、該当データ取得とadapterへの代入を行う
+        //ToDo cardViewのレイアウト修正
         //データ取得
         if (memoResults.size() != 0) {
             //CardViewに表示する要素の取得
@@ -112,9 +108,14 @@ public class MemoFragment extends Fragment {
                 min = memoResults.get(i).getTime() / 100 % 100;
                 sec = memoResults.get(i).getTime() % 100;
 
+                if(memoResults.get(i).getMemo().length() > 10){
+                    viewMemoData = memoResults.get(i).getMemo().substring(0,10) + "...";
+                }else{
+                    viewMemoData = memoResults.get(i).getMemo();
+                }
                 allMemoDate[i] = String.valueOf(year) + "/" + String.valueOf(month) + "/" + String.valueOf(day);
                 allMemoTime[i] = String.valueOf(hour) + ":" + String.valueOf(min);
-                allMemoData[i] = memoResults.get(i).getMemo();
+                allMemoData[i] = viewMemoData;
                 idList.add(memoResults.get(i).getId());
             }
         }
