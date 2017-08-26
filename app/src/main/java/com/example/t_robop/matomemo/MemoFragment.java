@@ -17,9 +17,7 @@ import io.realm.RealmResults;
 
 public class MemoFragment extends Fragment {
 
-    private String[] allMemoDate;
-    private String[] allMemoTime;
-    private String[] allMemoData;
+    private ArrayList<CardMemoData> memoDatas;
 
     public static ArrayList<Integer> idList = null;  //id保持用のリスト
 
@@ -58,11 +56,12 @@ public class MemoFragment extends Fragment {
         Bundle args = getArguments();
         nowSubjectName = args.getString("SUBJECT");
 
+        memoDatas = new ArrayList<>();
         idList = new ArrayList<>();
 
         getMemoDataList(nowSubjectName);   //選択されている教科名のメモ一覧をデータベースから取ってきて表示
 
-        customMemoRecyclerViewAdapter = new CustomMemoRecyclerViewAdapter(allMemoDate, allMemoTime, allMemoData);
+        customMemoRecyclerViewAdapter = new CustomMemoRecyclerViewAdapter(memoDatas,idList);
         recyclerView.setAdapter(customMemoRecyclerViewAdapter);
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
@@ -94,12 +93,10 @@ public class MemoFragment extends Fragment {
         int min;
         int sec;
 
-        String viewMemoData;
-
-        allMemoDate = new String[memoResults.size()];     //各CardViewに入れるメモの保存日付
-        allMemoTime = new String[memoResults.size()];     //各CardViewに入れるメモの保存時間
-        allMemoData = new String[memoResults.size()];     //各CardViewに入れるメモの内容
-
+        String memoDate;
+        String memoTime;
+        String memoText;
+        String textCountResult;
 
         //ToDo cardViewのレイアウト修正
         //データ取得
@@ -115,18 +112,20 @@ public class MemoFragment extends Fragment {
                 sec = memoResults.get(i).getTime() % 100;
 
                 if(memoResults.get(i).getMemo().length() > 10){
-                    viewMemoData = memoResults.get(i).getMemo().substring(0,10) + "...";
+                    textCountResult = memoResults.get(i).getMemo().substring(0,10) + "...";
                 }else{
-                    viewMemoData = memoResults.get(i).getMemo();
+                    textCountResult = memoResults.get(i).getMemo();
                 }
-                allMemoDate[i] = String.valueOf(year) + "/" + String.valueOf(month) + "/" + String.valueOf(day);
-                allMemoTime[i] = String.valueOf(hour) + ":" + String.valueOf(min);
-                allMemoData[i] = viewMemoData;
+                memoDate = String.valueOf(year) + "/" + String.valueOf(month) + "/" + String.valueOf(day);
+                memoTime = String.valueOf(hour) + ":" + String.valueOf(min);
+                memoText = textCountResult;
+                memoDatas.add(new CardMemoData(memoText,memoTime,memoDate));
                 idList.add(memoResults.get(i).getId());
             }
         }
     }
 
+    //ToDO もう一つおなじメモが作成されてしまう
     //Drawerクリック時のメモリスト更新
     public void reloadMemoData(String subject) {
         nowSubjectName = subject;   //Drawerでクリックされた教科名をフィールド変数に代入
@@ -134,7 +133,7 @@ public class MemoFragment extends Fragment {
         idList.clear();
         getMemoDataList(subject);    //データベースから教科別メモ取得
 
-        customMemoRecyclerViewAdapter = new CustomMemoRecyclerViewAdapter(allMemoDate, allMemoTime, allMemoData);
+        customMemoRecyclerViewAdapter = new CustomMemoRecyclerViewAdapter(memoDatas,idList);
         customMemoRecyclerViewAdapter.notifyDataSetChanged();
         recyclerView.setAdapter(customMemoRecyclerViewAdapter);
     }
