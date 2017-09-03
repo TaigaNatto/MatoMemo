@@ -35,22 +35,20 @@ import io.realm.RealmQuery;
 import io.realm.RealmResults;
 
 
-public class FolderCreateActivity extends AppCompatActivity implements OnDateSetListener, View.OnClickListener {
+public class FolderCreateActivity extends AppCompatActivity implements OnDateSetListener {
 
-    private TextView textViewfront; //まとめ期間開始日のTextView
-    private TextView textViewrear;  //まとめ期間終了日のTextView
+    private TextView dateTextView[] = new TextView[2]; //まとめ期間のTextView
     EditText edittext;  //まとめタイトル
     ListView listView;  //タグ表示
-    DatePick newFragment;
-    DatePick secondFragment;
-    int flag=0;     // 1:まとめ期間開始　2: まとめ期間終了
+    DatePick dateFragment[];
+    int flag = 0;     // 0:まとめ期間開始　1: まとめ期間終了
 
     Realm realm;
 
     //今日の日付の取得
     final Calendar c = Calendar.getInstance();
 
-    //Datepickerで取得した前半の日付
+    //Datepickerで取得した日付
     int frontYear = c.get(Calendar.YEAR);
     int frontMonth = c.get(Calendar.MONTH);
     int frontDay = c.get(Calendar.DAY_OF_MONTH);
@@ -61,12 +59,16 @@ public class FolderCreateActivity extends AppCompatActivity implements OnDateSet
     int rearDay = c.get(Calendar.DAY_OF_MONTH);
     int rearDate = 99999999;
 
-    int yearV[]= new int[2];
+    //実際に使うのはこいつら
+    int yearPear[] = {frontYear, rearYear};
+    int monthPear[] = {frontMonth, rearMonth};
+    int dayPear[] = {frontDay, rearDay};
+    int datePear[] = {frontDate, rearDate};
 
     //adapterに表示するアイテム用のArrayList
     ArrayList<RealmWordEntity> wordlist;
 
-   // ArrayList<String> wordlist;
+    // ArrayList<String> wordlist;
 
     //ArrayAdapterのString型でarrayAdapterを作成
     ArrayAdapter<String> arrayAdapter;
@@ -83,57 +85,36 @@ public class FolderCreateActivity extends AppCompatActivity implements OnDateSet
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_folder_create);
 
-        textViewfront = (TextView) findViewById(R.id.button1);
-        textViewrear = (TextView) findViewById(R.id.button2);
-
+        dateTextView[0] = (TextView) findViewById(R.id.button1);
+        dateTextView[1] = (TextView) findViewById(R.id.button2);
         edittext = (EditText) findViewById(R.id.txtmatome);
-
         listView = (ListView) findViewById(R.id.tagList);
-
-        Button btn = (Button)findViewById(R.id.createbutton);
-
         listView.setEmptyView(findViewById(R.id.txtempty));
-
-        newFragment = new DatePick(2017,1,1);
-        secondFragment=new DatePick(2017,1,1);
-
+        dateFragment = new DatePick[]{new DatePick(2017, 1, 1), new DatePick(2017, 1, 1)};
 
         //ToolBar
         Toolbar toolbar = (Toolbar) findViewById(R.id.tool_bar);
-
         toolbar.setTitle("まとめ作成");
-
         toolbar.setBackgroundColor(Color.parseColor("#c84f5d"));
-
         setSupportActionBar(toolbar);
-
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
 
         Realm.init(this);
         realm = Realm.getDefaultInstance();
 
-
-        //教科名取得
-        Intent intent=getIntent();
-        folder=intent.getStringExtra("SUBJECT NAME");
-
-
-        wordlist=new ArrayList<>();
-
+        wordlist = new ArrayList<>();
         arrayAdapter = new ArrayAdapter<>(
                 this, android.R.layout.simple_list_item_multiple_choice);
-
         listView.setItemsCanFocus(false);
-
         listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
+
+        //教科名取得
+        Intent intent = getIntent();
+        folder = intent.getStringExtra("SUBJECT NAME");
 
         //DatabaseからTagの一覧を取得
         getTagDataList();
-
-
-        btn.setOnClickListener(this);
-
     }
 
     @Override
@@ -143,88 +124,52 @@ public class FolderCreateActivity extends AppCompatActivity implements OnDateSet
     }
 
     public void showDatePickerDialog(View v) {
-        switch (v.getId()) {
-            //まとめ期間開始日
-            case R.id.button1:
-                newFragment = new DatePick(frontYear,frontMonth,frontDay);
-                newFragment.show(getSupportFragmentManager(), "datePicker");
-                flag=1;
-                break;
-
-            //まとめ期間終了日
-            case R.id.button2:
-                secondFragment = new DatePick(rearYear,rearMonth,rearDay);
-                secondFragment.show(getSupportFragmentManager(), "datePicker");
-                flag=2;
-                break;
-        }
+        //タグをint型に変換して取得
+        int tag = Integer.parseInt(v.getTag().toString());
+        dateFragment[tag] = new DatePick(yearPear[tag], monthPear[tag], dayPear[tag]);
+        dateFragment[tag].show(getSupportFragmentManager(), "datePicker");
+        flag = tag;
     }
 
     @Override
     public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-        switch (flag) {
-            case 1:
-                Log.d("date",String.valueOf(year));
-                Log.d("date",String.valueOf(monthOfYear));
-                Log.d("date",String.valueOf(dayOfMonth));
-                frontYear = year;
-                frontMonth = monthOfYear;
-                frontDay = dayOfMonth;
-                frontDate = frontYear*10000 + (frontMonth+1)*100 + frontDay;
+        Log.d("date", String.valueOf(year));
+        Log.d("date", String.valueOf(monthOfYear));
+        Log.d("date", String.valueOf(dayOfMonth));
+        yearPear[flag] = year;
+        monthPear[flag] = monthOfYear;
+        dayPear[flag] = dayOfMonth;
+        datePear[flag] = yearPear[flag] * 10000 + (monthPear[flag] + 1) * 100 + dayPear[flag];
 
-                if(frontDate<=rearDate){
-                    textViewfront.setText(String.valueOf(frontYear) + "/ " + String.valueOf(frontMonth+1) + "/ " + String.valueOf(frontDay));
-                }else{
-                    Toast.makeText(this, "誤った日付が設定されています。", Toast.LENGTH_LONG).show();
-                }
-
-                break;
-            case 2:
-                Log.d("date",String.valueOf(year));
-                Log.d("date",String.valueOf(monthOfYear));
-                Log.d("date",String.valueOf(dayOfMonth));
-                rearYear = year;
-                rearMonth = monthOfYear;
-                rearDay = dayOfMonth;
-                rearDate = rearYear*10000 + (rearMonth+1)*100 + rearDay;
-
-                if(frontDate<=rearDate){
-                    textViewrear.setText(String.valueOf(rearYear) + "/ " + String.valueOf(rearMonth+1) + "/ " + String.valueOf(rearDay));
-                }else{
-                    Toast.makeText(this, "誤った日付が設定されています。", Toast.LENGTH_LONG).show();
-                }
-
-                break;
+        if (datePear[0] <= datePear[1]) {
+            dateTextView[flag].setText(
+                            String.valueOf(yearPear[flag]) + "/ " +
+                            String.valueOf(monthPear[flag] + 1) + "/ " +
+                            String.valueOf(dayPear[flag]));
+        } else {
+            Toast.makeText(this, "誤った日付が設定されています。", Toast.LENGTH_LONG).show();
         }
-
-        //yearV[flag]=year;
     }
 
-    //ボタン処理
-    @Override
-    public void onClick(View view) {
-        checkarray = listView.getCheckedItemPositions();
-        if(checkarray.size()==0 && frontDate==0 && rearDate==99999999 && edittext.length()==0){
-            finish();
-        }else {
+    //保存ボタン処理
+    public void matomecreateClick(View view) {
+        //保存可能か判定
+        if (getSaveJudge()) {
             //まとめをデータベースに保存
             saveMatome();
-
         }
-
-
         finish();
     }
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if(keyCode== KeyEvent.KEYCODE_BACK){
-
-            checkarray = listView.getCheckedItemPositions();
-            if(checkarray.size()==0 && frontDate==0 && rearDate==99999999 && edittext.length()==0){
-                finish();
-            }else {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            //保存可能か判定
+            if (getSaveJudge()) {
+                //確認ダイアログ表示
                 saveMemoCheckedDialog();
+            } else {
+                finish();
             }
             return true;
         }
@@ -232,14 +177,14 @@ public class FolderCreateActivity extends AppCompatActivity implements OnDateSet
     }
 
     //DatabaseからTagの一覧を取得
-    public void getTagDataList(){
+    public void getTagDataList() {
         RealmQuery<RealmWordEntity> wordQuery = realm.where(RealmWordEntity.class);
 
         RealmResults<RealmWordEntity> wordResults = wordQuery.findAll();
         //取ってきたデータ全部欲しい時はこんな感じに
         wordlist.clear();
         arrayAdapter.clear();
-        for(int i=0;i<wordResults.size();i++){
+        for (int i = 0; i < wordResults.size(); i++) {
 
             wordlist.add(wordResults.get(i));
             //arrayAdapterにwordlistを入れる
@@ -252,29 +197,29 @@ public class FolderCreateActivity extends AppCompatActivity implements OnDateSet
 
     //todo Realmに保存するならまとめなきゃ
     //まとめを保存する
-    public void saveMatome(){
+    public void saveMatome() {
         //トランザクション開始
         realm.beginTransaction();
         RealmMatomeEntity model = realm.createObject(RealmMatomeEntity.class);
 
-        if(edittext.length() !=0) {
+        if (edittext.length() != 0) {
             model.setMatomeName(edittext.getText().toString());
 
-        }else{
+        } else {
             model.setMatomeName("タイトル未設定");
         }
 
-        model.setStartDate(frontDate);
-        model.setEndDate(rearDate);
+        model.setStartDate(datePear[0]);
+        model.setEndDate(datePear[1]);
 
         //ListViewチェックボックスで選択されているものを配列に代入
         checkarray = listView.getCheckedItemPositions();
-        for(int i = 0; i<checkarray.size(); i++){
+        for (int i = 0; i < checkarray.size(); i++) {
             int at = checkarray.keyAt(i);
             if (checkarray.get(at)) {
                 Log.d("example", "選択されている項目:" + listView.getItemAtPosition(at).toString()); //選択されているListの文字列を取得
                 Log.d("example", "そのキー" + at);  //選択されているListの要素数を取得
-                MatomeWord mWord= realm.createObject(MatomeWord.class);
+                MatomeWord mWord = realm.createObject(MatomeWord.class);
                 mWord.setTagName(listView.getItemAtPosition(at).toString());
                 //書き込みたいデータをインスタンスに入れる
                 model.words.add(mWord);
@@ -287,10 +232,9 @@ public class FolderCreateActivity extends AppCompatActivity implements OnDateSet
         folQuery = folQuery.equalTo("folderName", folder);
         RealmResults<RealmFolderEntity> folResults = folQuery.findAll();
 
-        if(folResults.size()!=0) {
+        if (folResults.size() != 0) {
             model.setFolderId(folResults.get(0).getId());
-        }
-        else {
+        } else {
             model.setFolderId(-1);
         }
 
@@ -303,11 +247,10 @@ public class FolderCreateActivity extends AppCompatActivity implements OnDateSet
     }
 
 
-    private void saveMemoCheckedDialog(){
+    private void saveMemoCheckedDialog() {
 
         // 確認ダイアログの生成
         AlertDialog.Builder alertDlg = new AlertDialog.Builder(this);
-        alertDlg.setTitle("");
         alertDlg.setMessage("メモの内容を保存しますか？");
         alertDlg.setPositiveButton(
                 "キャンセル",
@@ -341,9 +284,9 @@ public class FolderCreateActivity extends AppCompatActivity implements OnDateSet
 
     //メニューバーの作成
     @Override
-    public boolean onCreateOptionsMenu(Menu menu){
+    public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.options,menu);  //res\menu\optionsのlayoutを読み込む
+        inflater.inflate(R.menu.options, menu);  //res\menu\optionsのlayoutを読み込む
         return true;
     }
 
@@ -358,16 +301,12 @@ public class FolderCreateActivity extends AppCompatActivity implements OnDateSet
         switch (item.getItemId()) {
             //戻るボタンを押したときの処理
             case android.R.id.home:
-
-                //ListViewチェックボックスで選択されているものを配列に代入
-                checkarray = listView.getCheckedItemPositions();
-                if(checkarray.size()==0 && frontDate==0 && rearDate==99999999 && edittext.length()==0){
-                    finish();
-                }else {
+                if (getSaveJudge()) {
                     saveMemoCheckedDialog();
+                } else {
+                    finish();
                 }
                 break;
-
             //メニューが選択されたときの処理
             case R.id.tag_settings:
                 Log.d("menu", "タグ設定へ");  //TagEditActivityへIntent
@@ -409,6 +348,16 @@ public class FolderCreateActivity extends AppCompatActivity implements OnDateSet
             }
         }
         return maxId + 1;
+    }
+
+    //保存可能か判定してくれるメソッド
+    public Boolean getSaveJudge() {
+        checkarray = listView.getCheckedItemPositions();
+        if (!(checkarray.size() == 0 && datePear[0] == 0 && datePear[1] == 99999999 && edittext.length() == 0)) {
+            //まとめをデータベースに保存可能
+            return true;
+        }
+        return false;
     }
 
 }

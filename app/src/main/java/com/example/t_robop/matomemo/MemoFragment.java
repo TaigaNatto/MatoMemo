@@ -89,7 +89,7 @@ public class MemoFragment extends Fragment {
         //Debeg用　全データ確認
         int year;
         int month;
-        int day;
+         int day;
         int hour;
         int min;
         int sec;

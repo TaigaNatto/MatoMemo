@@ -35,7 +35,7 @@ import io.realm.RealmQuery;
 import io.realm.RealmResults;
 
 
-public class MatoMemoListActivity extends AppCompatActivity implements ViewPager.OnPageChangeListener, NavigationView.OnNavigationItemSelectedListener{
+public class MatoMemoListActivity extends AppCompatActivity implements ViewPager.OnPageChangeListener, NavigationView.OnNavigationItemSelectedListener {
 
     private CustomFragmentPagerAdapter customFragmentPagerAdapter;    //自作のViewPager用Adapter
 
@@ -74,7 +74,7 @@ public class MatoMemoListActivity extends AppCompatActivity implements ViewPager
         //UI部品の取得
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         matoMemoButton = (Button) findViewById(R.id.MatoMemoButton);
-        navigationView = (NavigationView)findViewById(R.id.navigationView);
+        navigationView = (NavigationView) findViewById(R.id.navigationView);
         drawerLayout = (DrawerLayout) findViewById(R.id.drawerLayout);
         //ListView drawerListView = (ListView) findViewById(R.id.left_drawer);
         String[] tabNames = getResources().getStringArray(R.array.tabs);
@@ -93,7 +93,8 @@ public class MatoMemoListActivity extends AppCompatActivity implements ViewPager
         //Drawer内のList初期化
         drawerArrayAdapter = new ArrayAdapter<>(this, R.layout.drawer_list_item);
 
-        getFolderDataList(realm, drawerArrayAdapter);    //Databaseから教科(Folder)取得してdrawerArrayAdapterにセット    //ToDo データのgetとsetを分けてメソッド化する →　reloadいらなくなる
+        getFolderDataList(realm, drawerArrayAdapter);    //Databaseから教科(Folder)取得してdrawerArrayAdapterにセット
+        // ToDo データのgetとsetを分けてメソッド化する →　reloadいらなくなる
 
         customSubjectItemAddMenu(drawerArrayAdapter);
         navigationView.setNavigationItemSelectedListener(this);
@@ -113,8 +114,8 @@ public class MatoMemoListActivity extends AppCompatActivity implements ViewPager
         viewPager.setBackgroundColor(Color.parseColor("#eeeeef"));
         tabLayout.setBackgroundColor(Color.parseColor("#ffffff"));
 
-        header=navigationView.getHeaderView(0);
-        drawerHeader= (LinearLayout) header.findViewById(R.id.header_color);
+        header = navigationView.getHeaderView(0);
+        drawerHeader = (LinearLayout) header.findViewById(R.id.header_color);
     }
 
     //Activityが再度開始された時に呼ばれるコールバックメソッド
@@ -130,23 +131,20 @@ public class MatoMemoListActivity extends AppCompatActivity implements ViewPager
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         String clickedItem = item.toString();
-        if(clickedItem.equals("教科編集")){
+        if (clickedItem.equals("教科編集")) {
             Intent intent = new Intent(this, GroupEditActivity.class);   //GroupEditActivityにIntent
             startActivity(intent);
-        }
-        else if(clickedItem.equals("タグ編集")){
+        } else if (clickedItem.equals("タグ編集")) {
             Intent intent = new Intent(this, TagEditActivity.class);   //GroupEditActivityにIntent
             startActivity(intent);
-        }
-        else{
-
+        } else if (clickedItem.equals("時間割モード")) {
+            Intent intent = new Intent(this, Zikanwari.class);   //GroupEditActivityにIntent
+            startActivity(intent);
+        } else {
             nowSubjectName = clickedItem;
-
             toolbar.setTitle(nowSubjectName);
-
             reloadFragmentData(nowSubjectName);
         }
-
         drawerLayout.closeDrawer(GravityCompat.START);
         return true;
     }
@@ -156,45 +154,35 @@ public class MatoMemoListActivity extends AppCompatActivity implements ViewPager
 
     }
 
+    //タブ切り替え時の処理
     @Override
     public void onPageSelected(int position) {
-        String buttonText = null;
-        switch (position) {
-            case 0:
-                drawerHeader.setBackgroundColor(Color.parseColor("#043C78"));
-                toolbar.setBackgroundColor(Color.parseColor("#043C78"));
-                viewPager.setBackgroundColor(Color.parseColor("#eeeeef"));
-                tabLayout.setSelectedTabIndicatorColor(Color.parseColor("#d902ce7f"));
-                buttonText = "メモる";
-                matoMemoButton.setBackgroundColor(Color.parseColor("#043C78"));
-                View view1 = this.matoMemoButton; // フェードイン・アウトさせたいViewを取得
-                view1.setAlpha(0.0f);
-                ObjectAnimator animation1 = ObjectAnimator.ofFloat(view1, "alpha", 1.0f);
-                animation1.start();
-                break;
+        View v = this.matoMemoButton;
+        ObjectAnimator animation;
+        //タブによる違いを配列化
+        int[] headerBackground = {Color.parseColor("#043C78"), Color.parseColor("#c84f5d")};
+        int[] toolbarBackground = {Color.parseColor("#043C78"), Color.parseColor("#c84f5d")};
+        int[] viewBackground = {Color.parseColor("#eeeeef"), Color.parseColor("#efeeee")};
+        int[] tabSelectedColor = {Color.parseColor("#d902ce7f"), Color.parseColor("#ff9999")};
+        int[] buttonBackground = {Color.parseColor("#043C78"), Color.parseColor("#c84f5d")};
+        String[] buttonText = {"メモる", "マトメる"};
 
-            case 1:
-                drawerHeader.setBackgroundColor(Color.parseColor("#c84f5d"));
-                toolbar.setBackgroundColor(Color.parseColor("#c84f5d"));
-                viewPager.setBackgroundColor(Color.parseColor("#efeeee"));
-                tabLayout.setSelectedTabIndicatorColor(Color.parseColor("#ff9999"));
-                buttonText = "マトメる";
-                matoMemoButton.setBackgroundColor(Color.parseColor("#c84f5d"));
-                View view2 = this.matoMemoButton; // フェードイン・アウトさせたいViewを取得
-                view2.setAlpha(0.0f);
-                ObjectAnimator animation2 = ObjectAnimator.ofFloat(view2, "alpha", 1.0f);
-                animation2.start();
-                break;
-
-            default:
-                break;
-        }
-        matoMemoButton.setText(buttonText);
+        //それぞれ適用
+        drawerHeader.setBackgroundColor(headerBackground[position]);
+        toolbar.setBackgroundColor(toolbarBackground[position]);
+        viewPager.setBackgroundColor(viewBackground[position]);
+        tabLayout.setSelectedTabIndicatorColor(tabSelectedColor[position]);
+        matoMemoButton.setBackgroundColor(buttonBackground[position]);
+        matoMemoButton.setText(buttonText[position]);
+        //切替時のアニメーション(リストラ最筆頭候補)
+        v.setAlpha(0.0f);
+        animation = ObjectAnimator.ofFloat(v, "alpha", 1.0f);
+        animation.start();
     }
 
     @Override
     public void onPageScrollStateChanged(int state) {
-        Log.d("ASD",String.valueOf(state));
+        Log.d("ASD", String.valueOf(state));
     }
 
     //データベースから教科取得
@@ -222,46 +210,36 @@ public class MatoMemoListActivity extends AppCompatActivity implements ViewPager
 
     //Fragmentの更新
     public void reloadFragmentData(String subjectName) {
-        int flag = 0;
 
         //Drawer内でタップされた教科名のメモリストを表示
         Fragment memoFragment = customFragmentPagerAdapter.getItem(0);    //CustomFragmentPagerAdapterのgetItemからfragment情報を取ってくる
         Fragment matomeFragment = customFragmentPagerAdapter.getItem(1);
 
-        //GroupEditActivityで削除した教科が指定された場合、強制的に未分類フォルダに変える
-        for (int i = 0; i < drawerArrayAdapter.getCount(); i++) {
-            if (subjectName.equals(drawerArrayAdapter.getItem(i))) {
-                flag = 1;
-            }
-        }
-
-        if (flag == 0) {
-            subjectName = "未分類";
-            toolbar.setTitle("未分類");
-        }
-
+        //教科があるか否か検索・無ければ未分類化
+        String subject=subjectFilter(subjectName);
 
         if (memoFragment != null && memoFragment instanceof MemoFragment) {
-            ((MemoFragment) memoFragment).reloadMemoData(subjectName);       //メモリストの更新
+            ((MemoFragment) memoFragment).reloadMemoData(subject);       //メモリストの更新
         }
 
         if (matomeFragment != null && matomeFragment instanceof MatomeFragment) {
-            ((MatomeFragment) matomeFragment).reloadMatomeData(subjectName);     //まとめリストの更新
+            ((MatomeFragment) matomeFragment).reloadMatomeData(subject);     //まとめリストの更新
         }
     }
 
-    private void customSubjectItemAddMenu(ArrayAdapter arrayAdapter){
+    private void customSubjectItemAddMenu(ArrayAdapter arrayAdapter) {
 
         menu = navigationView.getMenu();
-        subjectGroupMenu = menu.addSubMenu(0,0,0,"Subject");
-        subjectGroupMenu.add(0,0,0,"未分類");
+        subjectGroupMenu = menu.addSubMenu(0, 0, 0, "Subject");
+        subjectGroupMenu.add(0, 0, 0, "未分類");
 
-        optionGroupMenu = menu.addSubMenu(1,1,1,"Option");
-        optionGroupMenu.add(1,0,0,"タグ編集");
-        optionGroupMenu.add(1,1,0,"教科編集");
+        optionGroupMenu = menu.addSubMenu(1, 1, 1, "Option");
+        optionGroupMenu.add(1, 2, 0, "時間割モード");
+        optionGroupMenu.add(1, 0, 0, "タグ編集");
+        optionGroupMenu.add(1, 1, 0, "教科編集");
 
-        for(int i=0; i<arrayAdapter.getCount(); i++){
-            subjectGroupMenu.add(i+1,i+1,i+1,arrayAdapter.getItem(i).toString());
+        for (int i = 0; i < arrayAdapter.getCount(); i++) {
+            subjectGroupMenu.add(i + 1, i + 1, i + 1, arrayAdapter.getItem(i).toString());
         }
     }
 
@@ -271,7 +249,6 @@ public class MatoMemoListActivity extends AppCompatActivity implements ViewPager
         Intent intent = null;
         String modeKEY = "MODE";
         String subjectKEY = "SUBJECT NAME";
-
         switch (buttonText) {
             case "メモる":
                 intent = new Intent(this, WritingActivity.class);    //WritingActivityにIntent
@@ -287,8 +264,19 @@ public class MatoMemoListActivity extends AppCompatActivity implements ViewPager
             default:
                 break;
         }
-
         startActivity(intent);  //Intent!!!
+    }
+
+    //教科があるかどうか検索し、無ければ「未分類」を返すメソッド
+    public String subjectFilter(String subjectName){
+        //GroupEditActivityで削除した教科が指定された場合、強制的に未分類フォルダに変える
+        for (int i = 0; i < drawerArrayAdapter.getCount(); i++) {
+            if (subjectName.equals(drawerArrayAdapter.getItem(i))) {
+                return subjectName;
+            }
+        }
+        toolbar.setTitle("未分類");
+        return "未分類";
     }
 
 }

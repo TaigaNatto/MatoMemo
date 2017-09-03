@@ -67,10 +67,11 @@ public class CustomMatomeRecyclerViewAdapter extends RecyclerView.Adapter<Custom
 
     @Override
     public void onBindViewHolder(final CustomMatomeRecyclerViewHolder holder, final int position) {
-        holder.matomeTitleText.setText(mMatomeTitles[holder.getLayoutPosition()]);
-        holder.matomeStartDateText.setText(mMatomeStartDates[holder.getLayoutPosition()]);
-        holder.matomeEndDateText.setText(mMatomeEndDates[holder.getLayoutPosition()]);
-        holder.matomeTagNameText.setText(mMatomeTagNames[holder.getLayoutPosition()]);
+        int layoutPos=holder.getLayoutPosition();
+        holder.matomeTitleText.setText(mMatomeTitles[layoutPos]);
+        holder.matomeStartDateText.setText(mMatomeStartDates[layoutPos]);
+        holder.matomeEndDateText.setText(mMatomeEndDates[layoutPos]);
+        holder.matomeTagNameText.setText(mMatomeTagNames[layoutPos]);
 
         holder.matomeCardView.setOnClickListener(new View.OnClickListener(){
             @Override

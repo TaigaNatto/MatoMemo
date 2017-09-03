@@ -63,7 +63,7 @@ public class MatomeFragment extends Fragment {
 
         getMatomeDataList(nowSubjectName);   //StartListActivityでタップした教科名のメモ一覧をデータベースから取ってきて表示
 
-        customMatomeRecyclerViewAdapter = new CustomMatomeRecyclerViewAdapter(allMatomeTitles,allMatomeStartDates,allMatomeEndDates,allMatomeTagNames);
+        customMatomeRecyclerViewAdapter = new CustomMatomeRecyclerViewAdapter(allMatomeTitles, allMatomeStartDates, allMatomeEndDates, allMatomeTagNames);
         recyclerView.setAdapter(customMatomeRecyclerViewAdapter);
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
@@ -76,10 +76,9 @@ public class MatomeFragment extends Fragment {
     public void getMatomeDataList(String subjectName) {
 
         RealmQuery<RealmMatomeEntity> matomeQuery = realm.where(RealmMatomeEntity.class);
-        if(subjectName.equals("未分類")){
+        if (subjectName.equals("未分類")) {
             matomeQuery = matomeQuery.equalTo("folder", subjectName);
-        }
-        else {
+        } else {
             RealmQuery<RealmFolderEntity> folQuery = realm.where(RealmFolderEntity.class);
             folQuery = folQuery.equalTo("folderName", subjectName);
             RealmResults<RealmFolderEntity> folResults = folQuery.findAll();
@@ -97,11 +96,10 @@ public class MatomeFragment extends Fragment {
         int endMonth;
         int endDay;
 
-
-        allMatomeTitles = new String[matomeResults.size()];
-        allMatomeStartDates = new String[matomeResults.size()];
-        allMatomeEndDates = new String[matomeResults.size()];
-        allMatomeTagNames = new String[matomeResults.size()];
+        allMatomeTitles =
+                allMatomeStartDates =
+                        allMatomeEndDates =
+                                allMatomeTagNames = new String[matomeResults.size()];
 
         if (matomeResults.size() != 0) {
             //データ取得
@@ -131,25 +129,25 @@ public class MatomeFragment extends Fragment {
                 endMonth = matomeResults.get(i).getEndDate() / 100 % 100;
                 endDay = matomeResults.get(i).getEndDate() % 100;
 
-                if(startMonth == 0 && startDay == 0){
+                if (startMonth == 0 && startDay == 0) {
                     allMatomeStartDates[i] = "未設定";
-                }else{
+                } else {
                     allMatomeStartDates[i] = String.valueOf(startMonth) + "/" + String.valueOf(startDay);
                 }
 
-                if(endMonth == 99 && endDay == 99){
+                if (endMonth == 99 && endDay == 99) {
                     allMatomeEndDates[i] = "未設定";
-                }else{
+                } else {
                     allMatomeEndDates[i] = String.valueOf(endMonth) + "/" + String.valueOf(endDay);
                 }
-                if(matomeResults.get(i).getMatomeName() == null){
+                if (matomeResults.get(i).getMatomeName() == null) {
                     allMatomeTitles[i] = "タイトル未設定";
-                }else{
+                } else {
                     allMatomeTitles[i] = matomeResults.get(i).getMatomeName();
                 }
-                allMatomeTagNames[i]="";
-                for(int k=0;k<matomeResults.get(i).getWords().size();k++) {
-                    allMatomeTagNames[i] = allMatomeTagNames[i]+" "+ matomeResults.get(i).getWords().get(k).getTagName();
+                allMatomeTagNames[i] = "";
+                for (int k = 0; k < matomeResults.get(i).getWords().size(); k++) {
+                    allMatomeTagNames[i] = allMatomeTagNames[i] + " " + matomeResults.get(i).getWords().get(k).getTagName();
                 }
                 idList.add(matomeResults.get(i).getId());
             }
@@ -163,7 +161,7 @@ public class MatomeFragment extends Fragment {
         idList.clear();
         getMatomeDataList(subject);
 
-        customMatomeRecyclerViewAdapter = new CustomMatomeRecyclerViewAdapter(allMatomeTitles,allMatomeStartDates,allMatomeEndDates,allMatomeTagNames);
+        customMatomeRecyclerViewAdapter = new CustomMatomeRecyclerViewAdapter(allMatomeTitles, allMatomeStartDates, allMatomeEndDates, allMatomeTagNames);
         customMatomeRecyclerViewAdapter.notifyDataSetChanged();
         recyclerView.setAdapter(customMatomeRecyclerViewAdapter);
     }
