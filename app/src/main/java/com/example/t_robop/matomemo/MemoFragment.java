@@ -75,10 +75,9 @@ public class MemoFragment extends Fragment {
     public void getMemoDataList(String subjectName) {    //引数：　Drawer内でクリックした教科名
 
         RealmQuery<RealmMemoEntity> memoQuery = realm.where(RealmMemoEntity.class);
-        if(subjectName.equals("未分類")){
+        if (subjectName.equals("未分類")) {
             memoQuery = memoQuery.equalTo("folder", subjectName);  //引数で受け取った教科名のメモを取得
-        }
-        else {
+        } else {
             RealmQuery<RealmFolderEntity> folQuery = realm.where(RealmFolderEntity.class);
             folQuery = folQuery.equalTo("folderName", subjectName);  //引数で受け取った教科名のfolderを取得
             RealmResults<RealmFolderEntity> folResults = folQuery.findAll();
@@ -89,7 +88,7 @@ public class MemoFragment extends Fragment {
         //Debeg用　全データ確認
         int year;
         int month;
-         int day;
+        int day;
         int hour;
         int min;
         int sec;
@@ -106,17 +105,18 @@ public class MemoFragment extends Fragment {
         if (memoResults.size() != 0) {
             //CardViewに表示する要素の取得
             for (int i = 0; i < memoResults.size(); i++) {
-                year = memoResults.get(i).getDate() / 10000;
-                month = memoResults.get(i).getDate() / 100 % 100;
-                day = memoResults.get(i).getDate() % 100;
 
-                hour = memoResults.get(i).getTime() / 10000;
-                min = memoResults.get(i).getTime() / 100 % 100;
-                sec = memoResults.get(i).getTime() % 100;
+                year = getDeta("year",memoResults,i);
+                month = getDeta("month",memoResults,i);
+                day = getDeta("day",memoResults,i);
 
-                if(memoResults.get(i).getMemo().length() > 10){
-                    viewMemoData = memoResults.get(i).getMemo().substring(0,10) + "...";
-                }else{
+                hour = getDeta("hour",memoResults,i);
+                min = getDeta("min",memoResults,i);
+                sec = getDeta("sec",memoResults,i);
+
+                if (memoResults.get(i).getMemo().length() > 10) {
+                    viewMemoData = memoResults.get(i).getMemo().substring(0, 10) + "...";
+                } else {
                     viewMemoData = memoResults.get(i).getMemo();
                 }
                 allMemoDate[i] = String.valueOf(year) + "/" + String.valueOf(month) + "/" + String.valueOf(day);
@@ -137,6 +137,25 @@ public class MemoFragment extends Fragment {
         customMemoRecyclerViewAdapter = new CustomMemoRecyclerViewAdapter(allMemoDate, allMemoTime, allMemoData);
         customMemoRecyclerViewAdapter.notifyDataSetChanged();
         recyclerView.setAdapter(customMemoRecyclerViewAdapter);
+    }
+
+    //指定したデータを計算して返してくれるメソッド
+    public int getDeta(String type, RealmResults<RealmMemoEntity> memoResults, int pos) {
+        switch (type) {
+            case "year":
+                return memoResults.get(pos).getDate() / 10000;
+            case "month":
+                return memoResults.get(pos).getDate() / 100 % 100;
+            case "day":
+                return memoResults.get(pos).getDate() % 100;
+            case "hour":
+                return memoResults.get(pos).getTime() / 10000;
+            case "min":
+                return memoResults.get(pos).getTime() / 100 % 100;
+            case "sec":
+                return memoResults.get(pos).getTime() % 100;
+        }
+        return -1;
     }
 
 }

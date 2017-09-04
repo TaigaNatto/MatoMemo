@@ -121,13 +121,13 @@ public class MatomeFragment extends Fragment {
             }
             */
             for (int i = 0; i < matomeResults.size(); i++) {
-                startYear = matomeResults.get(i).getStartDate() / 10000;
-                startMonth = matomeResults.get(i).getStartDate() / 100 % 100;
-                startDay = matomeResults.get(i).getStartDate() % 100;
+                startYear = getDeta("startYear",matomeResults,i);
+                startMonth = getDeta("startMonth",matomeResults,i);
+                startDay = getDeta("startDay",matomeResults,i);
 
-                endYear = matomeResults.get(i).getEndDate() / 10000;
-                endMonth = matomeResults.get(i).getEndDate() / 100 % 100;
-                endDay = matomeResults.get(i).getEndDate() % 100;
+                endYear = getDeta("endYear",matomeResults,i);
+                endMonth = getDeta("endMonth",matomeResults,i);
+                endDay = getDeta("endDay",matomeResults,i);
 
                 if (startMonth == 0 && startDay == 0) {
                     allMatomeStartDates[i] = "未設定";
@@ -230,4 +230,23 @@ public class MatomeFragment extends Fragment {
         return true;
     }
     */
+
+    //指定したデータを計算して返してくれるメソッド
+    public int getDeta(String type, RealmResults<RealmMatomeEntity> matomeResults, int pos) {
+        switch (type) {
+            case "startYear":
+                return matomeResults.get(pos).getStartDate() / 10000;
+            case "startMonth":
+                return matomeResults.get(pos).getStartDate() / 100 % 100;
+            case "startDay":
+                return matomeResults.get(pos).getStartDate() % 100;
+            case "endHour":
+                return matomeResults.get(pos).getEndDate() / 10000;
+            case "endMin":
+                return matomeResults.get(pos).getEndDate() / 100 % 100;
+            case "endSec":
+                return matomeResults.get(pos).getEndDate() % 100;
+        }
+        return -1;
+    }
 }
