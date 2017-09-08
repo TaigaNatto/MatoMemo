@@ -34,7 +34,9 @@ public class GroupEditActivity extends AppCompatActivity {
     ///////
     //ダイアログ用のEditText
     EditText dialogGroupNameEditText;
+    EditText dialogClassNameEditText;
     EditText dialogGroupNameMakeText;
+    EditText dialogClassNameMakeTexy;
     //ダイアログ内のeditTextデータを一次保存
     String groupName;
 
@@ -59,6 +61,8 @@ public class GroupEditActivity extends AppCompatActivity {
     View dialogViewGroupEdit;
     View dialogViewGroupMake;
 
+    ArrayList FoldersId;
+
     //ダイアログ　上から編集、新規作成、削除用ダイアログ
     AlertDialog dialogBuilderGroupEdit;
     AlertDialog dialogBuilderGroupMake;
@@ -80,7 +84,9 @@ public class GroupEditActivity extends AppCompatActivity {
         dialogViewGroupEdit = factoryEdit.inflate(R.layout.dialog_group_edit,null);
         dialogViewGroupMake = factoryMake.inflate(R.layout.dialog_group_make,null);
         dialogGroupNameEditText = (EditText) dialogViewGroupEdit.findViewById(R.id.groupNameEdit);
+        dialogClassNameEditText = (EditText) dialogViewGroupEdit.findViewById(R.id.classPlaceEdit);
         dialogGroupNameMakeText = (EditText) dialogViewGroupMake.findViewById(R.id.groupNameMake);
+        dialogClassNameMakeTexy = (EditText) dialogViewGroupMake.findViewById(R.id.classPlaceMake);
         simpleListView = (ListView) findViewById(R.id.list);
         multiChoiceListView = (ListView) findViewById(R.id.list_item);
         folderNotExistText = (TextView) findViewById(R.id.textView);
@@ -276,6 +282,7 @@ public class GroupEditActivity extends AppCompatActivity {
                         )
                         .create();
             }
+            //フォルダがあるか判定して、フォルダが1つもない場合「フォルダがありません」と表示させる
             dialogBuilderGroupRemove.show();
 
             if(groupNameArrayList.size() == 0){
@@ -284,12 +291,13 @@ public class GroupEditActivity extends AppCompatActivity {
 
                 groupEditMode = true;
 
+                //adapterを更新
                 adapterUpdate();
                 simpleListView.setAdapter(groupNameArrayAdapter);
 
                 ((android.support.design.widget.FloatingActionButton) findViewById(R.id.fab)).setImageResource(R.drawable.plusmark);
             }
-
+            //フォルダがあるか判定して、フォルダが1つもない場合「フォルダがありません」と表示させる
             setTextViewDisply();
         }
     }
@@ -311,6 +319,7 @@ public class GroupEditActivity extends AppCompatActivity {
 
                                     //
                                     if (!groupName.equals("") && notExistList()) {
+                                        //データベースのデータを更新する
                                         detaKoshin();
 
                                         groupNameArrayList.set(listPosition, groupName);
@@ -339,6 +348,7 @@ public class GroupEditActivity extends AppCompatActivity {
                             new DialogInterface.OnClickListener(){
                                 @Override
                                 public void onClick(DialogInterface dialogBuilderGroupEdit,int witch){
+                                    //削除するか確認数ダイアログ
                                     kesukadoka();
                                 }
                             }
@@ -438,6 +448,7 @@ public class GroupEditActivity extends AppCompatActivity {
                 resultMemos.deleteAllFromRealm();
             }
         });
+
     }
 
     ////データベースのデータを削除////
@@ -508,13 +519,16 @@ public class GroupEditActivity extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialog, int whichButton){
 
+                //指定したフォルダにはいっているメモデータを削除
                 dateBaseMemoDateRemove();
 
                 groupNameArrayList.remove(listPosition);
 
+                //adapterの中身を更新
                 adapterUpdate();
                 simpleListView.setAdapter(groupNameArrayAdapter);
 
+                //データベースのデータを書き直す
                 detaBaseUpdate();
 
                 dialogGroupNameEditText.setText("");
