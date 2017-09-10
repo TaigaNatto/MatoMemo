@@ -1,10 +1,8 @@
-package com.example.t_robop.matomemo;
+package com.example.t_robop.matomemo.Main;
 
 import android.animation.ObjectAnimator;
 import android.content.Intent;
 import android.graphics.Color;
-import android.graphics.drawable.TransitionDrawable;
-import android.os.RecoverySystem;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
@@ -18,17 +16,21 @@ import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.SubMenu;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 
-import com.airbnb.lottie.LottieAnimationView;
+import com.example.t_robop.matomemo.CustomFragmentPagerAdapter;
+import com.example.t_robop.matomemo.FolderCreateActivity;
+import com.example.t_robop.matomemo.GroupEditActivity;
+import com.example.t_robop.matomemo.R;
+import com.example.t_robop.matomemo.RealmFolderEntity;
+import com.example.t_robop.matomemo.TagEditActivity;
+import com.example.t_robop.matomemo.WritingActivity;
+import com.example.t_robop.matomemo.Zikanwari;
 
 import io.realm.Realm;
 import io.realm.RealmQuery;

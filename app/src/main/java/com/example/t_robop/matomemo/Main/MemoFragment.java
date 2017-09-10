@@ -1,12 +1,17 @@
-package com.example.t_robop.matomemo;
+package com.example.t_robop.matomemo.Main;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import com.example.t_robop.matomemo.CustomMemoRecyclerViewAdapter;
+import com.example.t_robop.matomemo.EmptyRecyclerView;
+import com.example.t_robop.matomemo.R;
+import com.example.t_robop.matomemo.RealmFolderEntity;
+import com.example.t_robop.matomemo.RealmMemoEntity;
 
 import java.util.ArrayList;
 
