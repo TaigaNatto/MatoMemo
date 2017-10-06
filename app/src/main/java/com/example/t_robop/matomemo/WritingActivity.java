@@ -218,7 +218,7 @@ public class WritingActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
 
-        spinnerAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item);
+        spinnerAdapter = new ArrayAdapter<>(this, R.layout.spinner_item);
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         // アイテムを追加します
         spinnerAdapter.add("未分類");
