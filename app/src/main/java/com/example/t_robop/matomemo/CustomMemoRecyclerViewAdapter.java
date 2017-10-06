@@ -84,8 +84,6 @@ public class CustomMemoRecyclerViewAdapter extends RecyclerView.Adapter<CustomMe
                 Realm.init(view.getContext());
                 realm = Realm.getDefaultInstance();
 
-                //final String clickedMemoListItem = (String) view.getContext().getItemAtPosition(position);   //クリックしたpositionから文字列を取得
-
                 //消去確認のダイアログ
                 AlertDialog.Builder alertDig = new AlertDialog.Builder(view.getContext());
                 alertDig.setTitle("");
@@ -124,12 +122,11 @@ public class CustomMemoRecyclerViewAdapter extends RecyclerView.Adapter<CustomMe
     }
 
     //選択されたItemをデータベースから削除
-    //ToDo このままだとメモタイトル同名のものが全てデータベースから消えてしまう
     public void removeMemoData(int selectedItemId) {
         // クエリを発行
         RealmQuery<RealmMemoEntity> delQuery = realm.where(RealmMemoEntity.class);
         //消したいデータを指定
-        delQuery.equalTo("id", selectedItemId);      //メモ内容とListの文字列を比較      //ToDo List内の表示を決めないとequalToでヒットしないので、レイアウト決めよう
+        delQuery.equalTo("id", selectedItemId);
 
         //指定されたデータを持つデータのみに絞り込む
         final RealmResults<RealmMemoEntity> delR = delQuery.findAll();

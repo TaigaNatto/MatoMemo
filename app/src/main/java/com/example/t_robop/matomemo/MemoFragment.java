@@ -125,7 +125,6 @@ public class MemoFragment extends Fragment {
         }
     }
 
-    //ToDO もう一つおなじメモが作成されてしまう
     //Drawerクリック時のメモリスト更新
     public void reloadMemoData(String subject) {
         nowSubjectName = subject;   //Drawerでクリックされた教科名をフィールド変数に代入

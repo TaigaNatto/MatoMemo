@@ -139,11 +139,11 @@ public class MatomeFragment extends Fragment {
         }
     }
 
-    //ToDO もう一つ同じメモが作成されてしまう
     //Drawerクリック時のまとめリスト更新
     public void reloadMatomeData(String subject) {
         nowSubjectName = subject;
 
+        matomeDatas.clear();
         idList.clear();
         getMatomeDataList(subject);
 

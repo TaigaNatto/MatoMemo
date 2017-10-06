@@ -85,7 +85,8 @@ public class CustomMatomeRecyclerViewAdapter extends RecyclerView.Adapter<Custom
             @Override
             public boolean onLongClick(final View view) {
 
-                //final String clickedMatomeItem = (String) view.getContext().getItemAtPosition(position);   //クリックしたpositionからItemを取得
+                Realm.init(view.getContext());
+                realm = Realm.getDefaultInstance();
 
                 //消去確認のダイアログ
                 AlertDialog.Builder alertDig = new AlertDialog.Builder(view.getContext());
@@ -128,7 +129,7 @@ public class CustomMatomeRecyclerViewAdapter extends RecyclerView.Adapter<Custom
     //選択されたItemをデータベースから削除
     public void removeMatomeData(int selectedItemId) {
 
-        RealmQuery<RealmMatomeEntity> delQuery = realm.where(RealmMatomeEntity.class);  //ToDo ヌルポ発生
+        RealmQuery<RealmMatomeEntity> delQuery = realm.where(RealmMatomeEntity.class);
         //消したいデータを指定
         delQuery.equalTo("id", selectedItemId);
 
