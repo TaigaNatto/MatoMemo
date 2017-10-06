@@ -27,8 +27,9 @@
         <activity android:name=".DBLogActivity" />
         <activity android:name=".MatomeActivity" />
         <activity android:name=".TagEditActivity" />
-        <activity android:name=".KeyboardResizeTestActivity"
-            android:windowSoftInputMode="adjustResize"></activity>
+        <activity
+            android:name=".KeyboardResizeTestActivity"
+            android:windowSoftInputMode="adjustResize"/>
     </application>
 
 </manifest>

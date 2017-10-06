@@ -49,7 +49,8 @@ public class WritingActivity extends AppCompatActivity {
 
     int id;
     //メモを新規作成する場合は０、編集するときは１としています。
-    String folder;
+    String folder;  //intent元から受けとったときの教科名
+    String newfolder = "未分類"; //spinnerクリックで変更されたときの教科名
 
     int folderId;
 
@@ -242,7 +243,8 @@ public class WritingActivity extends AppCompatActivity {
                                        int position, long id) {
                 Spinner spinner = (Spinner) parent;
                 // 選択されたアイテムを取得します
-                folder = (String) spinner.getSelectedItem();
+                newfolder = (String) spinner.getSelectedItem();
+                Log.d("newfolder",newfolder);
 
             }
 
@@ -255,7 +257,7 @@ public class WritingActivity extends AppCompatActivity {
     @Override
     public void onRestart() {
         super.onRestart();
-        matoMemoListActivity.reloadFolderDataList(realm, spinnerAdapter);
+        matoMemoListActivity.reloadFolderDataList(realm, spinnerAdapter);   //スピナー内の教科リスト更新
     }
 
 
@@ -280,7 +282,8 @@ public class WritingActivity extends AppCompatActivity {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
 
             String newmemo = editText.getText().toString();
-            if (memo.equals(newmemo)) {
+
+            if (memo.equals(newmemo) && folder.equals(newfolder)) {
                 finish();
             } else {
                 saveMemoDialog();
@@ -311,9 +314,8 @@ public class WritingActivity extends AppCompatActivity {
         switch (id) {
             case android.R.id.home:
 
-
                 String newmemo = editText.getText().toString();
-                if (memo.equals(newmemo)) {
+                if (memo.equals(newmemo) && folder.equals(newfolder)) {
                     finish();
                 } else {
                     saveMemoDialog();
@@ -399,10 +401,10 @@ public class WritingActivity extends AppCompatActivity {
                             model.setMemo(editText.getText().toString());
 
                             //フォルダ名をセット
-                            model.setFolder(folder);
+                            model.setFolder(newfolder);
 
                             RealmQuery<RealmFolderEntity> folQuery = realm.where(RealmFolderEntity.class);
-                            folQuery = folQuery.equalTo("folderName", folder);
+                            folQuery = folQuery.equalTo("folderName", newfolder);
                             RealmResults<RealmFolderEntity> folResults = folQuery.findAll();
 
                             if(folResults.size()!=0) {

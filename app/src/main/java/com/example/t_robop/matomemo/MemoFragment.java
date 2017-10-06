@@ -130,6 +130,7 @@ public class MemoFragment extends Fragment {
     public void reloadMemoData(String subject) {
         nowSubjectName = subject;   //Drawerでクリックされた教科名をフィールド変数に代入
 
+        memoDatas.clear();
         idList.clear();
         getMemoDataList(subject);    //データベースから教科別メモ取得
 

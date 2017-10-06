@@ -276,9 +276,9 @@ public class MatoMemoListActivity extends AppCompatActivity implements ViewPager
 
         switch (buttonText) {
             case "メモる":
-                intent = new Intent(this, WritingActivity.class);    //WritingActivityにIntent
+                intent = new Intent(getApplicationContext(), WritingActivity.class);    //WritingActivityにIntent
                 intent.putExtra(modeKEY, -1);      //-1 : メモ新規作成
-                intent.putExtra(subjectKEY, nowSubjectName);     //教科名受け渡し
+                intent.putExtra("SUBJECT NAME", nowSubjectName);     //教科名受け渡し
                 break;
 
             case "マトメる":
