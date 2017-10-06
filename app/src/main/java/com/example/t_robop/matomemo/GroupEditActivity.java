@@ -561,12 +561,6 @@ public class GroupEditActivity extends AppCompatActivity {
                 Log.d("menu", "タグ設定へ");  //TagEditActivityへIntent
                 break;
 
-            /*
-            case R.id.important_setting:
-                Log.d("menu", "重要度設定へ");     //ImportantEditActivityへIntent
-                break;
-                */
-
             case R.id.editFolder:
                 intent = new Intent(this, GroupEditActivity.class);  //GroupEditActivityへIntent
                 startActivity(intent);

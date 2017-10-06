@@ -216,8 +216,10 @@ public class MatoMemoListActivity extends AppCompatActivity implements ViewPager
         arrayAdapter.clear();
         getFolderDataList(realm, arrayAdapter);
         arrayAdapter.notifyDataSetChanged();
-        menu.clear();
-        customSubjectItemAddMenu(arrayAdapter);
+        if(menu != null){
+            menu.clear();
+            customSubjectItemAddMenu(arrayAdapter);
+        }
     }
 
     //Fragmentの更新
