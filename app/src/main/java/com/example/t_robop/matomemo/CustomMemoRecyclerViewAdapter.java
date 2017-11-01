@@ -4,11 +4,14 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.CardView;
+import android.support.v7.widget.LinearLayoutCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
+import java.util.List;
 
 import io.realm.Realm;
 import io.realm.RealmQuery;
@@ -19,19 +22,18 @@ import static android.support.v4.content.ContextCompat.startActivity;
 
 public class CustomMemoRecyclerViewAdapter extends RecyclerView.Adapter<CustomMemoRecyclerViewAdapter.CustomMemoRecyclerViewHolder> {
 
-    private String[] mMemoDates;
-    private String[] mMemoTimes;
-    private String[] mMemoTexts;
+    private List<CardMemoData> memoDatas;
+    private List<Integer> IdLists;
 
     MemoFragment memoFragment;
 
     Realm realm;
 
     public static class CustomMemoRecyclerViewHolder extends RecyclerView.ViewHolder {
-        public CardView memoCardView;
-        public TextView memoDateText;
-        public TextView memoTimeText;
-        public TextView memoText;
+        private CardView memoCardView;
+        private TextView memoDateText;
+        private TextView memoTimeText;
+        private TextView memoText;
 
         public CustomMemoRecyclerViewHolder(View view) {
             super(view);
@@ -44,10 +46,9 @@ public class CustomMemoRecyclerViewAdapter extends RecyclerView.Adapter<CustomMe
     }
 
     //メモ用コンストラクタ
-    public CustomMemoRecyclerViewAdapter(String[] memoDates, String[] memoTimes, String[] memoTexts) {
-        mMemoDates = memoDates;
-        mMemoTimes = memoTimes;
-        mMemoTexts = memoTexts;
+    public CustomMemoRecyclerViewAdapter(List<CardMemoData> memoDatas, List<Integer> idLists){
+        this.memoDatas = memoDatas;
+        this.IdLists = idLists;
     }
 
     public CustomMemoRecyclerViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -61,9 +62,9 @@ public class CustomMemoRecyclerViewAdapter extends RecyclerView.Adapter<CustomMe
 
     @Override
     public void onBindViewHolder(final CustomMemoRecyclerViewHolder holder, final int position) {
-        holder.memoDateText.setText(mMemoDates[position]);
-        holder.memoTimeText.setText(mMemoTimes[position]);
-        holder.memoText.setText(mMemoTexts[position]);
+        holder.memoDateText.setText(memoDatas.get(position).getMemoDate());
+        holder.memoTimeText.setText(memoDatas.get(position).getMemoTime());
+        holder.memoText.setText(memoDatas.get(position).getMemoText());
 
         holder.memoCardView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -75,15 +76,13 @@ public class CustomMemoRecyclerViewAdapter extends RecyclerView.Adapter<CustomMe
             }
         });
 
-        /*
+
         holder.memoCardView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(final View view) {
 
                 Realm.init(view.getContext());
                 realm = Realm.getDefaultInstance();
-
-                //final String clickedMemoListItem = (String) view.getContext().getItemAtPosition(position);   //クリックしたpositionから文字列を取得
 
                 //消去確認のダイアログ
                 AlertDialog.Builder alertDig = new AlertDialog.Builder(view.getContext());
@@ -102,10 +101,10 @@ public class CustomMemoRecyclerViewAdapter extends RecyclerView.Adapter<CustomMe
                     public void onClick(DialogInterface dialogInterface, int i) {
                         //YES処理
                         //adapterMemo.remove(clickedMemoListItem);   //カードリストから削除
-                        holder.memoCardView.removeView(view);
+                        memoDatas.remove(position);
                         notifyItemRemoved(position);
 
-                        removeMemoData(mMemoTexts[position]);   //データベースから削除
+                        removeMemoData(IdLists.get(position));   //データベースから削除
                     }
                 });
 
@@ -114,21 +113,20 @@ public class CustomMemoRecyclerViewAdapter extends RecyclerView.Adapter<CustomMe
                 return true;
             }
         });
-        */
+
     }
 
     @Override
     public int getItemCount() {
-        return mMemoTexts.length;
+        return (null !=memoDatas?memoDatas.size():0);
     }
 
     //選択されたItemをデータベースから削除
-    //ToDo このままだとメモタイトル同名のものが全てデータベースから消えてしまう
-    public void removeMemoData(String selectedItem) {
+    public void removeMemoData(int selectedItemId) {
         // クエリを発行
         RealmQuery<RealmMemoEntity> delQuery = realm.where(RealmMemoEntity.class);
         //消したいデータを指定
-        delQuery.equalTo("memo", selectedItem);      //メモ内容とListの文字列を比較      //ToDo List内の表示を決めないとequalToでヒットしないので、レイアウト決めよう
+        delQuery.equalTo("id", selectedItemId);
 
         //指定されたデータを持つデータのみに絞り込む
         final RealmResults<RealmMemoEntity> delR = delQuery.findAll();

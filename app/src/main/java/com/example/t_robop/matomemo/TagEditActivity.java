@@ -393,11 +393,11 @@ public class TagEditActivity extends AppCompatActivity {
         inflater.inflate(R.menu.options, menu);  //res\menu\optionsのlayoutを読み込む
         return true;
     }
-
+    */
     //メニューが選択されたときの処理
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        Intent intent;
+        //Intent intent;
 
         //addしたときのIDで識別
         switch (item.getItemId()) {
@@ -405,13 +405,15 @@ public class TagEditActivity extends AppCompatActivity {
                 finish();
                 break;
 
+            /*
             case R.id.editFolder:
                 intent = new Intent(this, GroupEditActivity.class);  //GroupEditActivityへIntent
                 startActivity(intent);
                 break;
+            */
 
         }
         return true;
     }
-    */
+
 }

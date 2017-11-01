@@ -10,6 +10,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import java.util.List;
+
 import io.realm.Realm;
 import io.realm.RealmQuery;
 import io.realm.RealmResults;
@@ -19,12 +21,10 @@ import static android.support.v4.content.ContextCompat.startActivity;
 
 public class CustomMatomeRecyclerViewAdapter extends RecyclerView.Adapter<CustomMatomeRecyclerViewAdapter.CustomMatomeRecyclerViewHolder> {
 
-    private String[] mMatomeTitles;
-    private String[] mMatomeStartDates;
-    private String[] mMatomeEndDates;
-    private String[] mMatomeTagNames;
+    private List<CardMatomeData> matomeDatas;
+    private List<Integer> IdLists;
 
-    MatomeFragment matomeFragment;
+    //MatomeFragment matomeFragment;
 
     Realm realm;
 
@@ -48,11 +48,9 @@ public class CustomMatomeRecyclerViewAdapter extends RecyclerView.Adapter<Custom
     }
 
     //まとめ用コンストラクタ
-    public CustomMatomeRecyclerViewAdapter(String[] matomeTitles, String[] matomeStartDate, String[] matomeEndDate, String[] matomeTagNames) {
-        mMatomeTitles = matomeTitles;
-        mMatomeStartDates = matomeStartDate;
-        mMatomeEndDates = matomeEndDate;
-        mMatomeTagNames = matomeTagNames;
+    public CustomMatomeRecyclerViewAdapter(List<CardMatomeData> matomeDatas, List<Integer> idLists) {
+        this.matomeDatas = matomeDatas;
+        this.IdLists = idLists;
     }
 
     @Override
@@ -67,27 +65,28 @@ public class CustomMatomeRecyclerViewAdapter extends RecyclerView.Adapter<Custom
 
     @Override
     public void onBindViewHolder(final CustomMatomeRecyclerViewHolder holder, final int position) {
-        holder.matomeTitleText.setText(mMatomeTitles[holder.getLayoutPosition()]);
-        holder.matomeStartDateText.setText(mMatomeStartDates[holder.getLayoutPosition()]);
-        holder.matomeEndDateText.setText(mMatomeEndDates[holder.getLayoutPosition()]);
-        holder.matomeTagNameText.setText(mMatomeTagNames[holder.getLayoutPosition()]);
+        holder.matomeTitleText.setText(matomeDatas.get(position).getMatomeTitle());
+        holder.matomeStartDateText.setText(matomeDatas.get(position).getMatomeTagName());
+        holder.matomeEndDateText.setText(matomeDatas.get(position).getMatomeEndData());
+        holder.matomeTagNameText.setText(matomeDatas.get(position).getMatomeTagName());
 
         holder.matomeCardView.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(view.getContext(), MatomeActivity.class);     //MatomeActivityへIntent
                 //idの指定
-                intent.putExtra("ID", matomeFragment.idList.get(position));
+                intent.putExtra("ID", IdLists.get(position));
                 startActivity(view.getContext(),intent,null);
             }
         });
 
-        /*
+
         holder.matomeCardView.setOnLongClickListener(new View.OnLongClickListener(){
             @Override
             public boolean onLongClick(final View view) {
 
-                //final String clickedMatomeItem = (String) view.getContext().getItemAtPosition(position);   //クリックしたpositionからItemを取得
+                Realm.init(view.getContext());
+                realm = Realm.getDefaultInstance();
 
                 //消去確認のダイアログ
                 AlertDialog.Builder alertDig = new AlertDialog.Builder(view.getContext());
@@ -105,11 +104,10 @@ public class CustomMatomeRecyclerViewAdapter extends RecyclerView.Adapter<Custom
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         //YES処理
-                        //adapterMatome.remove(clickedMatomeItem);   //リストから削除
-                        holder.matomeCardView.removeView(view);
+                        matomeDatas.remove(position);   //カードリストから削除
                         notifyItemRemoved(position);
 
-                        removeMatomeData(mMatomeTitles[position]);   //データベースから削除
+                        removeMatomeData(IdLists.get(position));   //データベースから削除
 
                     }
                 });
@@ -119,23 +117,23 @@ public class CustomMatomeRecyclerViewAdapter extends RecyclerView.Adapter<Custom
                 return true;
             }
         });
-        */
+
     }
 
     @Override
     public int getItemCount() {
-        return mMatomeTitles.length;
+        return (null !=matomeDatas?matomeDatas.size():0);
     }
 
 
     //選択されたItemをデータベースから削除
-    public void removeMatomeData(String selectedItem) {
+    public void removeMatomeData(int selectedItemId) {
 
         RealmQuery<RealmMatomeEntity> delQuery = realm.where(RealmMatomeEntity.class);
         //消したいデータを指定
-        //delQuery.equalTo("folder", selectedItem);
+        delQuery.equalTo("id", selectedItemId);
 
-        final RealmResults<RealmMatomeEntity> delR = delQuery.equalTo("matomeName", selectedItem).findAll();     //まとめフォルダの名前と一致したものを削除
+        final RealmResults<RealmMatomeEntity> delR = delQuery.findAll();     //まとめフォルダの名前と一致したものを削除
 
         realm.executeTransaction(new Realm.Transaction() {
             @Override
